@@ -1,0 +1,221 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Enums
+// ==========================================
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  COMMERCIAL
+  LAND
+  RURAL
+}
+
+enum ListingType {
+  SALE
+  RENT
+  BOTH
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  AGENT
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIAL
+  OVERDUE
+  CANCELED
+}
+
+enum LayoutStyle {
+  GRID
+  LIST
+  MAP
+}
+
+enum LeadSource {
+  FORM
+  WHATSAPP
+  PHONE
+}
+
+// ==========================================
+// Models
+// ==========================================
+
+model Plan {
+  id            String @id @default(uuid())
+  name          String
+  slug          String @unique
+  monthlyPrice  Int    // in cents (BRL)
+  propertyLimit Int
+  userLimit     Int
+  features      Json   @default("{}")
+  stripePriceId String?
+
+  tenants Tenant[]
+
+  @@map("plans")
+}
+
+model Tenant {
+  id                   String             @id @default(uuid())
+  name                 String
+  slug                 String             @unique
+  customDomain         String?            @unique
+  logoUrl              String?
+  bannerUrl            String?
+  primaryColor         String             @default("#2563eb")
+  secondaryColor       String             @default("#1e40af")
+  fontFamily           String             @default("Inter")
+  layoutStyle          LayoutStyle        @default(GRID)
+  siteTheme            Json?              // SiteTheme JSON
+  planId               String
+  subscriptionStatus   SubscriptionStatus @default(TRIAL)
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  plan          Plan           @relation(fields: [planId], references: [id])
+  users         User[]
+  properties    Property[]
+  contactConfig ContactConfig?
+  leads         Lead[]
+  siteConfig    SiteConfig?
+
+  @@index([slug])
+  @@map("tenants")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  tenantId     String
+  email        String
+  passwordHash String
+  name         String
+  avatarUrl    String?
+  phone        String?
+  role         UserRole @default(AGENT)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@map("users")
+}
+
+model Property {
+  id                 String       @id @default(uuid())
+  tenantId           String
+  title              String
+  description        String       @db.Text
+  slug               String
+  type               PropertyType
+  listingType        ListingType
+  price              Int          // in cents
+  rentPrice          Int?         // in cents
+  condoFee           Int?         // in cents
+  iptuYearly         Int?         // in cents
+  area               Float
+  usableArea         Float?
+  bedrooms           Int          @default(0)
+  suites             Int          @default(0)
+  bathrooms          Int          @default(0)
+  parkingSpots       Int          @default(0)
+  floor              Int?
+  totalFloors        Int?
+  yearBuilt          Int?
+  neighborhood       String
+  city               String
+  state              String       @db.Char(2)
+  zipCode            String
+  fullAddress        String
+  latitude           Float?
+  longitude          Float?
+  amenities          String[]
+  petFriendly        Boolean      @default(false)
+  furnished          Boolean      @default(false)
+  financingAvailable Boolean      @default(false)
+  images             Json[]       @default([])
+  videoUrl           String?
+  active             Boolean      @default(true)
+  featured           Boolean      @default(false)
+  // SEO fields
+  metaTitle          String?
+  metaDescription    String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  leads  Lead[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@index([tenantId, active])
+  @@index([neighborhood])
+  @@index([listingType])
+  @@index([price])
+  @@index([tenantId, featured])
+  @@map("properties")
+}
+
+model SiteConfig {
+  id          String    @id @default(uuid())
+  tenantId    String    @unique
+  data        Json
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("site_configs")
+}
+
+model ContactConfig {
+  id       String  @id @default(uuid())
+  tenantId String  @unique
+  whatsapp String?
+  phone    String?
+  email    String?
+  showForm Boolean @default(true)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("contact_configs")
+}
+
+model Lead {
+  id         String     @id @default(uuid())
+  tenantId   String
+  propertyId String?
+  name       String
+  email      String
+  phone      String?
+  message    String?    @db.Text
+  source     LeadSource @default(FORM)
+  seen       Boolean    @default(false)
+  createdAt  DateTime   @default(now())
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId])
+  @@index([tenantId, seen])
+  @@map("leads")
+}
