@@ -50,8 +50,8 @@ RUN pnpm install --frozen-lockfile --prod
 COPY --from=build /app/apps/api/dist/ apps/api/dist/
 COPY --from=build /app/apps/api/prisma/ apps/api/prisma/
 
-# Generate Prisma client in production node_modules
-RUN cd apps/api && npx prisma generate
+# Generate Prisma client using project's prisma version
+RUN ./node_modules/.bin/prisma generate --schema=apps/api/prisma/schema.prisma
 
 # Shared packages (built)
 COPY --from=build /app/packages/types/ packages/types/
