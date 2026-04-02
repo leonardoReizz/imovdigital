@@ -1,10 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { join } from 'path';
+import { existsSync } from 'fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { rawBody: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
 
   app.setGlobalPrefix('api');
 
@@ -25,6 +28,22 @@ async function bootstrap() {
   );
 
   app.useGlobalFilters(new HttpExceptionFilter());
+
+  // In production, serve the dashboard SPA from public/dashboard
+  const dashboardPath = join(__dirname, '..', 'public', 'dashboard');
+  if (existsSync(dashboardPath)) {
+    app.useStaticAssets(dashboardPath, { prefix: '/' });
+
+    // SPA fallback: any non-API, non-file request serves index.html
+    const express = app.getHttpAdapter().getInstance();
+    express.get(/^\/(?!api\/).*/, (_req: any, res: any, next: any) => {
+      const indexPath = join(dashboardPath, 'index.html');
+      if (existsSync(indexPath)) {
+        return res.sendFile(indexPath);
+      }
+      next();
+    });
+  }
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
