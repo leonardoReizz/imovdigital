@@ -1,48 +1,35 @@
 # ============================================
-# Stage 1: Install + Build
+# Single-stage build — simple and reliable
 # ============================================
-FROM node:20-alpine AS build
+FROM node:20-alpine
 
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 WORKDIR /app
 
-# Force hoisted node_modules (flat, no symlinks — needed for Docker COPY)
-RUN echo "node-linker=hoisted" > .npmrc
-
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
-COPY apps/api/package.json apps/api/package.json
-COPY apps/dashboard/package.json apps/dashboard/package.json
-COPY packages/types/package.json packages/types/package.json
-COPY packages/utils/package.json packages/utils/package.json
-COPY packages/config/package.json packages/config/package.json
-
-RUN pnpm install --frozen-lockfile
-
+# Copy everything
 COPY . .
 
+# Install all dependencies
+RUN pnpm install --frozen-lockfile
+
+# Generate Prisma client
 RUN pnpm --filter @imovdigital/api exec prisma generate
+
+# Build shared packages
 RUN pnpm --filter @imovdigital/types build || true
 RUN pnpm --filter @imovdigital/utils build || true
+
+# Build dashboard
 RUN pnpm --filter @imovdigital/dashboard build
+
+# Build API
 RUN pnpm --filter @imovdigital/api build
 
-# ============================================
-# Stage 2: Production
-# ============================================
-FROM node:20-alpine
-
-WORKDIR /app
-
-COPY --from=build /app/node_modules/ node_modules/
-COPY --from=build /app/apps/api/dist/ apps/api/dist/
-COPY --from=build /app/apps/api/package.json apps/api/package.json
-COPY --from=build /app/apps/api/prisma/ apps/api/prisma/
-COPY --from=build /app/packages/ packages/
-COPY --from=build /app/apps/dashboard/dist/ apps/api/public/dashboard/
-COPY --from=build /app/package.json package.json
-COPY --from=build /app/pnpm-workspace.yaml pnpm-workspace.yaml
+# Move dashboard build into API's public folder
+RUN mkdir -p apps/api/public/dashboard && cp -r apps/dashboard/dist/* apps/api/public/dashboard/
 
 ENV NODE_ENV=production
 EXPOSE 3000
 
+WORKDIR /app
 CMD ["node", "apps/api/dist/main.js"]
