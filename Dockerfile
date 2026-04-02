@@ -65,7 +65,7 @@ cd /app/api && node dist/main &
 serve -s /app/dashboard -l 5173 &
 
 # Web (port 5174)
-cd /app/web && PORT=5174 HOSTNAME=0.0.0.0 API_URL=http://127.0.0.1:3000/api node apps/web/server.js &
+cd /app/web && PORT=5174 HOSTNAME=0.0.0.0 API_URL=http://127.0.0.1:3000/api NEXT_SHARP_PATH=/app/node_modules/sharp node apps/web/server.js &
 
 wait
 SCRIPT

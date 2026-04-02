@@ -5,6 +5,13 @@ const API_URL = process.env.API_URL || 'http://localhost:3000/api';
 const config: NextConfig = {
   output: 'standalone',
   transpilePackages: ['@imovdigital/types', '@imovdigital/utils'],
+  serverExternalPackages: [],
+  allowedDevOrigins: ['*'],
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['*'],
+    },
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**' },
