@@ -1,0 +1,49 @@
+# ============================================
+# Stage 1: Install dependencies
+# ============================================
+FROM node:20-alpine AS deps
+
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+WORKDIR /app
+
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
+COPY apps/web/package.json apps/web/package.json
+COPY packages/types/package.json packages/types/package.json
+COPY packages/utils/package.json packages/utils/package.json
+COPY packages/config/package.json packages/config/package.json
+
+RUN pnpm install --frozen-lockfile
+
+# ============================================
+# Stage 2: Build
+# ============================================
+FROM deps AS build
+
+COPY . .
+
+ARG API_URL="http://localhost:3000/api"
+ARG NEXT_PUBLIC_API_URL="/api"
+ENV API_URL=${API_URL}
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
+RUN pnpm --filter @imovdigital/types build || true
+RUN pnpm --filter @imovdigital/utils build || true
+RUN pnpm --filter @imovdigital/web build
+
+RUN pnpm prune --prod
+
+# ============================================
+# Stage 3: Production
+# ============================================
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/apps/web/.next/standalone ./
+COPY --from=build /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=build /app/apps/web/public ./apps/web/public
+
+ENV NODE_ENV=production
+EXPOSE 3000
+
+CMD ["node", "apps/web/server.js"]
