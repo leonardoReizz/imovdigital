@@ -30,7 +30,7 @@ RUN pnpm --filter @imovdigital/api build
 RUN pnpm --filter @imovdigital/dashboard build
 
 # Web (Next.js standalone)
-ENV API_URL=http://localhost:3000/api
+ENV API_URL=http://localhost:3001/api
 ENV NEXT_PUBLIC_API_URL=/api
 RUN pnpm --filter @imovdigital/web build
 
@@ -38,6 +38,7 @@ RUN pnpm --filter @imovdigital/web build
 FROM node:20-alpine AS runner
 RUN npm install -g serve
 WORKDIR /app
+RUN npm init -y && npm install http-proxy
 ENV NODE_ENV=production
 
 # API
@@ -53,23 +54,71 @@ COPY --from=builder /app/apps/dashboard/dist ./dashboard
 COPY --from=builder /app/apps/web/.next/standalone ./web
 COPY --from=builder /app/apps/web/.next/static ./web/apps/web/.next/static
 
+# Router — listens on port 80 and routes to internal services
+# Dashboard domain → serve static (port 3002)
+# Web/tenant domains → Next.js (port 3003)
+# /api → NestJS (port 3001)
+RUN cat > /app/router.js << 'ROUTER'
+const http = require("http");
+const { createProxyServer } = require("http-proxy");
+
+const proxy = createProxyServer({});
+const DASHBOARD_HOST = process.env.DASHBOARD_HOST || "dashboard";
+const PORT = process.env.PORT || 80;
+
+proxy.on("error", (err, req, res) => {
+  console.error("Proxy error:", err.message);
+  if (!res.headersSent) {
+    res.writeHead(502, { "Content-Type": "text/plain" });
+    res.end("Bad Gateway");
+  }
+});
+
+const server = http.createServer((req, res) => {
+  const host = (req.headers.host || "").split(":")[0];
+
+  // API requests always go to NestJS
+  if (req.url.startsWith("/api")) {
+    return proxy.web(req, res, { target: "http://127.0.0.1:3001" });
+  }
+
+  // Dashboard domain → static files
+  if (host.includes(DASHBOARD_HOST)) {
+    return proxy.web(req, res, { target: "http://127.0.0.1:3002" });
+  }
+
+  // Everything else → Next.js (tenant sites)
+  proxy.web(req, res, { target: "http://127.0.0.1:3003" });
+});
+
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Router listening on port ${PORT}`);
+});
+ROUTER
+
 # Startup script
 RUN cat > /app/start.sh << 'SCRIPT'
 #!/bin/sh
 set -e
 
-# API (port 3000)
-cd /app/api && node dist/main &
+# API (internal port 3001)
+cd /app/api && PORT=3001 node dist/main &
 
-# Dashboard (port 5173)
-serve -s /app/dashboard -l 5173 &
+# Dashboard static server (internal port 3002)
+serve -s /app/dashboard -l 3002 &
 
-# Web (port 5174)
-cd /app/web && PORT=5174 HOSTNAME=0.0.0.0 API_URL=http://127.0.0.1:3000/api NEXT_SHARP_PATH=/app/node_modules/sharp node apps/web/server.js &
+# Web / Next.js (internal port 3003)
+cd /app/web && PORT=3003 HOSTNAME=0.0.0.0 API_URL=http://127.0.0.1:3001/api node apps/web/server.js &
+
+# Wait for services to start
+sleep 2
+
+# Router (exposed port 80)
+node /app/router.js &
 
 wait
 SCRIPT
 RUN chmod +x /app/start.sh
 
-EXPOSE 3000 5173 5174
+EXPOSE 80
 CMD ["/app/start.sh"]
