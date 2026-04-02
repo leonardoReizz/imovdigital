@@ -13,7 +13,7 @@ COPY packages/types/package.json packages/types/package.json
 COPY packages/utils/package.json packages/utils/package.json
 COPY packages/config/package.json packages/config/package.json
 
-RUN pnpm install --frozen-lockfile --prod=false
+RUN pnpm install --frozen-lockfile
 
 # ============================================
 # Stage 2: Build
@@ -28,38 +28,34 @@ RUN pnpm --filter @imovdigital/utils build || true
 RUN pnpm --filter @imovdigital/dashboard build
 RUN pnpm --filter @imovdigital/api build
 
+# Prune dev dependencies
+RUN pnpm prune --prod
+
 # ============================================
 # Stage 3: Production
 # ============================================
 FROM node:20-alpine
 
-RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 WORKDIR /app
 
-# Copy everything needed to install prod deps
-COPY --from=build /app/pnpm-lock.yaml /app/pnpm-workspace.yaml /app/package.json /app/turbo.json ./
-COPY --from=build /app/apps/api/package.json apps/api/package.json
-COPY --from=build /app/packages/types/package.json packages/types/package.json
-COPY --from=build /app/packages/utils/package.json packages/utils/package.json
-COPY --from=build /app/packages/config/package.json packages/config/package.json
+# Node modules (pruned) + Prisma client already generated
+COPY --from=build /app/node_modules/ node_modules/
 
-# Install prod-only dependencies cleanly
-RUN pnpm install --frozen-lockfile --prod
-
-# API build output + prisma schema
+# API
 COPY --from=build /app/apps/api/dist/ apps/api/dist/
+COPY --from=build /app/apps/api/package.json apps/api/package.json
 COPY --from=build /app/apps/api/prisma/ apps/api/prisma/
 
-# Generate Prisma client using project's prisma version
-RUN ./node_modules/.bin/prisma generate --schema=apps/api/prisma/schema.prisma
-
-# Shared packages (built)
+# Shared packages
 COPY --from=build /app/packages/types/ packages/types/
 COPY --from=build /app/packages/utils/ packages/utils/
 COPY --from=build /app/packages/config/ packages/config/
 
 # Dashboard — served by NestJS as static files
 COPY --from=build /app/apps/dashboard/dist/ apps/api/public/dashboard/
+
+COPY --from=build /app/package.json package.json
+COPY --from=build /app/pnpm-workspace.yaml pnpm-workspace.yaml
 
 ENV NODE_ENV=production
 EXPOSE 3000
