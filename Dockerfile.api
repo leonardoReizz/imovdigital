@@ -6,6 +6,9 @@ FROM node:20-alpine AS build
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 WORKDIR /app
 
+# Force hoisted node_modules (flat, no symlinks — needed for Docker COPY)
+RUN echo "node-linker=hoisted" > .npmrc
+
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
 COPY apps/api/package.json apps/api/package.json
 COPY apps/dashboard/package.json apps/dashboard/package.json
