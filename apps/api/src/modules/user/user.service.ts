@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UserService {
@@ -8,19 +9,97 @@ export class UserService {
   async findAll(tenantId: string) {
     return this.prisma.user.findMany({
       where: { tenantId },
-      select: { id: true, name: true, email: true, role: true, phone: true, createdAt: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        phone: true,
+        avatarUrl: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'asc' },
     });
   }
 
-  async create(tenantId: string, data: any) {
-    return this.prisma.user.create({ data: { ...data, tenantId } });
+  async create(tenantId: string, data: { email: string; password: string; name: string; phone?: string; role?: string }) {
+    // Check plan limits
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      include: { plan: true, _count: { select: { users: true } } },
+    });
+    if (tenant) {
+      if (tenant.subscriptionStatus === 'TRIAL') {
+        throw new BadRequestException('Adicionar membros não está disponível no teste grátis. Faça upgrade do seu plano.');
+      }
+      if (tenant._count.users >= tenant.plan.userLimit) {
+        throw new BadRequestException(`Limite de ${tenant.plan.userLimit} membros atingido. Faça upgrade do seu plano.`);
+      }
+    }
+
+    const existing = await this.prisma.user.findUnique({
+      where: { tenantId_email: { tenantId, email: data.email } },
+    });
+    if (existing) {
+      throw new BadRequestException('Já existe um membro com este e-mail');
+    }
+
+    const passwordHash = await bcrypt.hash(data.password, 12);
+
+    return this.prisma.user.create({
+      data: {
+        tenantId,
+        email: data.email,
+        name: data.name,
+        phone: data.phone || null,
+        role: (data.role as any) || 'AGENT',
+        passwordHash,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        phone: true,
+        avatarUrl: true,
+        createdAt: true,
+      },
+    });
   }
 
-  async update(tenantId: string, id: string, data: any) {
-    return this.prisma.user.update({ where: { id }, data });
+  async update(tenantId: string, id: string, data: { name?: string; phone?: string; role?: string; password?: string }) {
+    const updateData: any = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.phone !== undefined) updateData.phone = data.phone || null;
+    if (data.role !== undefined) updateData.role = data.role;
+    if (data.password) updateData.passwordHash = await bcrypt.hash(data.password, 12);
+
+    return this.prisma.user.update({
+      where: { id },
+      data: updateData,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        phone: true,
+        avatarUrl: true,
+        createdAt: true,
+      },
+    });
   }
 
   async remove(tenantId: string, id: string) {
+    // Prevent deleting the last OWNER
+    const owners = await this.prisma.user.count({
+      where: { tenantId, role: 'OWNER' },
+    });
+    const user = await this.prisma.user.findFirst({ where: { id, tenantId } });
+    if (!user) throw new BadRequestException('Membro não encontrado');
+    if (user.role === 'OWNER' && owners <= 1) {
+      throw new BadRequestException('Não é possível remover o último proprietário');
+    }
+
     return this.prisma.user.delete({ where: { id } });
   }
 }

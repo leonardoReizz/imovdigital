@@ -1,15 +1,25 @@
 import type { AboutSettings } from '@imovdigital/types';
+import { useEditorStore } from '../../../store/editorStore';
 import { Building2 } from 'lucide-react';
 
 export function AboutPreview({ settings }: { settings: AboutSettings }) {
+  const breakpoint = useEditorStore((s) => s.previewBreakpoint);
+  const isMobile = breakpoint === 'mobile';
   const imageFirst = settings.imagePosition === 'left';
 
   return (
-    <div className="px-8 py-16">
+    <div style={{ padding: isMobile ? '40px 16px' : '64px 32px' }}>
       <div className="max-w-6xl mx-auto">
-        <div className={`flex items-center gap-12 ${imageFirst ? 'flex-row' : 'flex-row-reverse'}`}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : imageFirst ? 'row' : 'row-reverse',
+            gap: isMobile ? 24 : 48,
+            alignItems: isMobile ? 'stretch' : 'center',
+          }}
+        >
           {/* Image */}
-          <div className="flex-1">
+          <div style={{ flex: 1 }}>
             {settings.imageUrl ? (
               <img src={settings.imageUrl} alt="" className="w-full rounded-xl object-cover aspect-[4/3]" />
             ) : (
@@ -20,20 +30,9 @@ export function AboutPreview({ settings }: { settings: AboutSettings }) {
           </div>
 
           {/* Content */}
-          <div className="flex-1 space-y-4">
-            <h2 className="text-3xl font-bold text-gray-900">{settings.title}</h2>
-            <p className="text-gray-600 leading-relaxed">{settings.text}</p>
-
-            {settings.showStats && settings.stats.length > 0 && (
-              <div className="grid grid-cols-3 gap-4 pt-4">
-                {settings.stats.map((stat, i) => (
-                  <div key={i} className="text-center">
-                    <p className="text-2xl font-bold text-blue-600">{stat.value}</p>
-                    <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-            )}
+          <div style={{ flex: 1 }} className="space-y-4">
+            <h2 style={{ fontSize: isMobile ? 22 : 30 }} className="font-bold text-gray-900">{settings.title}</h2>
+            <p className="text-gray-600 leading-relaxed" style={{ fontSize: isMobile ? 14 : 16 }}>{settings.text}</p>
           </div>
         </div>
       </div>

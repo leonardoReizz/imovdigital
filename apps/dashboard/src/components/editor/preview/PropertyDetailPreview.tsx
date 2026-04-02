@@ -8,6 +8,7 @@ import { ImageLightbox } from './ImageLightbox';
 import { MapCircle } from './MapCircle';
 import {
   ArrowLeft,
+  Building2,
   MapPin,
   BedDouble,
   Bath,
@@ -120,15 +121,11 @@ function GalleryMobile({ images, onImageClick }: { images: Property['images']; o
   );
 }
 
-// ─── Contact Card ────────────────────────────────────────────
+// ─── Contact Card (form only — for sidebar/bottom) ──────────
 
-function ContactCard({ pd, primaryColor, floating }: { pd: PropertyDetailConfig; primaryColor: string; floating?: boolean }) {
-  const baseClass = floating
-    ? 'fixed bottom-4 right-4 z-40 w-72 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 space-y-3'
-    : 'border border-gray-200 rounded-xl p-5 space-y-4';
-
+function ContactCard({ pd, primaryColor }: { pd: PropertyDetailConfig; primaryColor: string }) {
   return (
-    <div className={baseClass}>
+    <div className="border border-gray-200 rounded-xl p-5 space-y-4">
       <h3 className="text-base font-semibold text-gray-900">Interessado?</h3>
 
       {pd.showContactForm && (
@@ -142,20 +139,151 @@ function ContactCard({ pd, primaryColor, floating }: { pd: PropertyDetailConfig;
           </button>
         </div>
       )}
+    </div>
+  );
+}
 
+// ─── Floating Chat Bubble (form only) ────────────────────────
+
+function FloatingChatBubble({ pd, primaryColor }: { pd: PropertyDetailConfig; primaryColor: string }) {
+  const [open, setOpen] = useState(false);
+  const tooltip = pd.chatTooltip || 'Precisa de ajuda?';
+
+  return (
+    <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-3">
+      {/* Expanded panel */}
+      {open && (
+        <div className="w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+          {/* Header */}
+          <div className="px-4 py-3 text-white flex items-center justify-between" style={{ backgroundColor: primaryColor }}>
+            <span className="text-sm font-semibold">Fale conosco</span>
+            <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white text-lg leading-none">&times;</button>
+          </div>
+
+          {/* Body — contact form only */}
+          {pd.showContactForm && (
+            <div className="p-4 space-y-2">
+              <div className="h-9 bg-gray-50 border border-gray-200 rounded-lg" />
+              <div className="h-9 bg-gray-50 border border-gray-200 rounded-lg" />
+              <div className="h-14 bg-gray-50 border border-gray-200 rounded-lg" />
+              <button className="w-full py-2 text-white font-medium rounded-lg text-sm" style={{ backgroundColor: primaryColor }}>
+                Enviar
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Bubble */}
+      <div className="relative">
+        {!open && (
+          <div className="absolute bottom-full right-0 mb-2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
+            {tooltip}
+            <div className="absolute top-full right-4 w-2 h-2 bg-gray-900 rotate-45 -mt-1" />
+          </div>
+        )}
+        <button
+          onClick={() => setOpen(!open)}
+          className="w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-white hover:scale-105 transition-transform"
+          style={{ backgroundColor: primaryColor }}
+        >
+          {open ? (
+            <span className="text-xl leading-none">&times;</span>
+          ) : (
+            <MessageCircle className="w-6 h-6" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Quick Action Buttons (WhatsApp + Phone on page) ─────────
+
+function QuickActionButtons({ pd, isMobile }: { pd: PropertyDetailConfig; isMobile: boolean }) {
+  if (!pd.showWhatsApp && !pd.showPhone) return null;
+
+  return (
+    <div style={{ display: 'flex', gap: 8, flexDirection: isMobile ? 'column' : 'row' }}>
       {pd.showWhatsApp && (
-        <button className="w-full py-2 border-2 border-green-500 text-green-600 font-medium rounded-lg text-sm flex items-center justify-center gap-2">
+        <button className="flex-1 py-2.5 bg-green-500 text-white font-medium rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-green-600 transition-colors">
           <MessageCircle className="w-4 h-4" />
           WhatsApp
         </button>
       )}
-
       {pd.showPhone && (
-        <button className="w-full py-2 border-2 border-gray-300 text-gray-700 font-medium rounded-lg text-sm flex items-center justify-center gap-2">
+        <button className="flex-1 py-2.5 bg-gray-900 text-white font-medium rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors">
           <PhoneIcon className="w-4 h-4" />
           Ligar
         </button>
       )}
+    </div>
+  );
+}
+
+// ─── Similar Properties ──────────────────────────────────────
+
+function SimilarProperties({ currentProperty, isMobile }: { currentProperty: Property; isMobile: boolean }) {
+  const properties = useEditorStore((s) => s.properties);
+  const navigatePreview = useEditorStore((s) => s.navigatePreview);
+  const primaryColor = useEditorStore((s) => s.config?.primaryColor || '#2563eb');
+
+  // Only same city, then rank by neighborhood/type/listingType
+  const scored = properties
+    .filter((p) => p.id !== currentProperty.id && p.active && p.city === currentProperty.city)
+    .map((p) => {
+      let score = 0;
+      if (p.neighborhood === currentProperty.neighborhood) score += 3;
+      if (p.type === currentProperty.type) score += 2;
+      if (p.listingType === currentProperty.listingType) score += 1;
+      return { property: p, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, isMobile ? 4 : 6);
+
+  if (scored.length === 0) return null;
+
+  const columns = isMobile ? 1 : 3;
+
+  return (
+    <div>
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">Imóveis Semelhantes</h2>
+      <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+        {scored.map(({ property: p }) => {
+          const hasImage = p.images && p.images.length > 0;
+          return (
+            <div
+              key={p.id}
+              className="bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigatePreview({ type: 'property', propertyId: p.id })}
+            >
+              <div className="relative aspect-[16/10] bg-gray-100">
+                {hasImage ? (
+                  <img src={p.images[0].url} alt={p.images[0].alt} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Building2 className="w-8 h-8 text-gray-200" />
+                  </div>
+                )}
+                <span
+                  className="absolute top-2 left-2 text-white text-[10px] font-medium px-1.5 py-0.5 rounded"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  {p.listingType === 'RENT' ? 'Aluguel' : p.listingType === 'BOTH' ? 'Venda/Aluguel' : 'Venda'}
+                </span>
+              </div>
+              <div className="p-3 space-y-1">
+                <PropertyPrice price={p.price} rentPrice={p.rentPrice} listingType={p.listingType} primaryColor={primaryColor} />
+                <p className="text-sm font-medium text-gray-700 truncate">{p.title}</p>
+                <p className="text-xs text-gray-400 flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />
+                  {p.neighborhood}, {p.city}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -255,6 +383,17 @@ export function PropertyDetailPreview({ property }: { property: Property }) {
                   <span>{property.neighborhood}, {property.city} - {property.state}</span>
                 </div>
               )}
+
+              {/* Date + Share */}
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                <p className="text-xs text-gray-400">
+                  Anúncio criado em {new Date(property.createdAt).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
+                <button className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 rounded-lg text-xs font-medium text-gray-500 hover:bg-gray-50 transition-colors">
+                  <Share2 className="w-3.5 h-3.5" />
+                  Compartilhar
+                </button>
+              </div>
             </div>
 
             {/* Price */}
@@ -266,23 +405,8 @@ export function PropertyDetailPreview({ property }: { property: Property }) {
               primaryColor={primaryColor}
             />
 
-            {/* Quick action buttons (mobile/floating) */}
-            {isCompact && (pd.showWhatsApp || pd.showPhone) && (
-              <div className="flex gap-2">
-                {pd.showWhatsApp && (
-                  <button className="flex-1 py-2.5 bg-green-500 text-white font-medium rounded-lg text-sm flex items-center justify-center gap-2">
-                    <MessageCircle className="w-4 h-4" />
-                    WhatsApp
-                  </button>
-                )}
-                {pd.showPhone && (
-                  <button className="flex-1 py-2.5 bg-gray-900 text-white font-medium rounded-lg text-sm flex items-center justify-center gap-2">
-                    <PhoneIcon className="w-4 h-4" />
-                    Ligar
-                  </button>
-                )}
-              </div>
-            )}
+            {/* WhatsApp + Phone buttons (always on page) */}
+            <QuickActionButtons pd={pd} isMobile={isMobile} />
 
             {/* Features */}
             <div className="flex flex-wrap items-center gap-4 py-4 border-y border-gray-100">
@@ -381,15 +505,20 @@ export function PropertyDetailPreview({ property }: { property: Property }) {
               </div>
             )}
 
-            {/* Contact bottom position */}
-            {pd.contactPosition === 'bottom' && (
+            {/* Similar properties */}
+            {pd.showSimilar && (
+              <SimilarProperties currentProperty={property} isMobile={isMobile} />
+            )}
+
+            {/* Contact bottom position — explicit bottom OR sidebar on mobile */}
+            {(pd.contactPosition === 'bottom' || (pd.contactPosition === 'sidebar' && isCompact)) && (
               <ContactCard pd={pd} primaryColor={primaryColor} />
             )}
           </div>
 
-          {/* Sidebar contact */}
+          {/* Sidebar contact — desktop only */}
           {showSidebar && (
-            <div style={{ width: 280, flexShrink: 0 }}>
+            <div style={{ width: 320, flexShrink: 0 }}>
               <div className="sticky" style={{ top: 80 }}>
                 <ContactCard pd={pd} primaryColor={primaryColor} />
               </div>
@@ -398,32 +527,9 @@ export function PropertyDetailPreview({ property }: { property: Property }) {
         </div>
       </div>
 
-      {/* Floating contact */}
-      {pd.contactPosition === 'floating' && !isCompact && (
-        <ContactCard pd={pd} primaryColor={primaryColor} floating />
-      )}
-
-      {/* Mobile floating quick actions */}
-      {pd.contactPosition === 'floating' && isCompact && (pd.showWhatsApp || pd.showPhone) && (
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 p-3 flex gap-2 z-30">
-          {pd.showWhatsApp && (
-            <button className="flex-1 py-2.5 bg-green-500 text-white font-medium rounded-lg text-sm flex items-center justify-center gap-2">
-              <MessageCircle className="w-4 h-4" />
-              WhatsApp
-            </button>
-          )}
-          {pd.showPhone && (
-            <button className="flex-1 py-2.5 bg-gray-900 text-white font-medium rounded-lg text-sm flex items-center justify-center gap-2">
-              <PhoneIcon className="w-4 h-4" />
-              Ligar
-            </button>
-          )}
-          {pd.showContactForm && (
-            <button className="flex-1 py-2.5 text-white font-medium rounded-lg text-sm" style={{ backgroundColor: primaryColor }}>
-              Contato
-            </button>
-          )}
-        </div>
+      {/* Floating chat bubble */}
+      {pd.contactPosition === 'floating' && (
+        <FloatingChatBubble pd={pd} primaryColor={primaryColor} />
       )}
     </div>
   );

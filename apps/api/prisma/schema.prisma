@@ -83,6 +83,7 @@ model Tenant {
   siteTheme            Json?              // SiteTheme JSON
   planId               String
   subscriptionStatus   SubscriptionStatus @default(TRIAL)
+  trialEndsAt          DateTime?
   stripeCustomerId     String?
   stripeSubscriptionId String?
   createdAt            DateTime           @default(now())
@@ -188,12 +189,25 @@ model SiteConfig {
 }
 
 model ContactConfig {
-  id       String  @id @default(uuid())
-  tenantId String  @unique
-  whatsapp String?
-  phone    String?
-  email    String?
-  showForm Boolean @default(true)
+  id               String  @id @default(uuid())
+  tenantId         String  @unique
+  whatsapp         String?
+  whatsappMessage  String? // mensagem padrão ao abrir WhatsApp
+  phone            String?
+  email            String?
+  showForm         Boolean @default(true)
+  address          String?
+  city             String?
+  state            String? @db.Char(2)
+  zipCode          String?
+  latitude         Float?
+  longitude        Float?
+  businessHours    Json?   // { mon: "09:00-18:00", tue: "09:00-18:00", ... }
+  instagram        String?
+  facebook         String?
+  youtube          String?
+  linkedin         String?
+  tiktok           String?
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 

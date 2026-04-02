@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { formatPrice } from '@imovdigital/utils';
+import { useSubscription } from '../contexts/SubscriptionContext';
 
 interface Property {
   id: string;
@@ -56,6 +57,7 @@ const LISTING_LABELS: Record<string, string> = {
 };
 
 export function PropertiesPage() {
+  const { canAddProperty, limits } = useSubscription();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -130,13 +132,22 @@ export function PropertiesPage() {
             {properties.length} cadastrados &middot; {activeCount} ativos &middot; {featuredCount} em destaque
           </p>
         </div>
-        <Link
-          to="/dashboard/properties/new"
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
-        >
-          <Plus className="w-5 h-5" />
-          Novo Imóvel
-        </Link>
+        {canAddProperty ? (
+          <Link
+            to="/dashboard/properties/new"
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+          >
+            <Plus className="w-5 h-5" />
+            Novo Imóvel
+          </Link>
+        ) : (
+          <Link
+            to="/dashboard/subscription"
+            className="flex items-center gap-2 bg-gray-400 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-gray-500 transition-colors"
+          >
+            Limite atingido ({limits.properties})
+          </Link>
+        )}
       </div>
 
       {/* Filters bar */}

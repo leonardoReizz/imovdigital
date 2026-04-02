@@ -176,7 +176,6 @@ function AboutSettingsPanel({ section }: { section: Section<'about'> }) {
           { value: 'right', label: 'Direita' },
         ]}
       />
-      <BadgeToggle label="Mostrar estatísticas" value={s.showStats} onChange={(v) => update('showStats', v)} />
     </div>
   );
 }

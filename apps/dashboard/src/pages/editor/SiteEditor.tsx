@@ -61,6 +61,10 @@ export function SiteEditor() {
 
   const [activeTab, setActiveTab] = useState<PanelTab>('sections');
 
+  // Auto-switch tabs when navigating preview
+  const isOnPropertyPage = previewPage.type === 'property';
+  const effectiveTab = isOnPropertyPage && activeTab === 'sections' ? 'property' : activeTab;
+
   useAutoSave();
 
   // Load config on mount
@@ -124,7 +128,13 @@ export function SiteEditor() {
       {/* Header */}
       <header className="flex items-center justify-between px-4 h-14 bg-white border-b border-gray-200 shrink-0">
         <div className="flex items-center gap-4">
-          <h1 className="text-sm font-bold text-blue-600">ImovDigital</h1>
+          <a
+            href="/dashboard"
+            className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ImovDigital
+          </a>
           <div className="h-5 w-px bg-gray-200" />
           <span className="text-sm text-gray-500">Editor do Site</span>
           {isDirty && (
@@ -217,52 +227,70 @@ export function SiteEditor() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left Panel */}
         <aside className="w-80 bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-hidden">
-          {/* Panel tabs */}
+          {/* Panel tabs — context-aware */}
           <div className="flex border-b border-gray-200 shrink-0">
-            <button
-              onClick={() => setActiveTab('sections')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-                activeTab === 'sections'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <Layers className="w-4 h-4" />
-              Seções
-            </button>
-            <button
-              onClick={() => setActiveTab('global')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-                activeTab === 'global'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <Palette className="w-4 h-4" />
-              Global
-            </button>
-            <button
-              onClick={() => setActiveTab('property')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-                activeTab === 'property'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <Home className="w-4 h-4" />
-              Imóvel
-            </button>
+            {isOnPropertyPage ? (
+              <>
+                <button
+                  onClick={() => setActiveTab('property')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                    effectiveTab === 'property'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Home className="w-4 h-4" />
+                  Imóvel
+                </button>
+                <button
+                  onClick={() => setActiveTab('global')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                    effectiveTab === 'global'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Palette className="w-4 h-4" />
+                  Global
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setActiveTab('sections')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                    effectiveTab === 'sections'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Layers className="w-4 h-4" />
+                  Seções
+                </button>
+                <button
+                  onClick={() => setActiveTab('global')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+                    effectiveTab === 'global'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Palette className="w-4 h-4" />
+                  Global
+                </button>
+              </>
+            )}
           </div>
 
           {/* Panel content */}
           <div className="flex-1 overflow-y-auto p-4">
-            {activeTab === 'sections' ? (
+            {effectiveTab === 'sections' ? (
               selectedSectionId ? (
                 <SectionSettings />
               ) : (
                 <SectionsList />
               )
-            ) : activeTab === 'property' ? (
+            ) : effectiveTab === 'property' ? (
               <PropertyDetailSettings />
             ) : (
               <GlobalSettings />

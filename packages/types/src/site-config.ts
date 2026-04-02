@@ -124,11 +124,12 @@ export interface PropertyDetailConfig {
   // Gallery
   galleryStyle: 'grid' | 'carousel' | 'single';
 
-  // Contact
+  // Contact form
   contactPosition: 'sidebar' | 'bottom' | 'floating';
   showContactForm: boolean;
+  chatTooltip: string; // tooltip text for floating chat bubble
 
-  // Quick action buttons
+  // Quick action buttons (shown directly on page)
   showWhatsApp: boolean;
   whatsAppNumber: string;
   showPhone: boolean;
@@ -137,18 +138,22 @@ export interface PropertyDetailConfig {
   // Address & Map
   showAddress: boolean;
   showMap: boolean;
-  mapRadius: number; // meters for the privacy circle
+  mapRadius: number;
 
   // Details
   showAmenities: boolean;
   showDescription: boolean;
   showCosts: boolean;
+
+  // Similar properties
+  showSimilar: boolean;
 }
 
 export const DEFAULT_PROPERTY_DETAIL_CONFIG: PropertyDetailConfig = {
   galleryStyle: 'grid',
   contactPosition: 'sidebar',
   showContactForm: true,
+  chatTooltip: 'Precisa de ajuda?',
   showWhatsApp: true,
   whatsAppNumber: '',
   showPhone: true,
@@ -159,6 +164,7 @@ export const DEFAULT_PROPERTY_DETAIL_CONFIG: PropertyDetailConfig = {
   showAmenities: true,
   showDescription: true,
   showCosts: true,
+  showSimilar: true,
 };
 
 // ─── Section ─────────────────────────────────────────────────
@@ -244,12 +250,8 @@ export const DEFAULT_SECTION_SETTINGS: SectionSettingsMap = {
     text: 'Somos uma imobiliária comprometida em encontrar o imóvel ideal para você.',
     imageUrl: null,
     imagePosition: 'right',
-    showStats: true,
-    stats: [
-      { label: 'Anos de experiência', value: '10+' },
-      { label: 'Imóveis vendidos', value: '500+' },
-      { label: 'Clientes satisfeitos', value: '1000+' },
-    ],
+    showStats: false,
+    stats: [],
   },
   agents: {
     title: 'Nossa Equipe',

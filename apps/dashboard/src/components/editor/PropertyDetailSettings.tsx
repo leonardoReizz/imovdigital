@@ -40,7 +40,7 @@ export function PropertyDetailSettings() {
         <p className="text-xs text-gray-400 mt-1.5">Imagens são expansíveis ao clicar.</p>
       </div>
 
-      {/* Contact */}
+      {/* Contact form */}
       <div>
         <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Formulário de Contato</h4>
         <div className="space-y-3">
@@ -51,16 +51,25 @@ export function PropertyDetailSettings() {
             options={[
               { value: 'sidebar', label: 'Lateral (desktop)' },
               { value: 'bottom', label: 'Abaixo do conteúdo' },
-              { value: 'floating', label: 'Flutuante (fixo)' },
+              { value: 'floating', label: 'Chat flutuante' },
             ]}
           />
           <BadgeToggle label="Mostrar formulário" value={pd.showContactForm} onChange={(v) => update('showContactForm', v)} />
+          {pd.contactPosition === 'floating' && (
+            <TextInput
+              label="Texto do tooltip"
+              value={pd.chatTooltip}
+              onChange={(v) => update('chatTooltip', v)}
+              placeholder="Precisa de ajuda?"
+            />
+          )}
         </div>
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick action buttons */}
       <div>
-        <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Ações Rápidas</h4>
+        <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Botões de Ação</h4>
+        <p className="text-xs text-gray-400 mb-3">Exibidos diretamente na página do imóvel</p>
         <div className="space-y-3">
           <BadgeToggle label="Botão WhatsApp" value={pd.showWhatsApp} onChange={(v) => update('showWhatsApp', v)} />
           {pd.showWhatsApp && (
@@ -103,6 +112,7 @@ export function PropertyDetailSettings() {
           <BadgeToggle label="Mostrar descrição" value={pd.showDescription} onChange={(v) => update('showDescription', v)} />
           <BadgeToggle label="Mostrar comodidades" value={pd.showAmenities} onChange={(v) => update('showAmenities', v)} />
           <BadgeToggle label="Mostrar custos adicionais" value={pd.showCosts} onChange={(v) => update('showCosts', v)} />
+          <BadgeToggle label="Imóveis semelhantes" value={pd.showSimilar} onChange={(v) => update('showSimilar', v)} />
         </div>
       </div>
     </div>

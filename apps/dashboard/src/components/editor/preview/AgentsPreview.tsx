@@ -1,4 +1,5 @@
 import type { AgentsSettings } from '@imovdigital/types';
+import { useEditorStore } from '../../../store/editorStore';
 import { User, Phone, Mail } from 'lucide-react';
 
 function AgentCard({ showContact }: { showContact: boolean }) {
@@ -24,14 +25,18 @@ function AgentCard({ showContact }: { showContact: boolean }) {
 }
 
 export function AgentsPreview({ settings }: { settings: AgentsSettings }) {
+  const breakpoint = useEditorStore((s) => s.previewBreakpoint);
+  const isMobile = breakpoint === 'mobile';
+  const columns = isMobile ? 1 : 3;
+
   return (
-    <div className="px-8 py-16 bg-white">
+    <div style={{ padding: isMobile ? '40px 16px' : '64px 32px' }} className="bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-gray-900">{settings.title}</h2>
+          <h2 style={{ fontSize: isMobile ? 22 : 30 }} className="font-bold text-gray-900">{settings.title}</h2>
           <p className="text-gray-500 mt-2">{settings.subtitle}</p>
         </div>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
           {[1, 2, 3].map((i) => (
             <AgentCard key={i} showContact={settings.showContact} />
           ))}

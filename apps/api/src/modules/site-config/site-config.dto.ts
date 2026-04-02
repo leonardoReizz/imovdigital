@@ -3,10 +3,12 @@ import {
   IsOptional,
   IsArray,
   IsBoolean,
-  ValidateNested,
   IsNumber,
   IsUUID,
   IsIn,
+  IsObject,
+  ValidateNested,
+  Allow,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -23,6 +25,7 @@ class SectionDto {
   @IsBoolean()
   visible: boolean;
 
+  @Allow()
   settings: Record<string, unknown>;
 }
 
@@ -52,6 +55,10 @@ export class UpdateSiteConfigDto {
   @ValidateNested({ each: true })
   @Type(() => SectionDto)
   sections?: SectionDto[];
+
+  @IsOptional()
+  @IsObject()
+  propertyDetail?: Record<string, unknown>;
 }
 
 export class PresignedUrlDto {

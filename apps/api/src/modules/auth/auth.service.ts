@@ -54,12 +54,16 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
     const result = await this.prisma.$transaction(async (tx) => {
+      const trialEndsAt = new Date();
+      trialEndsAt.setDate(trialEndsAt.getDate() + 7);
+
       const tenant = await tx.tenant.create({
         data: {
           name: dto.agencyName,
           slug,
           planId: trialPlan.id,
           subscriptionStatus: 'TRIAL',
+          trialEndsAt,
         },
       });
 

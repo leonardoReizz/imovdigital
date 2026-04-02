@@ -1,5 +1,7 @@
 import type { TestimonialsSettings } from '@imovdigital/types';
-import { Star, User } from 'lucide-react';
+import { useEditorStore } from '../../../store/editorStore';
+import { Star, User, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
 
 function TestimonialCard({ item }: { item: { name: string; text: string; rating: number } }) {
   return (
@@ -30,17 +32,40 @@ const PLACEHOLDER_ITEMS = [
 ];
 
 export function TestimonialsPreview({ settings }: { settings: TestimonialsSettings }) {
+  const breakpoint = useEditorStore((s) => s.previewBreakpoint);
+  const isMobile = breakpoint === 'mobile';
   const items = settings.items.length > 0 ? settings.items : PLACEHOLDER_ITEMS;
+  const [current, setCurrent] = useState(0);
 
   return (
-    <div className="px-8 py-16 bg-gray-50">
+    <div style={{ padding: isMobile ? '40px 16px' : '64px 32px' }} className="bg-gray-50">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl font-bold text-gray-900 text-center mb-10">{settings.title}</h2>
-        <div className="grid grid-cols-3 gap-6">
-          {items.slice(0, 3).map((item, i) => (
-            <TestimonialCard key={i} item={item} />
-          ))}
-        </div>
+        <h2 style={{ fontSize: isMobile ? 22 : 30 }} className="font-bold text-gray-900 text-center mb-10">{settings.title}</h2>
+
+        {isMobile ? (
+          /* Mobile: single card carousel */
+          <div className="relative">
+            <TestimonialCard item={items[current % items.length]} />
+            {items.length > 1 && (
+              <div className="flex items-center justify-center gap-3 mt-4">
+                <button onClick={() => setCurrent((c) => (c === 0 ? items.length - 1 : c - 1))} className="p-1.5 bg-white rounded-full shadow border border-gray-200">
+                  <ChevronLeft className="w-4 h-4 text-gray-600" />
+                </button>
+                <span className="text-xs text-gray-400">{(current % items.length) + 1}/{items.length}</span>
+                <button onClick={() => setCurrent((c) => c + 1)} className="p-1.5 bg-white rounded-full shadow border border-gray-200">
+                  <ChevronRight className="w-4 h-4 text-gray-600" />
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Desktop/Tablet: grid */
+          <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${Math.min(items.length, 3)}, 1fr)` }}>
+            {items.slice(0, 3).map((item, i) => (
+              <TestimonialCard key={i} item={item} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

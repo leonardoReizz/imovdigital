@@ -33,6 +33,20 @@ export class PropertyService {
   }
 
   async create(tenantId: string, data: any) {
+    // Check property limit
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      include: { plan: true, _count: { select: { properties: true } } },
+    });
+    if (tenant) {
+      const limit = tenant.subscriptionStatus === 'TRIAL' ? 10 : tenant.plan.propertyLimit;
+      if (tenant._count.properties >= limit) {
+        throw new BadRequestException(
+          `Limite de ${limit} imóveis atingido. Faça upgrade do seu plano.`,
+        );
+      }
+    }
+
     return this.prisma.property.create({ data: { ...data, tenantId } });
   }
 
