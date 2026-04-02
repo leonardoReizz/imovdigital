@@ -10,7 +10,7 @@ COPY apps/dashboard/package.json ./apps/dashboard/
 COPY apps/web/package.json ./apps/web/
 COPY packages/types/package.json ./packages/types/
 COPY packages/utils/package.json ./packages/utils/
-COPY packages/config/package.json ./packages/config/ 2>/dev/null || true
+COPY packages/config/package.json ./packages/config/
 RUN pnpm install --frozen-lockfile
 
 # ─── Build all apps ────────────────────────────────────────────
@@ -19,8 +19,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm install --frozen-lockfile
 
-RUN pnpm --filter @imovdigital/types build 2>/dev/null || true
-RUN pnpm --filter @imovdigital/utils build 2>/dev/null || true
+RUN pnpm --filter @imovdigital/types build || true
+RUN pnpm --filter @imovdigital/utils build || true
 
 # API
 RUN pnpm --filter @imovdigital/api prisma:generate
