@@ -1,5 +1,5 @@
 import { useEditorStore } from '../../store/editorStore';
-import { ColorPicker, FontSelector, EditorImageUploader } from './controls';
+import { ColorPicker, FontSelector, EditorImageUploader, RangeSlider } from './controls';
 import { RotateCcw } from 'lucide-react';
 
 export function GlobalSettings() {
@@ -13,7 +13,8 @@ export function GlobalSettings() {
       primaryColor: '#2563eb',
       secondaryColor: '#1e40af',
       fontFamily: 'Inter',
-    });
+      fontSize: 16,
+    } as any);
   };
 
   return (
@@ -50,6 +51,16 @@ export function GlobalSettings() {
         label="Fonte principal"
         value={config.fontFamily}
         onChange={(v) => updateGlobal({ fontFamily: v })}
+      />
+
+      <RangeSlider
+        label="Tamanho da fonte"
+        value={(config as any).fontSize || 16}
+        onChange={(v) => updateGlobal({ fontSize: v } as any)}
+        min={12}
+        max={22}
+        step={1}
+        suffix="px"
       />
 
       <button

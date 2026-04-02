@@ -18,6 +18,12 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Skip interceptor for auth endpoints — let the component handle the error
+    const url = originalRequest?.url || '';
+    if (url.includes('/auth/login') || url.includes('/auth/register')) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 

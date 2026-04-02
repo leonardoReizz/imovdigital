@@ -86,6 +86,7 @@ model Tenant {
   trialEndsAt          DateTime?
   stripeCustomerId     String?
   stripeSubscriptionId String?
+  twoFactorEnabled     Boolean            @default(false)
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 
@@ -101,16 +102,19 @@ model Tenant {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  tenantId     String
-  email        String
-  passwordHash String
-  name         String
-  avatarUrl    String?
-  phone        String?
-  role         UserRole @default(AGENT)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String    @id @default(uuid())
+  tenantId        String
+  email           String
+  passwordHash    String
+  name            String
+  avatarUrl       String?
+  phone           String?
+  role            UserRole  @default(AGENT)
+  resetCode       String?
+  resetCodeExpiry DateTime?
+  deletedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
@@ -219,7 +223,7 @@ model Lead {
   tenantId   String
   propertyId String?
   name       String
-  email      String
+  email      String?
   phone      String?
   message    String?    @db.Text
   source     LeadSource @default(FORM)

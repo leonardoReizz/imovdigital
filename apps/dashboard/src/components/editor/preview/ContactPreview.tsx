@@ -7,6 +7,9 @@ export function ContactPreview({ settings }: { settings: ContactSettings }) {
   const primaryColor = useEditorStore((s) => s.config?.primaryColor || '#2563eb');
   const isMobile = breakpoint === 'mobile';
 
+  const showEmailField = settings.showEmailField ?? false;
+  const showPhoneField = settings.showPhoneField ?? true;
+
   return (
     <div style={{ padding: isMobile ? '40px 16px' : '64px 32px' }} className="bg-white">
       <div className="max-w-6xl mx-auto">
@@ -17,7 +20,7 @@ export function ContactPreview({ settings }: { settings: ContactSettings }) {
           <div className="space-y-6" style={{ flex: 1 }}>
             {settings.address && (
               <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+                <MapPin className="w-5 h-5 mt-0.5 shrink-0" style={{ color: primaryColor }} />
                 <p className="text-gray-600">{settings.address}</p>
               </div>
             )}
@@ -38,18 +41,22 @@ export function ContactPreview({ settings }: { settings: ContactSettings }) {
 
           {/* Form */}
           {settings.showForm && (
-            <div className="bg-gray-50 rounded-xl p-6 space-y-4" style={{ flex: 1 }}>
-              <div className="space-y-1">
-                <label className="text-sm text-gray-600">Nome</label>
-                <div className="h-10 bg-white border border-gray-200 rounded-lg" />
+            <div className="bg-gray-50 rounded-xl p-6 space-y-3" style={{ flex: 1 }}>
+              <div className="px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-400">
+                Seu nome *
               </div>
-              <div className="space-y-1">
-                <label className="text-sm text-gray-600">E-mail</label>
-                <div className="h-10 bg-white border border-gray-200 rounded-lg" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-sm text-gray-600">Mensagem</label>
-                <div className="h-24 bg-white border border-gray-200 rounded-lg" />
+              {showEmailField && (
+                <div className="px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-400">
+                  Seu e-mail {!showPhoneField ? '*' : ''}
+                </div>
+              )}
+              {showPhoneField && (
+                <div className="px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-400">
+                  Seu WhatsApp {!showEmailField ? '*' : ''}
+                </div>
+              )}
+              <div className="px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-400 h-20">
+                Mensagem (opcional)
               </div>
               <button
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-white rounded-lg text-sm font-medium"

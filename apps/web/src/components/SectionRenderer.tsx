@@ -43,7 +43,7 @@ export function SectionRenderer({ sections, primaryColor, properties, cities, te
           case 'cta_banner':
             return <CTABanner key={section.id} settings={s} />;
           case 'contact':
-            return <div key={section.id} id="contato"><Contact settings={s} primaryColor={primaryColor} /></div>;
+            return <div key={section.id} id="contato"><Contact settings={s} primaryColor={primaryColor} tenantSlug={tenantSlug} /></div>;
           case 'footer':
             return <Footer key={section.id} settings={s} />;
           default:

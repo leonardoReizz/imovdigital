@@ -11,7 +11,9 @@ import { ContactPage } from './pages/ContactPage';
 import { TeamPage } from './pages/TeamPage';
 import { SubscriptionPage } from './pages/SubscriptionPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { OrganizationPage } from './pages/OrganizationPage';
 import { DomainPage } from './pages/DomainPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { SiteEditor } from './pages/editor/SiteEditor';
 
 export function App() {
@@ -19,6 +21,7 @@ export function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/dashboard/editor" element={<SiteEditor />} />
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route index element={<OverviewPage />} />
@@ -32,6 +35,7 @@ export function App() {
         <Route path="team" element={<TeamPage />} />
         <Route path="subscription" element={<SubscriptionPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="organization" element={<OrganizationPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

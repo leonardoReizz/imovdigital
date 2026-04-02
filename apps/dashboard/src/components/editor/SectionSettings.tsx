@@ -267,10 +267,21 @@ function ContactSettingsPanel({ section }: { section: Section<'contact'> }) {
     <div className="space-y-4">
       <TextInput label="Título" value={s.title} onChange={(v) => update('title', v)} />
       <TextInput label="Endereço" value={s.address} onChange={(v) => update('address', v)} />
-      <TextInput label="Número WhatsApp" value={s.whatsAppNumber} onChange={(v) => update('whatsAppNumber', v)} placeholder="+55 11 99999-9999" />
       <BadgeToggle label="Mostrar mapa" value={s.showMap} onChange={(v) => update('showMap', v)} />
-      <BadgeToggle label="Mostrar WhatsApp" value={s.showWhatsApp} onChange={(v) => update('showWhatsApp', v)} />
+
+      <BadgeToggle label="Exibir WhatsApp na página" value={s.showWhatsApp} onChange={(v) => update('showWhatsApp', v)} />
+      {s.showWhatsApp && (
+        <TextInput label="Número WhatsApp" value={s.whatsAppNumber} onChange={(v) => update('whatsAppNumber', v)} placeholder="+55 11 99999-9999" />
+      )}
+
       <BadgeToggle label="Mostrar formulário" value={s.showForm} onChange={(v) => update('showForm', v)} />
+      {s.showForm && (
+        <>
+          <p className="text-xs text-gray-400 -mt-2">Campos do formulário:</p>
+          <BadgeToggle label="Campo e-mail" value={s.showEmailField ?? false} onChange={(v) => update('showEmailField', v)} />
+          <BadgeToggle label="Campo telefone/WhatsApp" value={s.showPhoneField ?? true} onChange={(v) => update('showPhoneField', v)} />
+        </>
+      )}
     </div>
   );
 }

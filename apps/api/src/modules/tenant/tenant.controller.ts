@@ -13,6 +13,11 @@ export class TenantController {
     return this.tenantService.findById(tenantId);
   }
 
+  @Get('dashboard')
+  async dashboard(@CurrentUser('tenantId') tenantId: string) {
+    return this.tenantService.getDashboardStats(tenantId);
+  }
+
   @Patch()
   async update(
     @CurrentUser('tenantId') tenantId: string,

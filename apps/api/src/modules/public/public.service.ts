@@ -87,6 +87,8 @@ export class PublicService {
     if (query.city) where.city = { equals: query.city, mode: 'insensitive' };
     if (query.neighborhood) where.neighborhood = { equals: query.neighborhood, mode: 'insensitive' };
     if (query.bedrooms) where.bedrooms = { gte: parseInt(query.bedrooms) };
+    if (query.bathrooms) where.bathrooms = { gte: parseInt(query.bathrooms) };
+    if (query.parkingSpots) where.parkingSpots = { gte: parseInt(query.parkingSpots) };
     if (query.minPrice) where.price = { ...(where.price || {}), gte: parseInt(query.minPrice) };
     if (query.maxPrice) where.price = { ...(where.price || {}), lte: parseInt(query.maxPrice) };
 

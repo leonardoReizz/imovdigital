@@ -5,6 +5,7 @@ import { SectionsList } from '../../components/editor/SectionsList';
 import { SectionSettings } from '../../components/editor/SectionSettings';
 import { GlobalSettings } from '../../components/editor/GlobalSettings';
 import { PropertyDetailSettings } from '../../components/editor/PropertyDetailSettings';
+import { SearchPageSettings } from '../../components/editor/SearchPageSettings';
 import { SitePreview } from '../../components/editor/SitePreview';
 import {
   Monitor,
@@ -21,12 +22,14 @@ import {
   ArrowLeft,
   Globe,
   Home,
+  Search,
+  Building2,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Toaster, toast } from 'sonner';
 import type { PreviewPage } from '../../store/editorStore';
 
-type PanelTab = 'sections' | 'global' | 'property';
+type PanelTab = 'sections' | 'global' | 'property' | 'search';
 
 function getPreviewLabel(page: PreviewPage, properties: { id: string; title: string }[]) {
   switch (page.type) {
@@ -63,7 +66,11 @@ export function SiteEditor() {
 
   // Auto-switch tabs when navigating preview
   const isOnPropertyPage = previewPage.type === 'property';
-  const effectiveTab = isOnPropertyPage && activeTab === 'sections' ? 'property' : activeTab;
+  const isOnSearchPage = previewPage.type === 'search';
+  const effectiveTab =
+    isOnPropertyPage && (activeTab === 'sections' || activeTab === 'search') ? 'property' :
+    isOnSearchPage && (activeTab === 'sections' || activeTab === 'property') ? 'search' :
+    activeTab;
 
   useAutoSave();
 
@@ -227,59 +234,72 @@ export function SiteEditor() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left Panel */}
         <aside className="w-80 bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-hidden">
-          {/* Panel tabs — context-aware */}
+          {/* Page navigation */}
+          <div className="flex border-b border-gray-200 shrink-0 px-2 py-2 gap-1">
+            <button
+              onClick={() => { navigatePreview({ type: 'home' }); setActiveTab('sections'); }}
+              className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
+                previewPage.type === 'home' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'
+              }`}
+            >
+              <Home className="w-3.5 h-3.5" />
+              Home
+            </button>
+            <button
+              onClick={() => { navigatePreview({ type: 'search' }); setActiveTab('search'); }}
+              className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
+                previewPage.type === 'search' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'
+              }`}
+            >
+              <Search className="w-3.5 h-3.5" />
+              Busca
+            </button>
+            <button
+              onClick={() => {
+                const firstProp = properties[0];
+                if (firstProp) {
+                  navigatePreview({ type: 'property', propertyId: firstProp.id });
+                  setActiveTab('property');
+                }
+              }}
+              className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
+                previewPage.type === 'property' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'
+              }`}
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              Imóvel
+            </button>
+          </div>
+
+          {/* Settings tabs */}
           <div className="flex border-b border-gray-200 shrink-0">
-            {isOnPropertyPage ? (
-              <>
-                <button
-                  onClick={() => setActiveTab('property')}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-                    effectiveTab === 'property'
-                      ? 'text-blue-600 border-b-2 border-blue-600'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Home className="w-4 h-4" />
-                  Imóvel
-                </button>
-                <button
-                  onClick={() => setActiveTab('global')}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-                    effectiveTab === 'global'
-                      ? 'text-blue-600 border-b-2 border-blue-600'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Palette className="w-4 h-4" />
-                  Global
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => setActiveTab('sections')}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-                    effectiveTab === 'sections'
-                      ? 'text-blue-600 border-b-2 border-blue-600'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Layers className="w-4 h-4" />
-                  Seções
-                </button>
-                <button
-                  onClick={() => setActiveTab('global')}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-                    effectiveTab === 'global'
-                      ? 'text-blue-600 border-b-2 border-blue-600'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Palette className="w-4 h-4" />
-                  Global
-                </button>
-              </>
-            )}
+            {/* Context-specific tab */}
+            <button
+              onClick={() => {
+                if (previewPage.type === 'home') setActiveTab('sections');
+                else if (previewPage.type === 'search') setActiveTab('search');
+                else setActiveTab('property');
+              }}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-medium transition-colors ${
+                effectiveTab === 'sections' || effectiveTab === 'search' || effectiveTab === 'property'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              {previewPage.type === 'home' ? 'Seções' : previewPage.type === 'search' ? 'Busca' : 'Imóvel'}
+            </button>
+            <button
+              onClick={() => setActiveTab('global')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-medium transition-colors ${
+                effectiveTab === 'global'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <Palette className="w-3.5 h-3.5" />
+              Global
+            </button>
           </div>
 
           {/* Panel content */}
@@ -290,6 +310,8 @@ export function SiteEditor() {
               ) : (
                 <SectionsList />
               )
+            ) : effectiveTab === 'search' ? (
+              <SearchPageSettings />
             ) : effectiveTab === 'property' ? (
               <PropertyDetailSettings />
             ) : (

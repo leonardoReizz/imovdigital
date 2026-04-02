@@ -14,6 +14,7 @@ import {
   ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import { ShareButton } from '@/components/ShareButton';
+import { LeadForm } from '@/components/LeadForm';
 import { formatListingDate } from '@/lib/dates';
 
 interface Props {
@@ -292,11 +293,7 @@ export default async function PropertyPage({ params }: Props) {
             {(pd.contactPosition === 'bottom' || pd.contactPosition === 'sidebar') && pd.showContactForm && (
               <div className={`border border-gray-200 rounded-xl p-6 space-y-4 ${pd.contactPosition === 'sidebar' ? 'lg:hidden' : ''}`}>
                 <h3 className="text-lg font-semibold text-gray-900">Interessado?</h3>
-                <input placeholder="Seu nome" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none" />
-                <input placeholder="Seu e-mail" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none" />
-                <input placeholder="Seu telefone" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none" />
-                <textarea placeholder="Mensagem" rows={3} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none resize-none" />
-                <button className="w-full py-2.5 text-white font-medium rounded-lg" style={{ backgroundColor: primaryColor }}>Enviar mensagem</button>
+                <LeadForm tenantSlug={tenantSlug} propertyId={property.id} propertyTitle={property.title} primaryColor={primaryColor} />
               </div>
             )}
           </div>
@@ -306,11 +303,7 @@ export default async function PropertyPage({ params }: Props) {
             <div className="hidden lg:block w-80 xl:w-96 shrink-0">
               <div className="sticky top-20 border border-gray-200 rounded-xl p-6 space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">Interessado?</h3>
-                <input placeholder="Seu nome" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none" />
-                <input placeholder="Seu e-mail" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none" />
-                <input placeholder="Seu telefone" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none" />
-                <textarea placeholder="Mensagem" rows={3} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none resize-none" />
-                <button className="w-full py-2.5 text-white font-medium rounded-lg" style={{ backgroundColor: primaryColor }}>Enviar mensagem</button>
+                <LeadForm tenantSlug={tenantSlug} propertyId={property.id} propertyTitle={property.title} primaryColor={primaryColor} />
               </div>
             </div>
           )}

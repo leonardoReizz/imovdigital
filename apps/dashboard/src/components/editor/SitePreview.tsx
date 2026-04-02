@@ -221,6 +221,7 @@ export function SitePreview() {
 
   return (
     <div className="flex-1 bg-gray-100 overflow-y-auto min-h-0">
+      <link href={`https://fonts.googleapis.com/css2?family=${config.fontFamily.replace(/ /g, '+')}:wght@300;400;500;600;700;800&display=swap`} rel="stylesheet" />
       <style>{`#${previewId}, #${previewId} * { font-family: '${config.fontFamily}', sans-serif !important; }`}</style>
       <div className="flex justify-center p-4">
         <div
@@ -229,6 +230,7 @@ export function SitePreview() {
           style={{
             width: BREAKPOINT_WIDTHS[breakpoint],
             maxWidth: '100%',
+            zoom: ((config as any).fontSize || 16) / 16,
           }}
         >
           {/* Header for internal pages */}

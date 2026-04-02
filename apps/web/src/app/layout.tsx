@@ -29,6 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   let fontFamily = 'Inter';
   let primaryColor = '#2563eb';
+  let fontSize = 16;
   let jsonLd: object | null = null;
 
   try {
@@ -40,6 +41,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     ]);
     fontFamily = (siteConfig as any)?.fontFamily || tenant.fontFamily || 'Inter';
     primaryColor = (siteConfig as any)?.primaryColor || tenant.primaryColor || '#2563eb';
+    fontSize = (siteConfig as any)?.fontSize || 16;
     if (seo?.jsonLd) jsonLd = seo.jsonLd;
   } catch {
     // use defaults
@@ -60,7 +62,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           />
         )}
       </head>
-      <body style={{ fontFamily: `'${fontFamily}', sans-serif`, ['--color-primary' as string]: primaryColor }}>
+      <body style={{ fontFamily: `'${fontFamily}', sans-serif`, fontSize: `${fontSize}px`, ['--color-primary' as string]: primaryColor }}>
         {children}
       </body>
     </html>

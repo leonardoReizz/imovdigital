@@ -130,10 +130,10 @@ function ContactCard({ pd, primaryColor }: { pd: PropertyDetailConfig; primaryCo
 
       {pd.showContactForm && (
         <div className="space-y-2">
-          <div className="h-9 bg-gray-50 border border-gray-200 rounded-lg" />
-          <div className="h-9 bg-gray-50 border border-gray-200 rounded-lg" />
-          <div className="h-9 bg-gray-50 border border-gray-200 rounded-lg" />
-          <div className="h-16 bg-gray-50 border border-gray-200 rounded-lg" />
+          <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400">Seu nome *</div>
+          <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400">Seu e-mail</div>
+          <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400">Seu telefone</div>
+          <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400 h-16">Mensagem (opcional)</div>
           <button className="w-full py-2 text-white font-medium rounded-lg text-sm" style={{ backgroundColor: primaryColor }}>
             Enviar mensagem
           </button>
@@ -163,9 +163,9 @@ function FloatingChatBubble({ pd, primaryColor }: { pd: PropertyDetailConfig; pr
           {/* Body — contact form only */}
           {pd.showContactForm && (
             <div className="p-4 space-y-2">
-              <div className="h-9 bg-gray-50 border border-gray-200 rounded-lg" />
-              <div className="h-9 bg-gray-50 border border-gray-200 rounded-lg" />
-              <div className="h-14 bg-gray-50 border border-gray-200 rounded-lg" />
+              <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400">Seu nome *</div>
+              <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400">Seu e-mail</div>
+              <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400 h-14">Mensagem</div>
               <button className="w-full py-2 text-white font-medium rounded-lg text-sm" style={{ backgroundColor: primaryColor }}>
                 Enviar
               </button>

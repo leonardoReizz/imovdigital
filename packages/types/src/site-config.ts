@@ -90,6 +90,8 @@ export interface ContactSettings {
   showWhatsApp: boolean;
   whatsAppNumber: string;
   showForm: boolean;
+  showEmailField: boolean;
+  showPhoneField: boolean;
   address: string;
 }
 
@@ -167,6 +169,45 @@ export const DEFAULT_PROPERTY_DETAIL_CONFIG: PropertyDetailConfig = {
   showSimilar: true,
 };
 
+// ─── Search Page Config ──────────────────────────────────────
+
+export interface SearchPageConfig {
+  // Pagination
+  pagination: 'paginated' | 'infinite_scroll';
+  itemsPerPage: number;
+
+  // Filters
+  filterPosition: 'top' | 'sidebar';
+  showTypeFilter: boolean;
+  showListingFilter: boolean;
+  showBedroomsFilter: boolean;
+  showBathroomsFilter: boolean;
+  showParkingFilter: boolean;
+  showCityFilter: boolean;
+  showNeighborhoodFilter: boolean;
+  showPriceFilter: boolean;
+
+  // Layout
+  layout: 'grid' | 'list';
+  columns: 2 | 3 | 4;
+}
+
+export const DEFAULT_SEARCH_PAGE_CONFIG: SearchPageConfig = {
+  pagination: 'paginated',
+  itemsPerPage: 12,
+  filterPosition: 'sidebar',
+  showTypeFilter: true,
+  showListingFilter: true,
+  showBedroomsFilter: true,
+  showBathroomsFilter: true,
+  showParkingFilter: true,
+  showCityFilter: true,
+  showNeighborhoodFilter: true,
+  showPriceFilter: true,
+  layout: 'grid',
+  columns: 3,
+};
+
 // ─── Section ─────────────────────────────────────────────────
 
 export interface Section<T extends SectionType = SectionType> {
@@ -186,6 +227,7 @@ export interface SiteConfig {
   // Global
   primaryColor: string;
   secondaryColor: string;
+  fontSize: number; // base font size in px (default 16)
   fontFamily: string;
   logoUrl: string | null;
   faviconUrl: string | null;
@@ -195,6 +237,9 @@ export interface SiteConfig {
 
   // Property detail page config
   propertyDetail: PropertyDetailConfig;
+
+  // Search/listing page config
+  searchPage: SearchPageConfig;
 
   updatedAt: string;
 }
@@ -279,6 +324,8 @@ export const DEFAULT_SECTION_SETTINGS: SectionSettingsMap = {
     showWhatsApp: true,
     whatsAppNumber: '',
     showForm: true,
+    showEmailField: false,
+    showPhoneField: true,
     address: '',
   },
   footer: {

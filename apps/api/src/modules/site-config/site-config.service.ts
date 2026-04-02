@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UpdateSiteConfigDto } from './site-config.dto';
-import { DEFAULT_SECTION_SETTINGS, DEFAULT_PROPERTY_DETAIL_CONFIG, SectionType } from '@imovdigital/types';
+import { DEFAULT_SECTION_SETTINGS, DEFAULT_PROPERTY_DETAIL_CONFIG, DEFAULT_SEARCH_PAGE_CONFIG, SectionType } from '@imovdigital/types';
 import { randomUUID } from 'crypto';
 
 const DEFAULT_SECTIONS: SectionType[] = [
@@ -36,6 +36,7 @@ export class SiteConfigService {
         settings: DEFAULT_SECTION_SETTINGS[type],
       })),
       propertyDetail: DEFAULT_PROPERTY_DETAIL_CONFIG,
+      searchPage: DEFAULT_SEARCH_PAGE_CONFIG,
       updatedAt: new Date().toISOString(),
     };
   }

@@ -2,30 +2,43 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import { Building2, Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { api } from '../lib/api';
+
+const loginSchema = z.object({
+  email: z.string().min(1, 'E-mail é obrigatório').email('E-mail inválido'),
+  password: z.string().min(1, 'Senha é obrigatória'),
+});
+
+type LoginForm = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [serverError, setServerError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+  });
 
+  const onSubmit = async (data: LoginForm) => {
+    setServerError('');
     try {
-      const { data } = await api.post('/auth/login', { email, password });
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      const res = await api.post('/auth/login', data);
+      localStorage.setItem('accessToken', res.data.accessToken);
+      localStorage.setItem('refreshToken', res.data.refreshToken);
       navigate('/dashboard');
-    } catch {
-      setError('E-mail ou senha inválidos');
-    } finally {
-      setLoading(false);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      setServerError(
+        typeof msg === 'string' ? msg : 'E-mail ou senha inválidos'
+      );
     }
   };
 
@@ -104,7 +117,6 @@ export function LoginPage() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="w-full max-w-md"
         >
-          {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-10">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
               <Building2 className="w-6 h-6 text-white" />
@@ -113,86 +125,55 @@ export function LoginPage() {
           </div>
 
           <div className="mb-8">
-            <motion.h2
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="text-2xl sm:text-3xl font-bold text-gray-900"
-            >
-              Bem-vindo de volta
-            </motion.h2>
-            <motion.p
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-gray-500 mt-2"
-            >
-              Entre na sua conta para continuar
-            </motion.p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Bem-vindo de volta</h2>
+            <p className="text-gray-500 mt-2">Entre na sua conta para continuar</p>
           </div>
 
-          <motion.form
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            onSubmit={handleSubmit}
-            className="space-y-5"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <AnimatePresence>
-              {error && (
+              {serverError && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
                   <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-sm p-3.5 rounded-xl">
                     <AlertCircle className="w-4 h-4 shrink-0" />
-                    {error}
+                    {serverError}
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-gray-700">
-                E-mail
-              </label>
+              <label className="block text-sm font-medium text-gray-700">E-mail</label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                  {...register('email')}
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
-                  required
-                  className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                  className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${errors.email ? 'border-red-300' : 'border-gray-200'}`}
                 />
               </div>
+              {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-gray-700">
-                  Senha
-                </label>
-                <button
-                  type="button"
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                >
+                <label className="block text-sm font-medium text-gray-700">Senha</label>
+                <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
                   Esqueceu a senha?
-                </button>
+                </Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                  {...register('password')}
                   type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Sua senha"
-                  required
-                  className="w-full pl-11 pr-12 py-3 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                  className={`w-full pl-11 pr-12 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${errors.password ? 'border-red-300' : 'border-gray-200'}`}
                 />
                 <button
                   type="button"
@@ -202,16 +183,17 @@ export function LoginPage() {
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
+              {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
             </div>
 
             <motion.button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
               className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
             >
-              {loading ? (
+              {isSubmitting ? (
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
@@ -224,22 +206,14 @@ export function LoginPage() {
                 </>
               )}
             </motion.button>
-          </motion.form>
+          </form>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="text-center text-sm text-gray-500 mt-8"
-          >
+          <p className="text-center text-sm text-gray-500 mt-8">
             Não tem uma conta?{' '}
-            <Link
-              to="/register"
-              className="text-blue-600 hover:text-blue-700 font-semibold"
-            >
+            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
               Cadastre-se grátis
             </Link>
-          </motion.p>
+          </p>
         </motion.div>
       </div>
     </div>

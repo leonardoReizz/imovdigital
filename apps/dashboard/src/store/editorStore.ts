@@ -5,7 +5,7 @@ import type {
   SectionType,
   Property,
 } from '@imovdigital/types';
-import { DEFAULT_SECTION_SETTINGS, DEFAULT_PROPERTY_DETAIL_CONFIG } from '@imovdigital/types';
+import { DEFAULT_SECTION_SETTINGS, DEFAULT_PROPERTY_DETAIL_CONFIG, DEFAULT_SEARCH_PAGE_CONFIG } from '@imovdigital/types';
 import { api } from '../lib/api';
 
 const MAX_HISTORY = 50;
@@ -86,6 +86,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       const config = {
         ...data,
         propertyDetail: data.propertyDetail || DEFAULT_PROPERTY_DETAIL_CONFIG,
+        searchPage: data.searchPage || DEFAULT_SEARCH_PAGE_CONFIG,
       } as SiteConfig;
       set({
         config,

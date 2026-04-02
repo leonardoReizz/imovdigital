@@ -57,8 +57,16 @@ export class UpdateSiteConfigDto {
   sections?: SectionDto[];
 
   @IsOptional()
+  @IsNumber()
+  fontSize?: number;
+
+  @IsOptional()
   @IsObject()
   propertyDetail?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsObject()
+  searchPage?: Record<string, unknown>;
 }
 
 export class PresignedUrlDto {

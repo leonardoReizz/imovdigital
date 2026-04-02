@@ -14,6 +14,95 @@ export class TenantService {
     return this.prisma.tenant.findUnique({ where: { id } });
   }
 
+  async getDashboardStats(tenantId: string) {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+
+    const [
+      totalProperties,
+      activeProperties,
+      featuredProperties,
+      totalLeads,
+      leadsThisMonth,
+      leadsLastMonth,
+      unseenLeads,
+      totalUsers,
+      recentLeads,
+      recentProperties,
+      propertiesByType,
+      propertiesByListing,
+    ] = await Promise.all([
+      this.prisma.property.count({ where: { tenantId } }),
+      this.prisma.property.count({ where: { tenantId, active: true } }),
+      this.prisma.property.count({ where: { tenantId, featured: true } }),
+      this.prisma.lead.count({ where: { tenantId } }),
+      this.prisma.lead.count({ where: { tenantId, createdAt: { gte: startOfMonth } } }),
+      this.prisma.lead.count({ where: { tenantId, createdAt: { gte: startOfLastMonth, lte: endOfLastMonth } } }),
+      this.prisma.lead.count({ where: { tenantId, seen: false } }),
+      this.prisma.user.count({ where: { tenantId, deletedAt: null } }),
+      this.prisma.lead.findMany({
+        where: { tenantId },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        include: { property: { select: { title: true, slug: true } } },
+      }),
+      this.prisma.property.findMany({
+        where: { tenantId },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        select: { id: true, title: true, slug: true, price: true, listingType: true, active: true, images: true, createdAt: true },
+      }),
+      this.prisma.property.groupBy({
+        by: ['type'],
+        where: { tenantId, active: true },
+        _count: true,
+      }),
+      this.prisma.property.groupBy({
+        by: ['listingType'],
+        where: { tenantId, active: true },
+        _count: true,
+      }),
+    ]);
+
+    const leadsGrowth = leadsLastMonth > 0
+      ? Math.round(((leadsThisMonth - leadsLastMonth) / leadsLastMonth) * 100)
+      : leadsThisMonth > 0 ? 100 : 0;
+
+    // Check if tenant has leads access (not on trial)
+    const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId }, select: { subscriptionStatus: true } });
+    const canAccessLeads = tenant?.subscriptionStatus !== 'TRIAL';
+
+    const maskName = (name: string) => name.charAt(0) + '•'.repeat(Math.max(name.length - 1, 3));
+
+    return {
+      cards: {
+        totalProperties,
+        activeProperties,
+        featuredProperties,
+        leadsThisMonth,
+        unseenLeads,
+        totalUsers,
+        leadsGrowth,
+      },
+      recentLeads: recentLeads.map((l) => ({
+        id: l.id,
+        name: canAccessLeads ? l.name : maskName(l.name),
+        email: canAccessLeads ? l.email : null,
+        phone: canAccessLeads ? l.phone : null,
+        message: canAccessLeads ? l.message : null,
+        source: l.source,
+        seen: l.seen,
+        propertyTitle: l.property?.title || null,
+        createdAt: l.createdAt,
+      })),
+      recentProperties,
+      propertiesByType: propertiesByType.map((g) => ({ type: g.type, count: g._count })),
+      propertiesByListing: propertiesByListing.map((g) => ({ listingType: g.listingType, count: g._count })),
+    };
+  }
+
   async findBySlug(slug: string) {
     return this.prisma.tenant.findUnique({ where: { slug } });
   }
