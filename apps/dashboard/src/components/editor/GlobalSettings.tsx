@@ -28,6 +28,15 @@ export function GlobalSettings() {
           aspectRatio="3/1"
         />
         <p className="text-[10px] text-gray-400 mt-1">Recomendado: 600×200px, PNG transparente</p>
+        <RangeSlider
+          label="Tamanho da logo (navbar)"
+          value={(config as any).logoSize || 32}
+          onChange={(v) => updateGlobal({ logoSize: v } as any)}
+          min={20}
+          max={80}
+          step={2}
+          suffix="px"
+        />
       </div>
 
       <div>

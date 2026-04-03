@@ -152,7 +152,7 @@ export function CancellationModal({ onClose, onCanceled }: { onClose: () => void
                 </p>
 
                 <div className="flex gap-3">
-                  <button onClick={onClose} className="flex-1 py-2.5 text-sm font-medium bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors">
+                  <button onClick={onClose} className="flex-1 py-2.5 text-sm font-medium bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors">
                     Manter meu plano
                   </button>
                   <button onClick={() => setStep('feedback')} className="flex-1 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">

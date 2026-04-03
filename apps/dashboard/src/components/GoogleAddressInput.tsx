@@ -141,7 +141,7 @@ export function GoogleAddressInput({ onSelect }: GoogleAddressInputProps) {
           ref={inputRef}
           type="text"
           placeholder="Digite o endereço e selecione uma sugestão..."
-          className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm"
+          className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
         />
       </div>
       <p className="text-xs text-gray-400 mt-1.5">

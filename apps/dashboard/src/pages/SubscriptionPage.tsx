@@ -55,7 +55,7 @@ interface SubInfo {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: React.ElementType }> = {
-  TRIAL: { label: 'Teste Grátis', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200', icon: Clock },
+  TRIAL: { label: 'Teste Grátis', color: 'text-primary-dark', bg: 'bg-primary-light border-primary/30', icon: Clock },
   ACTIVE: { label: 'Ativo', color: 'text-green-700', bg: 'bg-green-50 border-green-200', icon: Check },
   OVERDUE: { label: 'Pagamento Pendente', color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200', icon: AlertCircle },
   CANCELED: { label: 'Cancelado', color: 'text-red-700', bg: 'bg-red-50 border-red-200', icon: X },
@@ -254,11 +254,11 @@ export function SubscriptionPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 + i * 0.05 }}
               className={`relative bg-white rounded-xl border-2 p-6 transition-colors ${
-                isPopular ? 'border-blue-500 shadow-lg shadow-blue-500/10' : 'border-gray-200'
+                isPopular ? 'border-primary shadow-lg shadow-primary/10' : 'border-gray-200'
               }`}
             >
               {isPopular && (
-                <div className="absolute -top-3 left-6 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                <div className="absolute -top-3 left-6 bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
                   <Zap className="w-3 h-3" />
                   Mais popular
                 </div>
@@ -291,7 +291,7 @@ export function SubscriptionPage() {
                       disabled={checkingOut !== null}
                       className={`px-5 py-2.5 text-sm font-medium rounded-xl transition-colors ${
                         isPopular
-                          ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/20'
+                          ? 'bg-primary text-white hover:bg-primary-dark shadow-lg shadow-primary/20'
                           : 'bg-gray-900 text-white hover:bg-gray-800'
                       } disabled:opacity-50`}
                     >

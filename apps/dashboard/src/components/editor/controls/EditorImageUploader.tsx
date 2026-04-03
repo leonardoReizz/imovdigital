@@ -73,7 +73,7 @@ export function EditorImageUploader({
         >
           {uploading ? (
             <div className="flex flex-col items-center gap-2">
-              <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+              <Loader2 className="w-6 h-6 text-primary animate-spin" />
               <span className="text-xs text-gray-500">{progress}%</span>
             </div>
           ) : (

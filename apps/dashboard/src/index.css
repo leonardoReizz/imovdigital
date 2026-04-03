@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #4ca270;
+  --color-primary-dark: #3d8a5e;
+  --color-primary-light: #4ca27020;
+}
+
 button:not(:disabled),
 a[href],
 [role="button"] {

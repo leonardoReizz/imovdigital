@@ -16,7 +16,7 @@ export function UpgradeWall({ feature, description }: UpgradeWallProps) {
       <p className="text-sm text-gray-500 text-center max-w-md mb-6">{description}</p>
       <Link
         to="/dashboard/subscription"
-        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+        className="flex items-center gap-2 px-6 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
       >
         <Zap className="w-4 h-4" />
         Fazer Upgrade

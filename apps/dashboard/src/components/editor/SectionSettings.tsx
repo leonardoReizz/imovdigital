@@ -279,7 +279,7 @@ function TestimonialsSettingsPanel({ section }: { section: Section<'testimonials
                 <span className="text-xs text-yellow-500">{'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}</span>
               </div>
               <div className="flex gap-1">
-                <button type="button" onClick={() => startEdit(i)} className="text-xs text-blue-600 hover:underline">Editar</button>
+                <button type="button" onClick={() => startEdit(i)} className="text-xs text-primary hover:underline">Editar</button>
                 <button type="button" onClick={() => removeItem(i)} className="text-xs text-red-500 hover:underline">Remover</button>
               </div>
             </div>
@@ -289,8 +289,8 @@ function TestimonialsSettingsPanel({ section }: { section: Section<'testimonials
       </div>
 
       {/* Add/Edit form */}
-      <div className="bg-blue-50/50 rounded-lg p-3 space-y-3 border border-blue-100">
-        <p className="text-xs font-medium text-blue-700">{editingIndex !== null ? 'Editar depoimento' : 'Novo depoimento'}</p>
+      <div className="bg-primary-light/50 rounded-lg p-3 space-y-3 border border-primary/20">
+        <p className="text-xs font-medium text-primary-dark">{editingIndex !== null ? 'Editar depoimento' : 'Novo depoimento'}</p>
         <TextInput label="Nome" value={draft.name} onChange={(v) => setDraft((d) => ({ ...d, name: v }))} placeholder="Nome do cliente" />
         <TextareaField label="Depoimento" value={draft.text} onChange={(v) => setDraft((d) => ({ ...d, text: v }))} placeholder="O que o cliente disse..." rows={2} />
         <div className="space-y-1">
@@ -307,7 +307,7 @@ function TestimonialsSettingsPanel({ section }: { section: Section<'testimonials
             type="button"
             onClick={editingIndex !== null ? () => updateItem(editingIndex) : addItem}
             disabled={!draft.name.trim() || !draft.text.trim()}
-            className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg disabled:opacity-40"
+            className="px-3 py-1.5 text-xs font-medium text-white bg-primary rounded-lg disabled:opacity-40"
           >
             {editingIndex !== null ? 'Salvar' : 'Adicionar'}
           </button>
@@ -387,6 +387,15 @@ function FooterSettingsPanel({ section }: { section: Section<'footer'> }) {
         value={s.logoUrl}
         onChange={(v) => update('logoUrl', v)}
         folder="logos"
+      />
+      <RangeSlider
+        label="Tamanho da logo"
+        value={s.logoSize || 32}
+        onChange={(v) => update('logoSize', v)}
+        min={16}
+        max={80}
+        step={2}
+        suffix="px"
       />
       <TextareaField label="Descrição" value={s.description} onChange={(v) => update('description', v)} />
       <TextInput label="CRECI" value={s.creci || ''} onChange={(v) => update('creci', v)} placeholder="CRECI J-00000/SC" />

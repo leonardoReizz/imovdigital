@@ -99,7 +99,7 @@ export function OverviewPage() {
   const { cards } = data;
 
   const statCards = [
-    { label: 'Imóveis Ativos', value: cards.activeProperties, total: cards.totalProperties, icon: Building2, color: 'bg-blue-500', sub: `${cards.totalProperties} cadastrados` },
+    { label: 'Imóveis Ativos', value: cards.activeProperties, total: cards.totalProperties, icon: Building2, color: 'bg-primary', sub: `${cards.totalProperties} cadastrados` },
     { label: 'Leads do Mês', value: cards.leadsThisMonth, icon: MessageSquare, color: 'bg-green-500', growth: cards.leadsGrowth, sub: cards.unseenLeads > 0 ? `${cards.unseenLeads} não lidos` : 'Todos lidos' },
     { label: 'Destaques', value: cards.featuredProperties, icon: Star, color: 'bg-amber-500', sub: 'Imóveis em destaque' },
     { label: 'Equipe', value: cards.totalUsers, icon: Users, color: 'bg-purple-500', sub: 'Membros ativos' },
@@ -111,7 +111,7 @@ export function OverviewPage() {
         <h2 className="text-2xl font-bold text-gray-900">Visão Geral</h2>
         <Link
           to="/dashboard/properties/new"
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+          className="flex items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
         >
           <Building2 className="w-4 h-4" />
           Novo Imóvel
@@ -158,7 +158,7 @@ export function OverviewPage() {
         >
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
             <h3 className="text-sm font-semibold text-gray-900">Últimos Leads</h3>
-            <Link to="/dashboard/leads" className="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+            <Link to="/dashboard/leads" className="text-xs text-primary hover:text-primary-dark font-medium flex items-center gap-1">
               Ver todos <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
@@ -172,17 +172,17 @@ export function OverviewPage() {
             <div>
               {data.recentLeads.map((lead) => (
                 <div key={lead.id} className="flex items-center gap-4 px-5 py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${lead.seen ? 'bg-gray-100' : 'bg-blue-100'}`}>
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${lead.seen ? 'bg-gray-100' : 'bg-primary/20'}`}>
                     {lead.source === 'WHATSAPP' ? (
-                      <Phone className={`w-4 h-4 ${lead.seen ? 'text-gray-400' : 'text-blue-600'}`} />
+                      <Phone className={`w-4 h-4 ${lead.seen ? 'text-gray-400' : 'text-primary'}`} />
                     ) : (
-                      <Mail className={`w-4 h-4 ${lead.seen ? 'text-gray-400' : 'text-blue-600'}`} />
+                      <Mail className={`w-4 h-4 ${lead.seen ? 'text-gray-400' : 'text-primary'}`} />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium text-gray-900 truncate">{canAccessLeads ? lead.name : `${lead.name.charAt(0)}${'•'.repeat(lead.name.length - 1)}`}</p>
-                      {!lead.seen && <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />}
+                      {!lead.seen && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
                     </div>
                     <p className="text-xs text-gray-400 truncate">
                       {!canAccessLeads
@@ -229,7 +229,7 @@ export function OverviewPage() {
                         <span className="text-xs font-semibold text-gray-900">{item.count}</span>
                       </div>
                       <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(item.count / max) * 100}%` }} />
+                        <div className="h-full bg-primary rounded-full" style={{ width: `${(item.count / max) * 100}%` }} />
                       </div>
                     </div>
                   );
@@ -269,7 +269,7 @@ export function OverviewPage() {
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
               <h3 className="text-sm font-semibold text-gray-900">Últimos Imóveis</h3>
-              <Link to="/dashboard/properties" className="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+              <Link to="/dashboard/properties" className="text-xs text-primary hover:text-primary-dark font-medium flex items-center gap-1">
                 Ver todos <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
@@ -297,7 +297,7 @@ export function OverviewPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-gray-900 truncate">{prop.title}</p>
-                      <p className={`text-xs font-semibold ${prop.listingType === 'RENT' ? 'text-blue-600' : 'text-gray-500'}`}>
+                      <p className={`text-xs font-semibold ${prop.listingType === 'RENT' ? 'text-primary' : 'text-gray-500'}`}>
                         {formatPrice(prop.listingType === 'RENT' && prop.rentPrice ? prop.rentPrice : prop.price)}
                         {prop.listingType === 'RENT' && <span className="font-normal text-gray-400">/mês</span>}
                       </p>

@@ -124,7 +124,7 @@ export function ImageUploader({
         onClick={handleClick}
         className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
           dragging
-            ? 'border-blue-400 bg-blue-50'
+            ? 'border-primary bg-primary-light'
             : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
         }`}
       >
@@ -192,7 +192,7 @@ export function ImageUploader({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   className={`relative w-32 h-32 rounded-xl overflow-hidden border-2 cursor-grab active:cursor-grabbing ${
-                    index === 0 ? 'border-blue-500' : 'border-gray-200'
+                    index === 0 ? 'border-primary' : 'border-gray-200'
                   }`}
                 >
                   <img
@@ -204,7 +204,7 @@ export function ImageUploader({
 
                   {/* Cover badge */}
                   {index === 0 && (
-                    <div className="absolute top-1.5 left-1.5 bg-blue-600 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                    <div className="absolute top-1.5 left-1.5 bg-primary text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
                       <Star className="w-2.5 h-2.5 fill-white" />
                       Capa
                     </div>

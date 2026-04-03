@@ -74,7 +74,7 @@ function SelectField({ label, value, options, onChange }: {
     <div className="flex items-center justify-between">
       <span className="text-sm text-gray-700">{label}</span>
       <div className="relative">
-        <select value={value} onChange={(e) => onChange(e.target.value)} className="appearance-none pl-3 pr-8 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-blue-500/20 outline-none">
+        <select value={value} onChange={(e) => onChange(e.target.value)} className="appearance-none pl-3 pr-8 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-primary/20 outline-none">
           {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
         <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
@@ -92,7 +92,7 @@ function ToggleField({ label, description, checked, onChange }: {
         <span className="text-sm text-gray-700">{label}</span>
         {description && <p className="text-xs text-gray-400 mt-0.5">{description}</p>}
       </div>
-      <button type="button" onClick={() => onChange(!checked)} className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${checked ? 'bg-blue-600' : 'bg-gray-200'}`}>
+      <button type="button" onClick={() => onChange(!checked)} className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${checked ? 'bg-primary' : 'bg-gray-200'}`}>
         <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${checked ? 'translate-x-[18px]' : 'translate-x-0.5'}`} />
       </button>
     </div>
@@ -108,7 +108,7 @@ function SliderField({ label, value, min, max, unit, onChange }: {
         <span className="text-sm text-gray-700">{label}</span>
         <span className="text-xs text-gray-400 font-mono">{value}{unit}</span>
       </div>
-      <input type="range" min={min} max={max} value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-600" />
+      <input type="range" min={min} max={max} value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer accent-primary" />
     </div>
   );
 }
@@ -214,7 +214,7 @@ export function BrandingPage() {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center h-96"><div className="w-8 h-8 border-2 border-gray-200 border-t-blue-600 rounded-full animate-spin" /></div>;
+    return <div className="flex items-center justify-center h-96"><div className="w-8 h-8 border-2 border-gray-200 border-t-primary rounded-full animate-spin" /></div>;
   }
 
   return (
@@ -222,16 +222,16 @@ export function BrandingPage() {
       {/* Top bar */}
       <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200 bg-white sticky top-0 z-20">
         <div className="flex items-center gap-3">
-          <Sparkles className="w-5 h-5 text-blue-600" />
+          <Sparkles className="w-5 h-5 text-primary" />
           <h1 className="text-lg font-bold text-gray-900">Identidade Visual</h1>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
-            <button onClick={() => setPreviewMode('desktop')} className={`p-1.5 rounded-md transition-colors ${previewMode === 'desktop' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}><Monitor className="w-4 h-4" /></button>
-            <button onClick={() => setPreviewMode('mobile')} className={`p-1.5 rounded-md transition-colors ${previewMode === 'mobile' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}><Smartphone className="w-4 h-4" /></button>
+            <button onClick={() => setPreviewMode('desktop')} className={`p-1.5 rounded-md transition-colors ${previewMode === 'desktop' ? 'bg-white shadow-sm text-primary' : 'text-gray-400'}`}><Monitor className="w-4 h-4" /></button>
+            <button onClick={() => setPreviewMode('mobile')} className={`p-1.5 rounded-md transition-colors ${previewMode === 'mobile' ? 'bg-white shadow-sm text-primary' : 'text-gray-400'}`}><Smartphone className="w-4 h-4" /></button>
           </div>
           <button onClick={() => { setTheme(THEME_MODERNO); setSaved(false); }} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 px-3 py-1.5"><RotateCcw className="w-3.5 h-3.5" />Resetar</button>
-          <motion.button onClick={handleSave} disabled={saving} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-lg shadow-blue-600/20">
+          <motion.button onClick={handleSave} disabled={saving} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex items-center gap-2 bg-primary text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-primary-dark transition-colors disabled:opacity-50 shadow-lg shadow-primary/20">
             {saving ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full" /> : saved ? <><Check className="w-4 h-4" />Salvo</> : <><Save className="w-4 h-4" />Salvar</>}
           </motion.button>
         </div>
@@ -242,7 +242,7 @@ export function BrandingPage() {
         <div className="w-[380px] border-r border-gray-200 bg-white flex shrink-0">
           <div className="w-14 border-r border-gray-100 bg-gray-50/50 py-2 flex flex-col items-center gap-1 shrink-0">
             {TABS.map((tab) => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)} title={tab.label} className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${activeTab === tab.id ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}>
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)} title={tab.label} className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${activeTab === tab.id ? 'bg-primary/20 text-primary' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}>
                 <tab.icon className="w-5 h-5" />
               </button>
             ))}
@@ -255,13 +255,13 @@ export function BrandingPage() {
                   <div><SectionTitle>Escolha um template</SectionTitle>
                     <div className="space-y-3">
                       {TEMPLATE_PRESETS.map((preset) => (
-                        <button key={preset.id} onClick={() => applyTemplate(preset.id)} className={`w-full text-left p-4 rounded-xl border-2 transition-all ${theme.templateId === preset.id ? 'border-blue-500 bg-blue-50/50' : 'border-gray-200 hover:border-blue-200'}`}>
+                        <button key={preset.id} onClick={() => applyTemplate(preset.id)} className={`w-full text-left p-4 rounded-xl border-2 transition-all ${theme.templateId === preset.id ? 'border-primary bg-primary-light/50' : 'border-gray-200 hover:border-primary/30'}`}>
                           <div className="flex items-start justify-between">
                             <div>
                               <p className="font-semibold text-sm text-gray-900">{preset.name}</p>
                               <p className="text-xs text-gray-500 mt-1 leading-relaxed">{preset.description}</p>
                             </div>
-                            {theme.templateId === preset.id && <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center shrink-0 ml-3"><Check className="w-3 h-3 text-white" /></div>}
+                            {theme.templateId === preset.id && <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center shrink-0 ml-3"><Check className="w-3 h-3 text-white" /></div>}
                           </div>
                           <div className="flex gap-1.5 mt-3">
                             {Object.values(preset.theme.colors).slice(0, 5).map((color, i) => <div key={i} className="w-6 h-6 rounded-md border border-gray-200" style={{ backgroundColor: color }} />)}
@@ -296,8 +296,8 @@ export function BrandingPage() {
                       <ToggleField label="Barra de busca" checked={theme.hero.showSearchBar} onChange={(v) => updateNested('hero', 'showSearchBar', v)} />
                       {theme.hero.showSearchBar && <SelectField label="Posição da busca" value={theme.hero.searchBarPosition} options={[{ value: 'center', label: 'Centralizada' }, { value: 'bottom', label: 'Inferior' }]} onChange={(v) => updateNested('hero', 'searchBarPosition', v)} />}
                       <SectionTitle>Textos</SectionTitle>
-                      <div><label className="text-sm text-gray-700 block mb-1">Título</label><input type="text" value={theme.hero.title} onChange={(e) => updateNested('hero', 'title', e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none" /></div>
-                      <div><label className="text-sm text-gray-700 block mb-1">Subtítulo</label><input type="text" value={theme.hero.subtitle} onChange={(e) => updateNested('hero', 'subtitle', e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none" /></div>
+                      <div><label className="text-sm text-gray-700 block mb-1">Título</label><input type="text" value={theme.hero.title} onChange={(e) => updateNested('hero', 'title', e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 outline-none" /></div>
+                      <div><label className="text-sm text-gray-700 block mb-1">Subtítulo</label><input type="text" value={theme.hero.subtitle} onChange={(e) => updateNested('hero', 'subtitle', e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 outline-none" /></div>
                     </>}
                   </div>
                 )}

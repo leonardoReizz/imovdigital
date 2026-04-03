@@ -35,7 +35,7 @@ export function PreviewHeader() {
             <img
               src={config.logoUrl}
               alt="Logo"
-              style={{ height: isMobile ? 24 : 28 }}
+              style={{ height: isMobile ? Math.min((config as any).logoSize || 32, 28) : (config as any).logoSize || 32 }}
               className="object-contain cursor-pointer"
               onClick={() => { navigatePreview({ type: 'home' }); setMenuOpen(false); }}
             />

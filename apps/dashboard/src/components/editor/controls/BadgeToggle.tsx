@@ -12,7 +12,7 @@ export function BadgeToggle({ label, value, onChange }: BadgeToggleProps) {
         type="button"
         onClick={() => onChange(!value)}
         className={`relative w-9 h-5 rounded-full transition-colors ${
-          value ? 'bg-blue-600' : 'bg-gray-200'
+          value ? 'bg-primary' : 'bg-gray-200'
         }`}
       >
         <span

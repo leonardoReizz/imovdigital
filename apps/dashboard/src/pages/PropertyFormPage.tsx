@@ -142,7 +142,7 @@ function SectionCard({
       className="bg-white rounded-xl border border-gray-200 overflow-hidden"
     >
       <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-        <Icon className="w-5 h-5 text-blue-600" />
+        <Icon className="w-5 h-5 text-primary" />
         <h3 className="text-base font-semibold text-gray-900">{title}</h3>
       </div>
       <div className="p-6">{children}</div>
@@ -185,7 +185,7 @@ function Input({
       <FieldLabel label={label} required={required} hint={hint} />
       <input
         {...props}
-        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm"
+        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
       />
     </div>
   );
@@ -209,7 +209,7 @@ function Select({
       <div className="relative">
         <select
           {...props}
-          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm appearance-none pr-10"
+          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm appearance-none pr-10"
         >
           <option value="">Selecione...</option>
           {options.map((opt) => (
@@ -242,7 +242,7 @@ function Textarea({
       <textarea
         rows={rows}
         {...props}
-        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm resize-none"
+        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm resize-none"
       />
     </div>
   );
@@ -263,7 +263,7 @@ function Toggle({
     <label className="flex items-start gap-3 cursor-pointer group">
       <div
         className={`relative w-10 h-6 rounded-full transition-colors shrink-0 mt-0.5 ${
-          checked ? 'bg-blue-600' : 'bg-gray-200'
+          checked ? 'bg-primary' : 'bg-gray-200'
         }`}
         onClick={() => onChange(!checked)}
       >
@@ -318,7 +318,7 @@ function CurrencyInput({
           value={display}
           onChange={handleChange}
           placeholder="R$ 0,00"
-          className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm"
+          className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
         />
       </div>
     </div>
@@ -671,7 +671,7 @@ export function PropertyFormPage() {
   if (loadingProperty) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="w-8 h-8 border-2 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-gray-200 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -734,7 +734,7 @@ export function PropertyFormPage() {
                   onClick={() => setActiveSection(section.id)}
                   className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeSection === section.id
-                      ? 'bg-blue-50 text-blue-700'
+                      ? 'bg-primary-light text-primary-dark'
                       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                   }`}
                 >
@@ -1045,13 +1045,13 @@ export function PropertyFormPage() {
                         addCustomAmenity();
                       }
                     }}
-                    className="w-full pl-10 pr-20 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm"
+                    className="w-full pl-10 pr-20 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
                   />
                   {amenitySearch.trim() && (
                     <button
                       type="button"
                       onClick={addCustomAmenity}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 bg-blue-50 px-2.5 py-1.5 rounded-lg"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs font-medium text-primary hover:text-primary-dark bg-primary-light px-2.5 py-1.5 rounded-lg"
                     >
                       <Plus className="w-3 h-3" />
                       Adicionar
@@ -1065,13 +1065,13 @@ export function PropertyFormPage() {
                     {form.amenities.map((amenity) => (
                       <span
                         key={amenity}
-                        className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-sm font-medium pl-3 pr-2 py-1.5 rounded-lg"
+                        className="inline-flex items-center gap-1.5 bg-primary-light text-primary-dark text-sm font-medium pl-3 pr-2 py-1.5 rounded-lg"
                       >
                         {amenity}
                         <button
                           type="button"
                           onClick={() => toggleAmenity(amenity)}
-                          className="hover:bg-blue-100 rounded p-0.5"
+                          className="hover:bg-primary/20 rounded p-0.5"
                         >
                           <X className="w-3.5 h-3.5" />
                         </button>
@@ -1087,7 +1087,7 @@ export function PropertyFormPage() {
                       key={amenity}
                       type="button"
                       onClick={() => toggleAmenity(amenity)}
-                      className="text-left px-3 py-2 text-sm rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                      className="text-left px-3 py-2 text-sm rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-primary-light transition-colors"
                     >
                       {amenity}
                     </button>
@@ -1118,7 +1118,7 @@ export function PropertyFormPage() {
                             <X className="w-3.5 h-3.5" />
                           </button>
                           {i === 0 && (
-                            <div className="absolute top-1.5 left-1.5 bg-blue-600 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                            <div className="absolute top-1.5 left-1.5 bg-primary text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
                               <Star className="w-2.5 h-2.5 fill-white" />
                               Capa
                             </div>
@@ -1219,7 +1219,7 @@ export function PropertyFormPage() {
                     Prévia no Google
                   </p>
                   <div className="space-y-1">
-                    <p className="text-blue-700 text-lg font-medium leading-snug truncate">
+                    <p className="text-primary-dark text-lg font-medium leading-snug truncate">
                       {form.metaTitle || form.title || 'Título do Imóvel'}
                     </p>
                     <p className="text-green-700 text-xs">
@@ -1286,7 +1286,7 @@ export function PropertyFormPage() {
                 disabled={loading}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                className="flex items-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-lg shadow-blue-600/20"
+                className="flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-xl font-semibold hover:bg-primary-dark transition-colors disabled:opacity-50 shadow-lg shadow-primary/20"
               >
                 {loading ? (
                   <motion.div

@@ -3,17 +3,18 @@ import { Home, Search, Info, Phone, Menu } from 'lucide-react';
 
 interface SiteHeaderProps {
   logoUrl: string | null;
+  logoSize?: number;
   siteName: string;
   primaryColor: string;
 }
 
-export function SiteHeader({ logoUrl, siteName, primaryColor }: SiteHeaderProps) {
+export function SiteHeader({ logoUrl, logoSize, siteName, primaryColor }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-8 py-3">
         <Link href="/" className="flex items-center gap-3 shrink-0">
           {logoUrl ? (
-            <img src={logoUrl} alt={siteName} className="h-8 object-contain" />
+            <img src={logoUrl} alt={siteName} className="object-contain" style={{ height: logoSize || 32 }} />
           ) : (
             <span className="text-lg font-bold" style={{ color: primaryColor }}>{siteName}</span>
           )}

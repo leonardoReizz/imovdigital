@@ -154,7 +154,7 @@ export function OrganizationPage() {
               <label className="text-sm font-medium text-gray-700">Nome da imobiliária</label>
               <input
                 {...form.register('name')}
-                className={`w-full px-4 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${form.formState.errors.name ? 'border-red-300' : 'border-gray-200'}`}
+                className={`w-full px-4 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary ${form.formState.errors.name ? 'border-red-300' : 'border-gray-200'}`}
               />
               {form.formState.errors.name && <p className="text-xs text-red-500">{form.formState.errors.name.message}</p>}
             </div>
@@ -184,7 +184,7 @@ export function OrganizationPage() {
           <button
             type="submit"
             disabled={form.formState.isSubmitting}
-            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark disabled:opacity-50 transition-colors"
           >
             {form.formState.isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Salvar

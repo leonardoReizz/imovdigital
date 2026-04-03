@@ -108,7 +108,7 @@ function Input({ value, onChange, placeholder, type = 'text' }: { value: string;
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
     />
   );
 }
@@ -216,7 +216,7 @@ export function ContactPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-lg shadow-blue-600/20"
+          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-primary-dark disabled:opacity-50 transition-colors shadow-lg shadow-primary/20"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Salvar
@@ -246,10 +246,10 @@ export function ContactPage() {
           </h3>
           <div className="grid grid-cols-2 gap-5">
             <Field label="WhatsApp" icon={MessageCircle}>
-              <PhoneInput value={form.whatsapp} onChange={(v) => update('whatsapp', v)} placeholder="(11) 99999-9999" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" />
+              <PhoneInput value={form.whatsapp} onChange={(v) => update('whatsapp', v)} placeholder="(11) 99999-9999" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm" />
             </Field>
             <Field label="Telefone fixo" icon={Phone}>
-              <PhoneInput value={form.phone} onChange={(v) => update('phone', v)} placeholder="(11) 3333-3333" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" />
+              <PhoneInput value={form.phone} onChange={(v) => update('phone', v)} placeholder="(11) 3333-3333" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm" />
             </Field>
           </div>
           <div className="mt-4">
@@ -259,7 +259,7 @@ export function ContactPage() {
                 onChange={(e) => update('whatsappMessage', e.target.value)}
                 placeholder="Olá! Gostaria de mais informações sobre os imóveis..."
                 rows={2}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none transition-all"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none transition-all"
               />
               <p className="text-xs text-gray-400 mt-1">
                 Essa mensagem será pré-preenchida quando o visitante clicar no botão de WhatsApp
@@ -271,7 +271,7 @@ export function ContactPage() {
         {/* Email & Form */}
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="bg-white rounded-xl border border-gray-200 p-6">
           <h3 className="text-base font-semibold text-gray-900 mb-5 flex items-center gap-2">
-            <Mail className="w-5 h-5 text-blue-500" />
+            <Mail className="w-5 h-5 text-primary" />
             E-mail e Formulário
           </h3>
           <div className="space-y-4">
@@ -289,7 +289,7 @@ export function ContactPage() {
               <button
                 type="button"
                 onClick={() => update('showForm', !form.showForm)}
-                className={`relative w-11 h-6 rounded-full transition-colors ${form.showForm ? 'bg-blue-600' : 'bg-gray-200'}`}
+                className={`relative w-11 h-6 rounded-full transition-colors ${form.showForm ? 'bg-primary' : 'bg-gray-200'}`}
               >
                 <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${form.showForm ? 'translate-x-5' : ''}`} />
               </button>
@@ -326,7 +326,7 @@ export function ContactPage() {
                 <select
                   value={form.state}
                   onChange={(e) => update('state', e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                 >
                   <option value="">UF</option>
                   {STATES.map((s) => <option key={s} value={s}>{s}</option>)}
@@ -357,7 +357,7 @@ export function ContactPage() {
                   value={form.businessHours[key as keyof BusinessHours]}
                   onChange={(e) => updateHour(key, e.target.value)}
                   placeholder="Fechado"
-                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                 />
                 {form.businessHours[key as keyof BusinessHours] ? (
                   <span className="text-xs text-green-600 w-16 text-right">Aberto</span>

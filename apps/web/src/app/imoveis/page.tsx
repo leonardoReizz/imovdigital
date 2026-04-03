@@ -59,7 +59,7 @@ export default async function ImoveisPage({ searchParams }: Props) {
 
   return (
     <>
-      <SiteHeader logoUrl={logoUrl} siteName={tenant.name} primaryColor={primaryColor} />
+      <SiteHeader logoUrl={logoUrl} logoSize={(siteConfig as any)?.logoSize} siteName={tenant.name} primaryColor={primaryColor} />
 
       {sp.filterPosition === 'top' && (
         <Suspense>

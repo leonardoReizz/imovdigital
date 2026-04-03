@@ -135,7 +135,7 @@ export function PropertiesPage() {
         {canAddProperty ? (
           <Link
             to="/dashboard/properties/new"
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+            className="flex items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl font-medium hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
           >
             <Plus className="w-5 h-5" />
             Novo Imóvel
@@ -164,7 +164,7 @@ export function PropertiesPage() {
               placeholder="Buscar por título, bairro ou cidade..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
             />
           </div>
           <div className="flex gap-3">
@@ -172,7 +172,7 @@ export function PropertiesPage() {
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2.5 border border-gray-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                className="appearance-none pl-3 pr-8 py-2.5 border border-gray-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               >
                 <option value="">Tipo</option>
                 <option value="APARTMENT">Apartamento</option>
@@ -187,7 +187,7 @@ export function PropertiesPage() {
               <select
                 value={filterListing}
                 onChange={(e) => setFilterListing(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2.5 border border-gray-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                className="appearance-none pl-3 pr-8 py-2.5 border border-gray-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               >
                 <option value="">Anúncio</option>
                 <option value="SALE">Venda</option>
@@ -202,7 +202,7 @@ export function PropertiesPage() {
                 onChange={(e) =>
                   setFilterActive(e.target.value as '' | 'true' | 'false')
                 }
-                className="appearance-none pl-3 pr-8 py-2.5 border border-gray-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                className="appearance-none pl-3 pr-8 py-2.5 border border-gray-200 rounded-xl bg-white text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               >
                 <option value="">Status</option>
                 <option value="true">Ativos</option>
@@ -220,7 +220,7 @@ export function PropertiesPage() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            className="w-8 h-8 border-2 border-gray-200 border-t-blue-600 rounded-full mx-auto"
+            className="w-8 h-8 border-2 border-gray-200 border-t-primary rounded-full mx-auto"
           />
           <p className="text-sm text-gray-400 mt-4">Carregando imóveis...</p>
         </div>
@@ -299,7 +299,7 @@ export function PropertiesPage() {
                       <div className="text-right shrink-0">
                         {property.listingType === 'RENT' ? (
                           <>
-                            <p className="text-sm font-bold text-blue-600">
+                            <p className="text-sm font-bold text-primary">
                               {formatPrice(property.rentPrice || property.price)}/mês
                             </p>
                           </>
@@ -309,7 +309,7 @@ export function PropertiesPage() {
                               {formatPrice(property.price)}
                             </p>
                             {property.rentPrice && (
-                              <p className="text-xs font-semibold text-blue-600">
+                              <p className="text-xs font-semibold text-primary">
                                 {formatPrice(property.rentPrice)}/mês
                               </p>
                             )}
@@ -328,7 +328,7 @@ export function PropertiesPage() {
                         <span className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md font-medium text-gray-600">
                           {TYPE_LABELS[property.type] || property.type}
                         </span>
-                        <span className="inline-flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-md font-medium text-blue-600">
+                        <span className="inline-flex items-center gap-1 bg-primary-light px-2 py-1 rounded-md font-medium text-primary">
                           {LISTING_LABELS[property.listingType] || property.listingType}
                         </span>
                         <span className="hidden sm:inline-flex items-center gap-1">

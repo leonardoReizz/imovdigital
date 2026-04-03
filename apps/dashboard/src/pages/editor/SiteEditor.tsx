@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { useAutoSave } from '../../hooks/useAutoSave';
+import logoImg from '../../assets/logo.png';
 import { SectionsList } from '../../components/editor/SectionsList';
 import { SectionSettings } from '../../components/editor/SectionSettings';
 import { GlobalSettings } from '../../components/editor/GlobalSettings';
@@ -137,10 +138,10 @@ export function SiteEditor() {
         <div className="flex items-center gap-4">
           <a
             href="/dashboard"
-            className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+            className="flex items-center gap-2 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
-            ImovDigital
+            <ArrowLeft className="w-4 h-4 text-gray-500" />
+            <img src={logoImg} alt="ImovDigital" className="h-14 object-contain" />
           </a>
           <div className="h-5 w-px bg-gray-200" />
           <span className="text-sm text-gray-500">Editor do Site</span>
@@ -211,7 +212,7 @@ export function SiteEditor() {
           {/* Publish */}
           <button
             onClick={handlePublish}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
           >
             <Upload className="w-4 h-4" />
             Publicar
@@ -239,7 +240,7 @@ export function SiteEditor() {
             <button
               onClick={() => { navigatePreview({ type: 'home' }); setActiveTab('sections'); }}
               className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
-                previewPage.type === 'home' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'
+                previewPage.type === 'home' ? 'bg-primary/10 text-primary' : 'text-gray-500 hover:bg-gray-50'
               }`}
             >
               <Home className="w-3.5 h-3.5" />
@@ -248,7 +249,7 @@ export function SiteEditor() {
             <button
               onClick={() => { navigatePreview({ type: 'search' }); setActiveTab('search'); }}
               className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
-                previewPage.type === 'search' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'
+                previewPage.type === 'search' ? 'bg-primary/10 text-primary' : 'text-gray-500 hover:bg-gray-50'
               }`}
             >
               <Search className="w-3.5 h-3.5" />
@@ -263,7 +264,7 @@ export function SiteEditor() {
                 }
               }}
               className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
-                previewPage.type === 'property' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'
+                previewPage.type === 'property' ? 'bg-primary/10 text-primary' : 'text-gray-500 hover:bg-gray-50'
               }`}
             >
               <Building2 className="w-3.5 h-3.5" />
@@ -282,7 +283,7 @@ export function SiteEditor() {
               }}
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-medium transition-colors ${
                 effectiveTab === 'sections' || effectiveTab === 'search' || effectiveTab === 'property'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  ? 'text-primary border-b-2 border-primary'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -293,7 +294,7 @@ export function SiteEditor() {
               onClick={() => setActiveTab('global')}
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-medium transition-colors ${
                 effectiveTab === 'global'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  ? 'text-primary border-b-2 border-primary'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >

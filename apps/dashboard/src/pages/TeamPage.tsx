@@ -35,7 +35,7 @@ interface TeamMember {
 
 const ROLE_CONFIG: Record<string, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   OWNER: { label: 'Proprietário', color: 'text-amber-700', bg: 'bg-amber-50', icon: Crown },
-  ADMIN: { label: 'Administrador', color: 'text-blue-700', bg: 'bg-blue-50', icon: Shield },
+  ADMIN: { label: 'Administrador', color: 'text-primary-dark', bg: 'bg-primary-light', icon: Shield },
   AGENT: { label: 'Corretor', color: 'text-green-700', bg: 'bg-green-50', icon: UserCheck },
 };
 
@@ -121,7 +121,7 @@ function MemberModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Nome do membro"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
             />
           </div>
 
@@ -133,7 +133,7 @@ function MemberModal({
               onChange={(e) => setEmail(e.target.value)}
               placeholder="email@exemplo.com"
               disabled={isEditing}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none disabled:bg-gray-50 disabled:text-gray-400"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none disabled:bg-gray-50 disabled:text-gray-400"
             />
           </div>
 
@@ -143,7 +143,7 @@ function MemberModal({
               value={phone}
               onChange={setPhone}
               placeholder="(11) 99999-9999"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
             />
           </div>
 
@@ -184,7 +184,7 @@ function MemberModal({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={isEditing ? 'Manter senha atual' : 'Mínimo 6 caracteres'}
-                className="w-full px-4 py-2.5 pr-10 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2.5 pr-10 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
               <button
                 type="button"
@@ -208,7 +208,7 @@ function MemberModal({
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 px-5 py-2 text-sm font-medium bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="flex items-center gap-2 px-5 py-2 text-sm font-medium bg-primary text-white rounded-xl hover:bg-primary-dark disabled:opacity-50 transition-colors"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
               {isEditing ? 'Salvar' : 'Adicionar'}
@@ -288,7 +288,7 @@ export function TeamPage() {
         </div>
         <button
           onClick={() => setModal({ open: true, member: null })}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
         >
           <Plus className="w-4 h-4" />
           Novo Membro
@@ -433,7 +433,7 @@ export function TeamPage() {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <Shield className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
+            <Shield className="w-4 h-4 text-primary mt-0.5 shrink-0" />
             <div>
               <p className="font-medium text-gray-700">Administrador</p>
               <p className="text-xs text-gray-500">Gerencia imóveis, leads, equipe, editor do site e configurações. Sem acesso à assinatura.</p>

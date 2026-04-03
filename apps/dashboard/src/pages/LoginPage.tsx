@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
-import { Building2, Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { api } from '../lib/api';
+import logoImg from '../assets/logo.png';
 
 const loginSchema = z.object({
   email: z.string().min(1, 'E-mail é obrigatório').email('E-mail inválido'),
@@ -49,11 +50,11 @@ export function LoginPage() {
         initial={{ x: -60, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800 relative overflow-hidden"
+        className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-primary via-primary-dark to-primary-dark relative overflow-hidden"
       >
         <div className="absolute inset-0">
           <div className="absolute top-20 -left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
           <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-indigo-400/10 rounded-full blur-3xl" />
         </div>
 
@@ -64,10 +65,7 @@ export function LoginPage() {
             transition={{ delay: 0.3, duration: 0.5 }}
             className="flex items-center gap-3"
           >
-            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-white">ImovDigital</span>
+            <img src={logoImg} alt="ImovDigital" className="h-14 object-contain brightness-0 invert" />
           </motion.div>
 
           <motion.div
@@ -81,9 +79,9 @@ export function LoginPage() {
               <br />
               imobiliária com
               <br />
-              <span className="text-blue-200">simplicidade.</span>
+              <span className="text-green-200">simplicidade.</span>
             </h1>
-            <p className="text-blue-100/80 text-lg max-w-md">
+            <p className="text-green-100/80 text-lg max-w-md">
               Portal completo para cadastrar imóveis, receber leads e fortalecer
               sua marca online.
             </p>
@@ -102,7 +100,7 @@ export function LoginPage() {
             ].map((stat) => (
               <div key={stat.label}>
                 <p className="text-2xl font-bold text-white">{stat.value}</p>
-                <p className="text-sm text-blue-200/70">{stat.label}</p>
+                <p className="text-sm text-green-200/70">{stat.label}</p>
               </div>
             ))}
           </motion.div>
@@ -118,10 +116,7 @@ export function LoginPage() {
           className="w-full max-w-md"
         >
           <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900">ImovDigital</span>
+            <img src={logoImg} alt="ImovDigital" className="h-14 object-contain" />
           </div>
 
           <div className="mb-8">
@@ -154,7 +149,7 @@ export function LoginPage() {
                   {...register('email')}
                   type="email"
                   placeholder="seu@email.com"
-                  className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${errors.email ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${errors.email ? 'border-red-300' : 'border-gray-200'}`}
                 />
               </div>
               {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
@@ -163,7 +158,7 @@ export function LoginPage() {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="block text-sm font-medium text-gray-700">Senha</label>
-                <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                <Link to="/forgot-password" className="text-sm text-primary hover:text-primary-dark font-medium">
                   Esqueceu a senha?
                 </Link>
               </div>
@@ -173,7 +168,7 @@ export function LoginPage() {
                   {...register('password')}
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Sua senha"
-                  className={`w-full pl-11 pr-12 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${errors.password ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full pl-11 pr-12 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${errors.password ? 'border-red-300' : 'border-gray-200'}`}
                 />
                 <button
                   type="button"
@@ -191,7 +186,7 @@ export function LoginPage() {
               disabled={isSubmitting}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
+              className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
             >
               {isSubmitting ? (
                 <motion.div
@@ -210,7 +205,7 @@ export function LoginPage() {
 
           <p className="text-center text-sm text-gray-500 mt-8">
             Não tem uma conta?{' '}
-            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
+            <Link to="/register" className="text-primary hover:text-primary-dark font-semibold">
               Cadastre-se grátis
             </Link>
           </p>

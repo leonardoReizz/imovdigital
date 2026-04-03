@@ -68,18 +68,18 @@ function SectionWrapper({ section, index, total }: { section: Section; index: nu
 
   return (
     <div
-      className={`relative group ${isSelected ? 'ring-2 ring-blue-500 ring-offset-1' : ''}`}
+      className={`relative group ${isSelected ? 'ring-2 ring-primary ring-offset-1' : ''}`}
     >
       <Preview settings={section.settings} />
 
       {/* Hover overlay */}
-      <div className="absolute inset-0 border-2 border-transparent group-hover:border-dashed group-hover:border-blue-400/50 transition-colors pointer-events-none" />
+      <div className="absolute inset-0 border-2 border-transparent group-hover:border-dashed group-hover:border-primary/50 transition-colors pointer-events-none" />
 
       {/* Action buttons */}
       <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
         <button
           onClick={() => selectSection(section.id)}
-          className="p-1.5 bg-blue-600 text-white rounded-lg shadow-lg text-xs flex items-center gap-1"
+          className="p-1.5 bg-primary text-white rounded-lg shadow-lg text-xs flex items-center gap-1"
           title="Editar"
         >
           <Pencil className="w-3 h-3" />
@@ -172,7 +172,7 @@ function PropertyPagePreview({ propertyId }: { propertyId: string }) {
         <p className="text-sm">Imóvel não encontrado</p>
         <button
           onClick={() => navigatePreview({ type: 'home' })}
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm text-primary hover:underline"
         >
           Voltar à página inicial
         </button>

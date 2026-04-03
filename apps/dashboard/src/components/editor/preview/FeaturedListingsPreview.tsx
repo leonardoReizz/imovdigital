@@ -110,7 +110,7 @@ function PlaceholderCard({ showPrice, showBadge }: { showPrice: boolean; showBad
       <div className="relative aspect-[16/10] bg-gray-100 flex items-center justify-center">
         <Home className="w-10 h-10 text-gray-200" />
         {showBadge && (
-          <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-medium px-2 py-0.5 rounded-md">
+          <span className="absolute top-3 left-3 bg-primary text-white text-xs font-medium px-2 py-0.5 rounded-md">
             Destaque
           </span>
         )}

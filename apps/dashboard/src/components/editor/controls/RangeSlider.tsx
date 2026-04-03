@@ -32,7 +32,7 @@ export function RangeSlider({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-600"
+        className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer accent-primary"
       />
     </div>
   );

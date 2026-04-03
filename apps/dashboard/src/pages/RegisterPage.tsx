@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { api } from '../lib/api';
 import { formatPhone } from '../components/PhoneInput';
+import logoImg from '../assets/logo.png';
 
 const step1Schema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -78,28 +79,23 @@ export function RegisterPage() {
         initial={{ x: -60, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800 relative overflow-hidden"
+        className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-primary via-primary-dark to-primary-dark relative overflow-hidden"
       >
         <div className="absolute inset-0">
           <div className="absolute top-20 -left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
           <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-indigo-400/10 rounded-full blur-3xl" />
         </div>
 
-        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-white">ImovDigital</span>
-          </div>
+        <div className="relative z-10 flex flex-col justify-between p-12 w-full items-start">
+          <img src={logoImg} alt="ImovDigital" className="h-14 object-contain brightness-0 invert" />
 
           <div className="space-y-6">
             <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight">
               Comece a<br />transformar sua<br />
-              <span className="text-blue-200">imobiliária.</span>
+              <span className="text-green-200">imobiliária.</span>
             </h1>
-            <p className="text-blue-100/80 text-lg max-w-md">
+            <p className="text-green-100/80 text-lg max-w-md">
               Crie sua conta em segundos e tenha acesso completo ao portal mais moderno do mercado imobiliário.
             </p>
           </div>
@@ -111,10 +107,10 @@ export function RegisterPage() {
               '7 dias grátis, sem cartão de crédito',
             ].map((item) => (
               <div key={item} className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full bg-blue-500/30 flex items-center justify-center">
-                  <Check className="w-3.5 h-3.5 text-blue-200" />
+                <div className="w-6 h-6 rounded-full bg-primary/80/30 flex items-center justify-center">
+                  <Check className="w-3.5 h-3.5 text-green-200" />
                 </div>
-                <span className="text-blue-100/90 text-sm">{item}</span>
+                <span className="text-green-100/90 text-sm">{item}</span>
               </div>
             ))}
           </div>
@@ -129,11 +125,8 @@ export function RegisterPage() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="w-full max-w-md"
         >
-          <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900">ImovDigital</span>
+          <div className="lg:hidden mb-10">
+            <img src={logoImg} alt="ImovDigital" className="h-14 object-contain" />
           </div>
 
           <div className="mb-8">
@@ -147,12 +140,12 @@ export function RegisterPage() {
           <div className="flex items-center gap-3 mb-8">
             {[1, 2].map((s) => (
               <div key={s} className="flex items-center gap-3 flex-1">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${step >= s ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${step >= s ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'}`}>
                   {step > s ? <Check className="w-4 h-4" /> : s}
                 </div>
                 {s < 2 && (
                   <div className="flex-1 h-0.5 rounded-full bg-gray-200 overflow-hidden">
-                    <motion.div className="h-full bg-blue-600" initial={{ width: 0 }} animate={{ width: step > 1 ? '100%' : '0%' }} transition={{ duration: 0.3 }} />
+                    <motion.div className="h-full bg-primary" initial={{ width: 0 }} animate={{ width: step > 1 ? '100%' : '0%' }} transition={{ duration: 0.3 }} />
                   </div>
                 )}
               </div>
@@ -185,7 +178,7 @@ export function RegisterPage() {
                   <label className="block text-sm font-medium text-gray-700">Nome completo</label>
                   <div className="relative">
                     <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input {...form1.register('name')} placeholder="Seu nome" className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${form1.formState.errors.name ? 'border-red-300' : 'border-gray-200'}`} />
+                    <input {...form1.register('name')} placeholder="Seu nome" className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${form1.formState.errors.name ? 'border-red-300' : 'border-gray-200'}`} />
                   </div>
                   {form1.formState.errors.name && <p className="text-xs text-red-500 mt-1">{form1.formState.errors.name.message}</p>}
                 </div>
@@ -194,7 +187,7 @@ export function RegisterPage() {
                   <label className="block text-sm font-medium text-gray-700">E-mail</label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input {...form1.register('email')} type="email" placeholder="seu@email.com" className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${form1.formState.errors.email ? 'border-red-300' : 'border-gray-200'}`} />
+                    <input {...form1.register('email')} type="email" placeholder="seu@email.com" className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${form1.formState.errors.email ? 'border-red-300' : 'border-gray-200'}`} />
                   </div>
                   {form1.formState.errors.email && <p className="text-xs text-red-500 mt-1">{form1.formState.errors.email.message}</p>}
                 </div>
@@ -208,7 +201,7 @@ export function RegisterPage() {
                       value={formatPhone(form1.watch('phone') || '')}
                       onChange={(e) => form1.setValue('phone', e.target.value.replace(/\D/g, '').slice(0, 11))}
                       placeholder="(11) 99999-9999"
-                      className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                      className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -217,12 +210,12 @@ export function RegisterPage() {
                   <label className="block text-sm font-medium text-gray-700">Nome da imobiliária</label>
                   <div className="relative">
                     <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input {...form1.register('agencyName')} placeholder="Minha Imobiliária" className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${form1.formState.errors.agencyName ? 'border-red-300' : 'border-gray-200'}`} />
+                    <input {...form1.register('agencyName')} placeholder="Minha Imobiliária" className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${form1.formState.errors.agencyName ? 'border-red-300' : 'border-gray-200'}`} />
                   </div>
                   {form1.formState.errors.agencyName && <p className="text-xs text-red-500 mt-1">{form1.formState.errors.agencyName.message}</p>}
                 </div>
 
-                <motion.button type="submit" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20">
+                <motion.button type="submit" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
                   Continuar <ArrowRight className="w-4 h-4" />
                 </motion.button>
               </motion.form>
@@ -244,7 +237,7 @@ export function RegisterPage() {
                       {...form2.register('password')}
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Crie uma senha"
-                      className={`w-full pl-11 pr-12 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${form2.formState.errors.password ? 'border-red-300' : 'border-gray-200'}`}
+                      className={`w-full pl-11 pr-12 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${form2.formState.errors.password ? 'border-red-300' : 'border-gray-200'}`}
                     />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -275,7 +268,7 @@ export function RegisterPage() {
                       {...form2.register('confirmPassword')}
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Confirme sua senha"
-                      className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${form2.formState.errors.confirmPassword ? 'border-red-300' : 'border-gray-200'}`}
+                      className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${form2.formState.errors.confirmPassword ? 'border-red-300' : 'border-gray-200'}`}
                     />
                   </div>
                   {form2.formState.errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{form2.formState.errors.confirmPassword.message}</p>}
@@ -290,7 +283,7 @@ export function RegisterPage() {
                     disabled={form2.formState.isSubmitting}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex-[2] bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
+                    className="flex-[2] bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
                   >
                     {form2.formState.isSubmitting ? (
                       <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
@@ -305,7 +298,7 @@ export function RegisterPage() {
 
           <p className="text-center text-sm text-gray-500 mt-8">
             Já tem uma conta?{' '}
-            <Link to="/login" className="text-blue-600 hover:text-blue-700 font-semibold">Fazer login</Link>
+            <Link to="/login" className="text-primary hover:text-primary-dark font-semibold">Fazer login</Link>
           </p>
         </motion.div>
       </div>

@@ -61,6 +61,10 @@ export class UpdateSiteConfigDto {
   fontSize?: number;
 
   @IsOptional()
+  @IsNumber()
+  logoSize?: number;
+
+  @IsOptional()
   @IsObject()
   propertyDetail?: Record<string, unknown>;
 

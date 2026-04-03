@@ -171,7 +171,7 @@ export function SettingsPage() {
               <label className="text-sm font-medium text-gray-700">Nome completo</label>
               <input
                 {...profileForm.register('name')}
-                className={`w-full px-4 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${profileForm.formState.errors.name ? 'border-red-300' : 'border-gray-200'}`}
+                className={`w-full px-4 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary ${profileForm.formState.errors.name ? 'border-red-300' : 'border-gray-200'}`}
               />
               {profileForm.formState.errors.name && <p className="text-xs text-red-500">{profileForm.formState.errors.name.message}</p>}
             </div>
@@ -182,7 +182,7 @@ export function SettingsPage() {
                 value={formatPhone(profileForm.watch('phone') || '')}
                 onChange={(e) => profileForm.setValue('phone', e.target.value.replace(/\D/g, '').slice(0, 11))}
                 placeholder="(11) 99999-9999"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
               />
             </div>
           </div>
@@ -195,7 +195,7 @@ export function SettingsPage() {
           <button
             type="submit"
             disabled={profileForm.formState.isSubmitting}
-            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark disabled:opacity-50 transition-colors"
           >
             {profileForm.formState.isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Salvar
@@ -240,7 +240,7 @@ export function SettingsPage() {
               <input
                 {...passwordForm.register('currentPassword')}
                 type={showCurrentPassword ? 'text' : 'password'}
-                className={`w-full px-4 py-2.5 pr-10 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${passwordForm.formState.errors.currentPassword ? 'border-red-300' : 'border-gray-200'}`}
+                className={`w-full px-4 py-2.5 pr-10 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary ${passwordForm.formState.errors.currentPassword ? 'border-red-300' : 'border-gray-200'}`}
               />
               <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                 {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -256,7 +256,7 @@ export function SettingsPage() {
                 <input
                   {...passwordForm.register('newPassword')}
                   type={showNewPassword ? 'text' : 'password'}
-                  className={`w-full px-4 py-2.5 pr-10 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${passwordForm.formState.errors.newPassword ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full px-4 py-2.5 pr-10 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary ${passwordForm.formState.errors.newPassword ? 'border-red-300' : 'border-gray-200'}`}
                 />
                 <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                   {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -269,7 +269,7 @@ export function SettingsPage() {
               <input
                 {...passwordForm.register('confirmPassword')}
                 type={showNewPassword ? 'text' : 'password'}
-                className={`w-full px-4 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${passwordForm.formState.errors.confirmPassword ? 'border-red-300' : 'border-gray-200'}`}
+                className={`w-full px-4 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary ${passwordForm.formState.errors.confirmPassword ? 'border-red-300' : 'border-gray-200'}`}
               />
               {passwordForm.formState.errors.confirmPassword && <p className="text-xs text-red-500">{passwordForm.formState.errors.confirmPassword.message}</p>}
             </div>
@@ -278,7 +278,7 @@ export function SettingsPage() {
           <button
             type="submit"
             disabled={passwordForm.formState.isSubmitting}
-            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark disabled:opacity-50 transition-colors"
           >
             {passwordForm.formState.isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
             Alterar senha

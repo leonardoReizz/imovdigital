@@ -28,7 +28,7 @@ interface Lead {
 }
 
 const SOURCE_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  FORM: { label: 'Formulário', color: 'bg-blue-50 text-blue-700', icon: Mail },
+  FORM: { label: 'Formulário', color: 'bg-primary-light text-primary-dark', icon: Mail },
   WHATSAPP: { label: 'WhatsApp', color: 'bg-green-50 text-green-700', icon: MessageSquare },
   PHONE: { label: 'Telefone', color: 'bg-purple-50 text-purple-700', icon: Phone },
 };
@@ -126,11 +126,11 @@ function LeadsContent() {
           <h2 className="text-2xl font-bold text-gray-900">Leads</h2>
           <p className="text-sm text-gray-500 mt-0.5">
             {total} {total === 1 ? 'lead' : 'leads'}
-            {unseenCount > 0 && <> &middot; <span className="text-blue-600 font-medium">{unseenCount} não {unseenCount === 1 ? 'lido' : 'lidos'}</span></>}
+            {unseenCount > 0 && <> &middot; <span className="text-primary font-medium">{unseenCount} não {unseenCount === 1 ? 'lido' : 'lidos'}</span></>}
           </p>
         </div>
         {unseenCount > 0 && (
-          <button onClick={handleMarkAllSeen} className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20">
+          <button onClick={handleMarkAllSeen} className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20">
             <CheckCheck className="w-4 h-4" />
             Marcar todos como lidos
           </button>
@@ -147,7 +147,7 @@ function LeadsContent() {
               placeholder="Buscar por nome, e-mail ou telefone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
             />
           </div>
           <div className="flex gap-2">
@@ -203,13 +203,13 @@ function LeadsContent() {
                       if (!lead.seen) handleMarkSeen(lead.id);
                     }}
                     className={`group flex items-center gap-3 px-4 py-3.5 border-b border-gray-100 last:border-0 transition-colors ${
-                      isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
-                    } ${!lead.seen ? 'bg-blue-50/30' : ''}`}
+                      isSelected ? 'bg-primary-light' : 'hover:bg-gray-50'
+                    } ${!lead.seen ? 'bg-primary-light/30' : ''}`}
                   >
-                    <div className={`w-2 h-2 rounded-full shrink-0 ${lead.seen ? 'bg-transparent' : 'bg-blue-500'}`} />
+                    <div className={`w-2 h-2 rounded-full shrink-0 ${lead.seen ? 'bg-transparent' : 'bg-primary'}`} />
 
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${lead.seen ? 'bg-gray-100' : 'bg-blue-100'}`}>
-                      <src.icon className={`w-4 h-4 ${lead.seen ? 'text-gray-400' : 'text-blue-600'}`} />
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${lead.seen ? 'bg-gray-100' : 'bg-primary/20'}`}>
+                      <src.icon className={`w-4 h-4 ${lead.seen ? 'text-gray-400' : 'text-primary'}`} />
                     </div>
 
                     <div className="flex-1 min-w-0">
@@ -258,12 +258,12 @@ function LeadsContent() {
                   {/* Contact */}
                   <div className="space-y-3">
                     {selectedLead.email && (
-                      <a href={`mailto:${selectedLead.email}`} className="flex items-center gap-3 text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                      <a href={`mailto:${selectedLead.email}`} className="flex items-center gap-3 text-sm text-gray-600 hover:text-primary transition-colors">
                         <Mail className="w-4 h-4 text-gray-400" />{selectedLead.email}
                       </a>
                     )}
                     {selectedLead.phone && (
-                      <a href={`tel:${selectedLead.phone}`} className="flex items-center gap-3 text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                      <a href={`tel:${selectedLead.phone}`} className="flex items-center gap-3 text-sm text-gray-600 hover:text-primary transition-colors">
                         <Phone className="w-4 h-4 text-gray-400" />{selectedLead.phone}
                       </a>
                     )}

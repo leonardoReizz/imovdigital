@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   LayoutDashboard,
   Building2,
@@ -20,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { SupportWidget } from '../components/SupportWidget';
+import logoImg from '../assets/logo.png';
 import { api } from '../lib/api';
 
 interface NavItem {
@@ -51,6 +53,7 @@ const navItems: NavItem[] = [
 
 export function DashboardLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { limits, isTrial, trialDaysLeft, trialExpired } = useSubscription();
 
   const [userName, setUserName] = useState('');
@@ -137,18 +140,21 @@ export function DashboardLayout() {
   return (
     <div className="flex h-screen bg-gray-50">
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        {/* Tenant switcher */}
-        <div className="p-4 border-b border-gray-200" ref={tenantMenuRef}>
-          <div className="relative">
+        {/* Logo + Tenant switcher */}
+        <div className="border-b border-gray-200" ref={tenantMenuRef}>
+          <div className="px-5 pt-5 pb-0">
+            <img src={logoImg} alt="ImovDigital" className="h-14 object-contain" />
+          </div>
+          <div className="px-3 pb-3 relative">
             <button
               onClick={() => setTenantMenuOpen(!tenantMenuOpen)}
-              className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
-                <Building2 className="w-4 h-4 text-white" />
+              <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                <Building2 className="w-3.5 h-3.5 text-primary" />
               </div>
               <div className="flex-1 text-left min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">{currentTenant?.name || 'Carregando...'}</p>
+                <p className="text-xs font-semibold text-gray-900 truncate">{currentTenant?.name || 'Carregando...'}</p>
               </div>
               <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${tenantMenuOpen ? 'rotate-180' : ''}`} />
             </button>
@@ -168,7 +174,7 @@ export function DashboardLayout() {
                       <p className="font-medium text-gray-900 truncate">{t.name}</p>
                       <p className="text-xs text-gray-400">{t.slug}</p>
                     </div>
-                    {t.id === currentTenant?.id && <Check className="w-4 h-4 text-blue-600 shrink-0" />}
+                    {t.id === currentTenant?.id && <Check className="w-4 h-4 text-primary shrink-0" />}
                   </button>
                 ))}
 
@@ -179,7 +185,7 @@ export function DashboardLayout() {
                         value={newTenantName}
                         onChange={(e) => setNewTenantName(e.target.value)}
                         placeholder="Nome da imobiliária"
-                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary"
                         autoFocus
                         onKeyDown={(e) => e.key === 'Enter' && handleCreateTenant()}
                       />
@@ -193,7 +199,7 @@ export function DashboardLayout() {
                         <button
                           onClick={handleCreateTenant}
                           disabled={creatingTenant || !newTenantName.trim()}
-                          className="flex-1 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg disabled:opacity-50"
+                          className="flex-1 py-1.5 text-xs font-medium text-white bg-primary rounded-lg disabled:opacity-50"
                         >
                           {creatingTenant ? 'Criando...' : 'Criar'}
                         </button>
@@ -202,7 +208,7 @@ export function DashboardLayout() {
                   ) : (
                     <button
                       onClick={() => setShowNewTenant(true)}
-                      className="flex items-center gap-2 w-full px-4 py-3 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
+                      className="flex items-center gap-2 w-full px-4 py-3 text-sm text-primary hover:bg-primary/10 transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       Nova imobiliária
@@ -221,7 +227,7 @@ export function DashboardLayout() {
               ? 'bg-red-50 text-red-700 border border-red-200'
               : trialDaysLeft <= 2
                 ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                : 'bg-blue-50 text-blue-700 border border-blue-200'
+                : 'bg-primary/10 text-primary border border-primary/30'
           }`}>
             {trialExpired
               ? 'Teste expirado'
@@ -241,7 +247,7 @@ export function DashboardLayout() {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-blue-50 text-blue-700'
+                      ? 'bg-primary/10 text-primary'
                       : locked
                         ? 'text-gray-400 hover:bg-gray-50'
                         : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
@@ -263,7 +269,7 @@ export function DashboardLayout() {
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold shrink-0">
+              <div className="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold shrink-0">
                 {initials || <User className="w-4 h-4" />}
               </div>
               <div className="flex-1 text-left min-w-0">
@@ -307,9 +313,18 @@ export function DashboardLayout() {
       </aside>
 
       <main className="flex-1 overflow-y-auto">
-        <div className="p-8">
-          <Outlet />
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="p-8"
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       <SupportWidget />

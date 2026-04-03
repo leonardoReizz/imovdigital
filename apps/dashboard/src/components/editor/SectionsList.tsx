@@ -80,7 +80,7 @@ function SortableSection({ section }: { section: Section }) {
       style={style}
       className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-colors ${
         isSelected
-          ? 'bg-blue-50 border border-blue-200'
+          ? 'bg-primary-light border border-primary/30'
           : 'hover:bg-gray-50 border border-transparent'
       } ${!section.visible ? 'opacity-50' : ''}`}
       onClick={() => selectSection(section.id)}
@@ -143,7 +143,7 @@ function AddSectionButton() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-primary hover:bg-primary-light rounded-lg transition-colors"
       >
         <Plus className="w-4 h-4" />
         Adicionar seção

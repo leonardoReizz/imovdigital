@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
-import { Building2, Mail, Lock, ArrowLeft, ArrowRight, Eye, EyeOff, AlertCircle, Check, KeyRound } from 'lucide-react';
+import { Mail, Lock, ArrowLeft, ArrowRight, Eye, EyeOff, AlertCircle, Check, KeyRound } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { api } from '../lib/api';
+import logoImg from '../assets/logo.png';
 
 const emailSchema = z.object({
   email: z.string().min(1, 'E-mail é obrigatório').email('E-mail inválido'),
@@ -100,10 +101,7 @@ export function ForgotPasswordPage() {
       >
         {/* Logo */}
         <div className="flex items-center gap-3 mb-10">
-          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-            <Building2 className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-xl font-bold text-gray-900">ImovDigital</span>
+          <img src={logoImg} alt="ImovDigital" className="h-10 object-contain" />
         </div>
 
         <AnimatePresence>
@@ -134,7 +132,7 @@ export function ForgotPasswordPage() {
                     {...emailForm.register('email')}
                     type="email"
                     placeholder="seu@email.com"
-                    className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${emailForm.formState.errors.email ? 'border-red-300' : 'border-gray-200'}`}
+                    className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${emailForm.formState.errors.email ? 'border-red-300' : 'border-gray-200'}`}
                   />
                 </div>
                 {emailForm.formState.errors.email && <p className="text-xs text-red-500 mt-1">{emailForm.formState.errors.email.message}</p>}
@@ -143,7 +141,7 @@ export function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={emailForm.formState.isSubmitting}
-                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
+                className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
               >
                 {emailForm.formState.isSubmitting ? (
                   <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
@@ -163,8 +161,8 @@ export function ForgotPasswordPage() {
         {step === 'code' && (
           <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
             <div className="mb-8">
-              <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-4">
-                <KeyRound className="w-7 h-7 text-blue-600" />
+              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
+                <KeyRound className="w-7 h-7 text-primary" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900">Verifique seu e-mail</h2>
               <p className="text-gray-500 mt-2">
@@ -181,7 +179,7 @@ export function ForgotPasswordPage() {
                   inputMode="numeric"
                   maxLength={6}
                   placeholder="000000"
-                  className={`w-full px-4 py-4 text-center text-2xl font-bold tracking-[0.5em] border rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${codeForm.formState.errors.code ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full px-4 py-4 text-center text-2xl font-bold tracking-[0.5em] border rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${codeForm.formState.errors.code ? 'border-red-300' : 'border-gray-200'}`}
                 />
                 {codeForm.formState.errors.code && <p className="text-xs text-red-500 mt-1 text-center">{codeForm.formState.errors.code.message}</p>}
               </div>
@@ -189,7 +187,7 @@ export function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={codeForm.formState.isSubmitting}
-                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
+                className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
               >
                 {codeForm.formState.isSubmitting ? (
                   <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
@@ -203,7 +201,7 @@ export function ForgotPasswordPage() {
               <button onClick={() => setStep('email')} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
                 <ArrowLeft className="w-4 h-4" /> Trocar e-mail
               </button>
-              <button onClick={handleResend} disabled={resending} className="text-sm text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50">
+              <button onClick={handleResend} disabled={resending} className="text-sm text-primary hover:text-primary-dark font-medium disabled:opacity-50">
                 {resending ? 'Reenviando...' : 'Reenviar código'}
               </button>
             </div>
@@ -227,7 +225,7 @@ export function ForgotPasswordPage() {
                     {...passwordForm.register('password')}
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Sua nova senha"
-                    className={`w-full pl-11 pr-12 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${passwordForm.formState.errors.password ? 'border-red-300' : 'border-gray-200'}`}
+                    className={`w-full pl-11 pr-12 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${passwordForm.formState.errors.password ? 'border-red-300' : 'border-gray-200'}`}
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -258,7 +256,7 @@ export function ForgotPasswordPage() {
                     {...passwordForm.register('confirmPassword')}
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Confirme a nova senha"
-                    className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${passwordForm.formState.errors.confirmPassword ? 'border-red-300' : 'border-gray-200'}`}
+                    className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${passwordForm.formState.errors.confirmPassword ? 'border-red-300' : 'border-gray-200'}`}
                   />
                 </div>
                 {passwordForm.formState.errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{passwordForm.formState.errors.confirmPassword.message}</p>}
@@ -267,7 +265,7 @@ export function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={passwordForm.formState.isSubmitting}
-                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
+                className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
               >
                 {passwordForm.formState.isSubmitting ? (
                   <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
@@ -289,7 +287,7 @@ export function ForgotPasswordPage() {
             <p className="text-gray-500 mb-8">Sua senha foi alterada com sucesso. Você já pode fazer login.</p>
             <button
               onClick={() => navigate('/login')}
-              className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
+              className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
             >
               Ir para o login <ArrowRight className="w-4 h-4" />
             </button>

@@ -192,18 +192,18 @@ export function DomainPage() {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6"
+        className="bg-primary-light border border-primary/30 rounded-xl p-5 mb-6"
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-blue-600 uppercase tracking-wider mb-1">Seu site está em</p>
+            <p className="text-xs font-medium text-primary uppercase tracking-wider mb-1">Seu site está em</p>
             <div className="flex items-center gap-2">
-              <Globe className="w-5 h-5 text-blue-600" />
+              <Globe className="w-5 h-5 text-primary" />
               <a
                 href={`https://${hasDomain ? tenant!.customDomain : currentSubdomain}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-lg font-semibold text-blue-700 hover:underline"
+                className="text-lg font-semibold text-primary-dark hover:underline"
               >
                 {hasDomain ? tenant!.customDomain : currentSubdomain}
               </a>
@@ -212,7 +212,7 @@ export function DomainPage() {
           </div>
           <button
             onClick={() => copyToClipboard(`https://${hasDomain ? tenant!.customDomain : currentSubdomain}`, 'url')}
-            className="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+            className="p-2 text-blue-400 hover:text-primary hover:bg-primary/20 rounded-lg transition-colors"
           >
             {copied === 'url' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
           </button>
@@ -236,7 +236,7 @@ export function DomainPage() {
             type="text"
             value={slug}
             onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-l-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-l-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
             placeholder="sua-imobiliaria"
           />
           <div className="px-4 py-2.5 bg-gray-50 border border-l-0 border-gray-200 rounded-r-xl text-sm text-gray-500">
@@ -275,7 +275,7 @@ export function DomainPage() {
         <button
           onClick={handleSaveSlug}
           disabled={!canSaveSlug}
-          className="mt-3 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="mt-3 px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           {slugSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Salvar subdomínio'}
         </button>
@@ -297,7 +297,7 @@ export function DomainPage() {
           <div className="text-center py-6">
             <Lock className="w-8 h-8 text-gray-300 mx-auto mb-2" />
             <p className="text-sm text-gray-500 mb-3">Recurso disponível nos planos pagos</p>
-            <Link to="/dashboard/subscription" className="text-sm font-medium text-blue-600 hover:text-blue-700">
+            <Link to="/dashboard/subscription" className="text-sm font-medium text-primary hover:text-primary-dark">
               Fazer upgrade →
             </Link>
           </div>
@@ -312,7 +312,7 @@ export function DomainPage() {
             type="text"
             value={domain}
             onChange={(e) => setDomain(e.target.value.toLowerCase().trim())}
-            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
             placeholder="www.suaimobiliaria.com.br"
           />
           {hasDomain && (
@@ -343,7 +343,7 @@ export function DomainPage() {
           <button
             onClick={handleSaveDomain}
             disabled={domainSaving || domain === (tenant?.customDomain || '')}
-            className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {domainSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Salvar domínio'}
           </button>

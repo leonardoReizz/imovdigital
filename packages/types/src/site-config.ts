@@ -95,6 +95,7 @@ export interface ContactSettings {
 
 export interface FooterSettings {
   logoUrl: string | null;
+  logoSize: number; // height in px (default 32)
   description: string;
   creci: string;
   showInstagram: boolean;
@@ -232,6 +233,7 @@ export interface SiteConfig {
   fontSize: number; // base font size in px (default 16)
   fontFamily: string;
   logoUrl: string | null;
+  logoSize: number; // height in px (default 32)
   faviconUrl: string | null;
 
   // Sections
@@ -330,6 +332,7 @@ export const DEFAULT_SECTION_SETTINGS: SectionSettingsMap = {
   },
   footer: {
     logoUrl: null,
+    logoSize: 32,
     description: '',
     creci: '',
     showInstagram: true,

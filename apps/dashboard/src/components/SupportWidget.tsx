@@ -24,7 +24,7 @@ export function SupportWidget() {
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div className="fixed bottom-20 right-5 z-50 w-72 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
-            <div className="bg-blue-600 px-4 py-3 flex items-center justify-between">
+            <div className="bg-primary px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2 text-white">
                 <Headphones className="w-4 h-4" />
                 <span className="text-sm font-semibold">Suporte</span>
@@ -56,7 +56,7 @@ export function SupportWidget() {
       {/* Floating button */}
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-5 right-5 z-50 w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition-colors hover:scale-105"
+        className="fixed bottom-5 right-5 z-50 w-12 h-12 bg-primary text-white rounded-full shadow-lg flex items-center justify-center hover:bg-primary-dark transition-colors hover:scale-105"
       >
         {open ? <X className="w-5 h-5" /> : <MessageCircle className="w-5 h-5" />}
       </button>

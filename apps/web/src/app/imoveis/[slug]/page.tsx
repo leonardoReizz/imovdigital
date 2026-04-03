@@ -102,7 +102,7 @@ export default async function PropertyPage({ params }: Props) {
 
   return (
     <>
-      <SiteHeader logoUrl={logoUrl} siteName={tenant.name} primaryColor={primaryColor} />
+      <SiteHeader logoUrl={logoUrl} logoSize={(siteConfig as any)?.logoSize} siteName={tenant.name} primaryColor={primaryColor} />
 
       {/* JSON-LD */}
       {seoData?.jsonLd && (

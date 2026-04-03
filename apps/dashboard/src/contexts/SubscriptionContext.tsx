@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router';
 import { api } from '../lib/api';
 
 interface Limits {
@@ -67,11 +68,13 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     }
   }, []);
 
+  const location = useLocation();
+
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) refresh();
     else setState((prev) => ({ ...prev, loaded: true }));
-  }, [refresh]);
+  }, [refresh, location.pathname]);
 
   const isTrial = state.status === 'TRIAL';
   const isActive = state.status === 'ACTIVE';
@@ -102,7 +105,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
       return (
         <div className="flex items-center justify-center h-screen bg-gray-50">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 border-2 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-gray-200 border-t-primary rounded-full animate-spin" />
             <p className="text-sm text-gray-400">Carregando...</p>
           </div>
         </div>
