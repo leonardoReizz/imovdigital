@@ -38,6 +38,22 @@ export class SubscriptionController {
     return this.subscriptionService.createPortalSession(tenantId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('cancellation-summary')
+  async cancellationSummary(@CurrentUser('tenantId') tenantId: string) {
+    return this.subscriptionService.getCancellationSummary(tenantId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('cancel')
+  async cancel(
+    @CurrentUser('tenantId') tenantId: string,
+    @CurrentUser('sub') userId: string,
+    @Body() body: { reason: string; comment?: string },
+  ) {
+    return this.subscriptionService.cancelSubscription(tenantId, userId, body.reason, body.comment);
+  }
+
   @Post('webhook')
   async webhook(
     @Req() req: RawBodyRequest<Request>,

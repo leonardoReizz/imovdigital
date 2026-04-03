@@ -8,7 +8,8 @@
     "db:generate": "pnpm --filter api prisma:generate",
     "db:push": "pnpm --filter api prisma:push",
     "db:seed": "pnpm --filter api prisma:seed",
-    "db:migrate": "pnpm --filter api prisma:migrate"
+    "db:migrate": "pnpm --filter api prisma:migrate",
+    "stripe:listen": "stripe listen --forward-to http://localhost:3000/api/subscription/webhook"
   },
   "devDependencies": {
     "turbo": "^2.5.0"

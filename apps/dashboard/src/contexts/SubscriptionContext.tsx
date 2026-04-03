@@ -90,6 +90,26 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     isBlocked,
   };
 
+  // Don't render children until subscription data is loaded
+  // This prevents flash of "upgrade" walls and locked nav items
+  if (!state.loaded) {
+    const isAuthPage = typeof window !== 'undefined' &&
+      (window.location.pathname === '/login' ||
+       window.location.pathname === '/register' ||
+       window.location.pathname === '/forgot-password');
+
+    if (!isAuthPage) {
+      return (
+        <div className="flex items-center justify-center h-screen bg-gray-50">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-2 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
+            <p className="text-sm text-gray-400">Carregando...</p>
+          </div>
+        </div>
+      );
+    }
+  }
+
   return (
     <SubscriptionContext.Provider value={value}>
       {children}

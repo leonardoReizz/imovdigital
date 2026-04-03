@@ -121,6 +121,73 @@ export class SubscriptionService {
     return { url: session.url };
   }
 
+  async cancelSubscription(
+    tenantId: string,
+    userId: string,
+    reason: string,
+    comment?: string,
+  ) {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      include: { plan: true },
+    });
+    if (!tenant) throw new BadRequestException('Tenant não encontrado');
+
+    // Save feedback
+    await this.prisma.cancellationFeedback.create({
+      data: {
+        tenantId,
+        userId,
+        reason,
+        comment: comment || null,
+        planName: tenant.plan.name,
+      },
+    });
+
+    // Cancel Stripe subscription if exists
+    const stripe = this.getStripe();
+    if (stripe && tenant.stripeSubscriptionId) {
+      try {
+        await stripe.subscriptions.cancel(tenant.stripeSubscriptionId);
+      } catch {
+        // Subscription may already be canceled
+      }
+    }
+
+    // Update tenant status
+    await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: {
+        subscriptionStatus: 'CANCELED',
+        stripeSubscriptionId: null,
+      },
+    });
+
+    return { canceled: true };
+  }
+
+  async getCancellationSummary(tenantId: string) {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+      include: {
+        plan: true,
+        _count: { select: { properties: true, users: true, leads: true } },
+      },
+    });
+    if (!tenant) throw new BadRequestException('Tenant não encontrado');
+
+    const siteConfig = await this.prisma.siteConfig.findUnique({ where: { tenantId } });
+
+    return {
+      planName: tenant.plan.name,
+      properties: tenant._count.properties,
+      users: tenant._count.users,
+      leads: tenant._count.leads,
+      hasSitePublished: !!siteConfig?.published,
+      hasCustomDomain: !!tenant.customDomain,
+    };
+  }
+
   async handleWebhook(payload: Buffer, signature: string) {
     const stripe = this.getStripe();
     if (!stripe) return { received: true };

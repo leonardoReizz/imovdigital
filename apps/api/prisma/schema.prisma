@@ -237,3 +237,15 @@ model Lead {
   @@index([tenantId, seen])
   @@map("leads")
 }
+
+model CancellationFeedback {
+  id        String   @id @default(uuid())
+  tenantId  String
+  userId    String
+  reason    String   // "too_expensive" | "not_using" | "switched" | "technical" | "other"
+  comment   String?  @db.Text
+  planName  String
+  createdAt DateTime @default(now())
+
+  @@map("cancellation_feedbacks")
+}

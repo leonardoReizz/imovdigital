@@ -287,7 +287,7 @@ export function SettingsPage() {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.15 }}
         className="bg-white rounded-xl border border-red-200 p-6"
       >
         <h3 className="text-base font-semibold text-red-700 mb-1 flex items-center gap-2">
