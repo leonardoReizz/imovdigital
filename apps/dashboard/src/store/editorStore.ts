@@ -16,8 +16,17 @@ export type PreviewPage =
   | { type: 'search'; query?: string }
   | { type: 'property'; propertyId: string };
 
+interface ContactData {
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  whatsapp: string | null;
+  phone: string | null;
+}
+
 interface EditorStore {
   config: SiteConfig | null;
+  contactData: ContactData | null;
   history: SiteConfig[];
   historyIndex: number;
   selectedSectionId: string | null;
@@ -66,6 +75,7 @@ function generateId() {
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
   config: null,
+  contactData: null,
   history: [],
   historyIndex: -1,
   selectedSectionId: null,
@@ -82,14 +92,27 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   loadConfig: async () => {
     set({ isLoading: true });
     try {
-      const { data } = await api.get('/site-config');
+      const [{ data }, contactRes] = await Promise.all([
+        api.get('/site-config'),
+        api.get('/contact').catch(() => ({ data: null })),
+      ]);
       const config = {
         ...data,
         propertyDetail: data.propertyDetail || DEFAULT_PROPERTY_DETAIL_CONFIG,
         searchPage: data.searchPage || DEFAULT_SEARCH_PAGE_CONFIG,
       } as SiteConfig;
+
+      const cd = contactRes.data;
+
       set({
         config,
+        contactData: cd ? {
+          address: cd.address,
+          latitude: cd.latitude,
+          longitude: cd.longitude,
+          whatsapp: cd.whatsapp,
+          phone: cd.phone,
+        } : null,
         history: [structuredClone(config)],
         historyIndex: 0,
         isDirty: false,

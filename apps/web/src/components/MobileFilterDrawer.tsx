@@ -1,0 +1,209 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { SlidersHorizontal, X } from 'lucide-react';
+import type { SearchPageConfig } from '@imovdigital/types';
+import { PROPERTY_TYPE_LABELS } from '@imovdigital/types';
+
+interface Props {
+  primaryColor: string;
+  tenantSlug: string;
+  sp: SearchPageConfig;
+  total: number;
+}
+
+export function MobileFilterDrawer({ primaryColor, tenantSlug, sp, total }: Props) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [open, setOpen] = useState(false);
+  const [cities, setCities] = useState<string[]>([]);
+  const [neighborhoods, setNeighborhoods] = useState<string[]>([]);
+
+  const params = Object.fromEntries(searchParams.entries());
+  const [local, setLocal] = useState(params);
+
+  const hasFilters = !!(params.type || params.listingType || params.bedrooms || params.bathrooms || params.parkingSpots || params.city || params.neighborhood || params.minPrice || params.maxPrice);
+
+  useEffect(() => {
+    fetch(`/api/public/${tenantSlug}/filters`, { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => setCities(d.cities || []))
+      .catch(() => {});
+  }, [tenantSlug]);
+
+  useEffect(() => {
+    if (!local.city) { setNeighborhoods([]); return; }
+    fetch(`/api/public/${tenantSlug}/filters?city=${encodeURIComponent(local.city)}`, { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => setNeighborhoods(d.neighborhoods || []))
+      .catch(() => {});
+  }, [tenantSlug, local.city]);
+
+  const set = (key: string, value: string) => {
+    setLocal((prev) => {
+      const next = { ...prev };
+      if (value) next[key] = value;
+      else delete next[key];
+      if (key === 'city') delete next.neighborhood;
+      return next;
+    });
+  };
+
+  const apply = () => {
+    const qs = new URLSearchParams();
+    for (const [k, v] of Object.entries(local)) {
+      if (v) qs.set(k, v);
+    }
+    router.push(`/imoveis?${qs.toString()}`);
+    setOpen(false);
+  };
+
+  const clear = () => {
+    setLocal({});
+    router.push('/imoveis');
+    setOpen(false);
+  };
+
+  const toggleChip = (key: string, value: string) => {
+    set(key, local[key] === value ? '' : value);
+  };
+
+  return (
+    <>
+      {/* Mobile filter button */}
+      <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        <p className="text-sm text-gray-500">{total} {total === 1 ? 'imóvel' : 'imóveis'}</p>
+        <button
+          onClick={() => { setLocal(Object.fromEntries(searchParams.entries())); setOpen(true); }}
+          className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600"
+        >
+          <SlidersHorizontal className="w-4 h-4" />
+          Filtros
+          {hasFilters && (
+            <span className="w-5 h-5 rounded-full text-white text-xs flex items-center justify-center" style={{ backgroundColor: primaryColor }}>
+              {Object.keys(params).filter((k) => k !== 'sort' && k !== 'page' && params[k]).length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Drawer */}
+      {open && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-0 bottom-0 w-80 bg-white shadow-xl overflow-y-auto">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+              <h3 className="text-base font-semibold text-gray-900">Filtros</h3>
+              <button onClick={() => setOpen(false)} className="p-1 text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-5">
+              {sp.showTypeFilter && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-gray-500">Tipo</label>
+                  <select value={local.type || ''} onChange={(e) => set('type', e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none">
+                    <option value="">Todos</option>
+                    {Object.entries(PROPERTY_TYPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                  </select>
+                </div>
+              )}
+
+              {sp.showListingFilter && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-gray-500">Modalidade</label>
+                  <select value={local.listingType || ''} onChange={(e) => set('listingType', e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none">
+                    <option value="">Todos</option>
+                    <option value="SALE">Venda</option>
+                    <option value="RENT">Aluguel</option>
+                  </select>
+                </div>
+              )}
+
+              {sp.showBedroomsFilter && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-gray-500">Quartos</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['1', '2', '3', '4', '5'].map((v) => (
+                      <button key={v} type="button" onClick={() => toggleChip('bedrooms', v)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${local.bedrooms === v ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'}`}
+                      >{v}+</button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(sp.showBathroomsFilter ?? true) && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-gray-500">Banheiros</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['1', '2', '3', '4'].map((v) => (
+                      <button key={v} type="button" onClick={() => toggleChip('bathrooms', v)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${local.bathrooms === v ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'}`}
+                      >{v}+</button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(sp.showParkingFilter ?? true) && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-gray-500">Vagas</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['1', '2', '3', '4'].map((v) => (
+                      <button key={v} type="button" onClick={() => toggleChip('parkingSpots', v)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${local.parkingSpots === v ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'}`}
+                      >{v}+</button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {sp.showCityFilter && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-gray-500">Cidade</label>
+                  <select value={local.city || ''} onChange={(e) => set('city', e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none">
+                    <option value="">Todas</option>
+                    {cities.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+              )}
+
+              {sp.showNeighborhoodFilter && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-gray-500">Bairro</label>
+                  <select value={local.neighborhood || ''} onChange={(e) => set('neighborhood', e.target.value)} disabled={!local.city} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none disabled:opacity-50">
+                    <option value="">{local.city ? 'Todos' : 'Selecione a cidade'}</option>
+                    {neighborhoods.map((n) => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                </div>
+              )}
+
+              {sp.showPriceFilter && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-gray-500">Faixa de preço</label>
+                  <div className="flex gap-2">
+                    <input type="number" value={local.minPrice || ''} onChange={(e) => set('minPrice', e.target.value)} placeholder="Mín" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none" />
+                    <input type="number" value={local.maxPrice || ''} onChange={(e) => set('maxPrice', e.target.value)} placeholder="Máx" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 flex gap-3">
+              <button onClick={clear} className="flex-1 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg">
+                Limpar
+              </button>
+              <button onClick={apply} className="flex-1 py-2.5 text-sm font-medium text-white rounded-lg" style={{ backgroundColor: primaryColor }}>
+                Aplicar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

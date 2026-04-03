@@ -29,10 +29,22 @@ import { ImageUploader, type ImageFile } from '../components/ImageUploader';
 
 const PROPERTY_TYPES = [
   { value: 'APARTMENT', label: 'Apartamento' },
+  { value: 'AREA', label: 'Área' },
   { value: 'HOUSE', label: 'Casa' },
+  { value: 'HOUSE_COMMERCIAL', label: 'Casa Comercial' },
+  { value: 'CHACARA', label: 'Chácara' },
+  { value: 'COBERTURA', label: 'Cobertura' },
   { value: 'COMMERCIAL', label: 'Comercial' },
+  { value: 'CONJUNTO_COMERCIAL', label: 'Conjunto Comercial' },
+  { value: 'GALPAO', label: 'Galpão' },
+  { value: 'GEMINADO', label: 'Geminado' },
+  { value: 'LOFT', label: 'Loft' },
+  { value: 'PREDIO_COMERCIAL', label: 'Prédio Comercial' },
+  { value: 'SALA_COMERCIAL', label: 'Sala Comercial' },
+  { value: 'SALA_CONJUNTO', label: 'Sala/Conjunto' },
+  { value: 'SITIO', label: 'Sítio' },
+  { value: 'SOBRADO', label: 'Sobrado' },
   { value: 'LAND', label: 'Terreno' },
-  { value: 'RURAL', label: 'Rural' },
 ] as const;
 
 const LISTING_TYPES = [

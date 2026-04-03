@@ -73,11 +73,11 @@ export function PropertyDetailSettings() {
         <div className="space-y-3">
           <BadgeToggle label="Botão WhatsApp" value={pd.showWhatsApp} onChange={(v) => update('showWhatsApp', v)} />
           {pd.showWhatsApp && (
-            <TextInput label="Número WhatsApp" value={pd.whatsAppNumber} onChange={(v) => update('whatsAppNumber', v)} placeholder="+55 11 99999-9999" />
+            <TextInput label="Número WhatsApp" value={pd.whatsAppNumber} onChange={(v) => update('whatsAppNumber', v)} placeholder="(11) 99999-9999" />
           )}
           <BadgeToggle label="Botão Telefone" value={pd.showPhone} onChange={(v) => update('showPhone', v)} />
           {pd.showPhone && (
-            <TextInput label="Número Telefone" value={pd.phoneNumber} onChange={(v) => update('phoneNumber', v)} placeholder="+55 11 3333-3333" />
+            <TextInput label="Número Telefone" value={pd.phoneNumber} onChange={(v) => update('phoneNumber', v)} placeholder="(11) 3333-3333" />
           )}
         </div>
       </div>

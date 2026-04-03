@@ -16,6 +16,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { api } from '../lib/api';
+import { formatPhone } from '../components/PhoneInput';
 
 // ─── Schemas ─────────────────────────────────────────────────
 
@@ -177,7 +178,9 @@ export function SettingsPage() {
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-gray-700">Telefone</label>
               <input
-                {...profileForm.register('phone')}
+                type="tel"
+                value={formatPhone(profileForm.watch('phone') || '')}
+                onChange={(e) => profileForm.setValue('phone', e.target.value.replace(/\D/g, '').slice(0, 11))}
                 placeholder="(11) 99999-9999"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />

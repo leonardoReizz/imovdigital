@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { ShareButton } from '@/components/ShareButton';
 import { LeadForm } from '@/components/LeadForm';
+import { Footer } from '@/components/sections/Footer';
 import { formatListingDate } from '@/lib/dates';
 
 interface Props {
@@ -309,6 +310,12 @@ export default async function PropertyPage({ params }: Props) {
           )}
         </div>
       </div>
+
+      {/* Footer */}
+      {siteConfig?.sections && (() => {
+        const footerSection = (siteConfig as any).sections.find((s: any) => s.type === 'footer' && s.visible);
+        return footerSection ? <Footer settings={footerSection.settings} contactData={{ ...(tenant as any).contact }} /> : null;
+      })()}
     </>
   );
 }

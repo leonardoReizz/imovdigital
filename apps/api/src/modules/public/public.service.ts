@@ -128,11 +128,15 @@ export class PublicService {
   }
 
   async getSiteConfig(slug: string) {
-    const tenant = await this.prisma.tenant.findUnique({ where: { slug } });
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { slug },
+      include: { contactConfig: true },
+    });
     if (!tenant) throw new NotFoundException('Imobiliária não encontrada');
 
     const config = await this.prisma.siteConfig.findUnique({ where: { tenantId: tenant.id } });
     if (!config) return null;
+
     return config.data;
   }
 

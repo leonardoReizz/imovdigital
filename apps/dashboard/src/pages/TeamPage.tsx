@@ -21,6 +21,7 @@ import {
 import { api } from '../lib/api';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { UpgradeWall } from '../components/UpgradeWall';
+import { PhoneInput } from '../components/PhoneInput';
 
 interface TeamMember {
   id: string;
@@ -138,10 +139,9 @@ function MemberModal({
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-gray-700">Telefone</label>
-            <input
-              type="text"
+            <PhoneInput
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={setPhone}
               placeholder="(11) 99999-9999"
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
             />
@@ -228,6 +228,7 @@ export function TeamPage() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ open: boolean; member: TeamMember | null }>({ open: false, member: null });
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
   const [error, setError] = useState('');
 
   if (!canAccessTeam) {
@@ -252,8 +253,7 @@ export function TeamPage() {
 
   useEffect(() => { fetchMembers(); }, []);
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Tem certeza que deseja remover ${name} da equipe?`)) return;
+  const handleDelete = async (id: string) => {
     setDeleting(id);
     setError('');
     try {
@@ -263,6 +263,7 @@ export function TeamPage() {
       setError(err?.response?.data?.message || 'Erro ao remover membro');
     } finally {
       setDeleting(null);
+      setDeleteConfirm(null);
     }
   };
 
@@ -395,7 +396,7 @@ export function TeamPage() {
                     </button>
                     {!isOwner && (
                       <button
-                        onClick={() => handleDelete(member.id, member.name)}
+                        onClick={() => setDeleteConfirm({ id: member.id, name: member.name })}
                         disabled={deleting === member.id}
                         className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                         title="Remover"
@@ -448,7 +449,7 @@ export function TeamPage() {
         </div>
       </motion.div>
 
-      {/* Modal */}
+      {/* Member Modal */}
       <AnimatePresence>
         {modal.open && (
           <MemberModal
@@ -456,6 +457,50 @@ export function TeamPage() {
             onClose={() => setModal({ open: false, member: null })}
             onSaved={handleSaved}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Dialog */}
+      <AnimatePresence>
+        {deleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setDeleteConfirm(null)}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-6"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center shrink-0">
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900">Remover membro</h3>
+                  <p className="text-sm text-gray-500">Esta ação não pode ser desfeita.</p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-6">
+                Tem certeza que deseja remover <strong>{deleteConfirm.name}</strong> da equipe?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  className="flex-1 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => handleDelete(deleteConfirm.id)}
+                  disabled={deleting === deleteConfirm.id}
+                  className="flex-1 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  {deleting === deleteConfirm.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                  Remover
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

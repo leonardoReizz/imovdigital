@@ -15,9 +15,10 @@ interface Props {
   properties: Property[];
   cities: string[];
   tenantSlug: string;
+  contactData?: any;
 }
 
-export function SectionRenderer({ sections, primaryColor, properties, cities, tenantSlug }: Props) {
+export function SectionRenderer({ sections, primaryColor, properties, cities, tenantSlug, contactData }: Props) {
   const sorted = [...sections].filter((s) => s.visible).sort((a, b) => a.order - b.order);
   const searchBarSection = sorted.find((s) => s.type === 'search_bar');
   const searchBarSettings = searchBarSection?.settings as SearchBarSettings | undefined;
@@ -43,9 +44,9 @@ export function SectionRenderer({ sections, primaryColor, properties, cities, te
           case 'cta_banner':
             return <CTABanner key={section.id} settings={s} />;
           case 'contact':
-            return <div key={section.id} id="contato"><Contact settings={s} primaryColor={primaryColor} tenantSlug={tenantSlug} /></div>;
+            return <div key={section.id} id="contato"><Contact settings={s} primaryColor={primaryColor} tenantSlug={tenantSlug} contactData={contactData} /></div>;
           case 'footer':
-            return <Footer key={section.id} settings={s} />;
+            return <Footer key={section.id} settings={s} contactData={contactData} />;
           default:
             return null;
         }

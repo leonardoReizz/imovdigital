@@ -88,18 +88,20 @@ export interface ContactSettings {
   title: string;
   showMap: boolean;
   showWhatsApp: boolean;
-  whatsAppNumber: string;
   showForm: boolean;
   showEmailField: boolean;
   showPhoneField: boolean;
-  address: string;
 }
 
 export interface FooterSettings {
   logoUrl: string | null;
   description: string;
-  showSocials: boolean;
-  socials: { platform: string; url: string }[];
+  creci: string;
+  showInstagram: boolean;
+  showFacebook: boolean;
+  showYoutube: boolean;
+  showLinkedin: boolean;
+  showTiktok: boolean;
   columns: { title: string; links: { label: string; url: string }[] }[];
   copyrightText: string;
   backgroundColor: string;
@@ -322,17 +324,19 @@ export const DEFAULT_SECTION_SETTINGS: SectionSettingsMap = {
     title: 'Entre em Contato',
     showMap: true,
     showWhatsApp: true,
-    whatsAppNumber: '',
     showForm: true,
     showEmailField: false,
     showPhoneField: true,
-    address: '',
   },
   footer: {
     logoUrl: null,
     description: '',
-    showSocials: true,
-    socials: [],
+    creci: '',
+    showInstagram: true,
+    showFacebook: true,
+    showYoutube: false,
+    showLinkedin: false,
+    showTiktok: false,
     columns: [],
     copyrightText: '© 2026 Todos os direitos reservados.',
     backgroundColor: '#1f2937',

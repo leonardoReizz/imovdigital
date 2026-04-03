@@ -17,6 +17,7 @@ import {
   Globe,
 } from 'lucide-react';
 import { api } from '../lib/api';
+import { PhoneInput } from '../components/PhoneInput';
 import { GoogleAddressInput } from '../components/GoogleAddressInput';
 import type { AddressData } from '../components/GoogleAddressInput';
 import type { BusinessHours } from '@imovdigital/types';
@@ -56,6 +57,8 @@ interface FormState {
   city: string;
   state: string;
   zipCode: string;
+  latitude: number | null;
+  longitude: number | null;
   businessHours: BusinessHours;
   instagram: string;
   facebook: string;
@@ -74,6 +77,8 @@ const INITIAL: FormState = {
   city: '',
   state: '',
   zipCode: '',
+  latitude: null,
+  longitude: null,
   businessHours: DEFAULT_HOURS,
   instagram: '',
   facebook: '',
@@ -142,6 +147,8 @@ export function ContactPage() {
             city: data.city || '',
             state: data.state || '',
             zipCode: data.zipCode || '',
+            latitude: data.latitude ?? null,
+            longitude: data.longitude ?? null,
             businessHours: data.businessHours || DEFAULT_HOURS,
             instagram: data.instagram || '',
             facebook: data.facebook || '',
@@ -170,6 +177,8 @@ export function ContactPage() {
         city: form.city || null,
         state: form.state || null,
         zipCode: form.zipCode || null,
+        latitude: form.latitude,
+        longitude: form.longitude,
         businessHours: form.businessHours,
         instagram: form.instagram || null,
         facebook: form.facebook || null,
@@ -237,10 +246,10 @@ export function ContactPage() {
           </h3>
           <div className="grid grid-cols-2 gap-5">
             <Field label="WhatsApp" icon={MessageCircle}>
-              <Input value={form.whatsapp} onChange={(v) => update('whatsapp', v)} placeholder="+55 11 99999-9999" />
+              <PhoneInput value={form.whatsapp} onChange={(v) => update('whatsapp', v)} placeholder="(11) 99999-9999" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" />
             </Field>
             <Field label="Telefone fixo" icon={Phone}>
-              <Input value={form.phone} onChange={(v) => update('phone', v)} placeholder="+55 11 3333-3333" />
+              <PhoneInput value={form.phone} onChange={(v) => update('phone', v)} placeholder="(11) 3333-3333" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-sm" />
             </Field>
           </div>
           <div className="mt-4">
@@ -301,6 +310,8 @@ export function ContactPage() {
                 update('city', addr.city);
                 update('state', addr.state);
                 update('zipCode', addr.zipCode);
+                update('latitude', addr.latitude);
+                update('longitude', addr.longitude);
               }}
             />
 

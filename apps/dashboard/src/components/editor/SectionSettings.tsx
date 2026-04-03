@@ -266,13 +266,13 @@ function ContactSettingsPanel({ section }: { section: Section<'contact'> }) {
   return (
     <div className="space-y-4">
       <TextInput label="Título" value={s.title} onChange={(v) => update('title', v)} />
-      <TextInput label="Endereço" value={s.address} onChange={(v) => update('address', v)} />
-      <BadgeToggle label="Mostrar mapa" value={s.showMap} onChange={(v) => update('showMap', v)} />
 
-      <BadgeToggle label="Exibir WhatsApp na página" value={s.showWhatsApp} onChange={(v) => update('showWhatsApp', v)} />
-      {s.showWhatsApp && (
-        <TextInput label="Número WhatsApp" value={s.whatsAppNumber} onChange={(v) => update('whatsAppNumber', v)} placeholder="+55 11 99999-9999" />
-      )}
+      <BadgeToggle label="Mostrar mapa" value={s.showMap} onChange={(v) => update('showMap', v)} />
+      <BadgeToggle label="Exibir WhatsApp" value={s.showWhatsApp} onChange={(v) => update('showWhatsApp', v)} />
+
+      <p className="text-xs text-gray-400 bg-gray-50 rounded-lg p-2">
+        Endereço, telefone e WhatsApp são gerenciados em <strong>Contato</strong> no painel lateral.
+      </p>
 
       <BadgeToggle label="Mostrar formulário" value={s.showForm} onChange={(v) => update('showForm', v)} />
       {s.showForm && (
@@ -301,10 +301,17 @@ function FooterSettingsPanel({ section }: { section: Section<'footer'> }) {
         folder="logos"
       />
       <TextareaField label="Descrição" value={s.description} onChange={(v) => update('description', v)} />
+      <TextInput label="CRECI" value={s.creci || ''} onChange={(v) => update('creci', v)} placeholder="CRECI J-00000/SC" />
       <TextInput label="Texto de copyright" value={s.copyrightText} onChange={(v) => update('copyrightText', v)} />
       <ColorPicker label="Cor de fundo" value={s.backgroundColor} onChange={(v) => update('backgroundColor', v)} />
       <ColorPicker label="Cor do texto" value={s.textColor} onChange={(v) => update('textColor', v)} />
-      <BadgeToggle label="Mostrar redes sociais" value={s.showSocials} onChange={(v) => update('showSocials', v)} />
+      <p className="text-xs font-medium text-gray-500 pt-2">Redes sociais no rodapé</p>
+      <p className="text-xs text-gray-400 -mt-2">URLs são carregadas da página de Contato.</p>
+      <BadgeToggle label="Instagram" value={s.showInstagram ?? true} onChange={(v) => update('showInstagram', v)} />
+      <BadgeToggle label="Facebook" value={s.showFacebook ?? true} onChange={(v) => update('showFacebook', v)} />
+      <BadgeToggle label="YouTube" value={s.showYoutube ?? false} onChange={(v) => update('showYoutube', v)} />
+      <BadgeToggle label="LinkedIn" value={s.showLinkedin ?? false} onChange={(v) => update('showLinkedin', v)} />
+      <BadgeToggle label="TikTok" value={s.showTiktok ?? false} onChange={(v) => update('showTiktok', v)} />
     </div>
   );
 }

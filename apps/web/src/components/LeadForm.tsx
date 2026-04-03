@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Send, Check, Loader2 } from 'lucide-react';
+import { PhoneInput } from './PhoneInput';
 
 interface LeadFormProps {
   tenantSlug: string;
@@ -75,11 +76,10 @@ export function LeadForm({ tenantSlug, propertyId, propertyTitle, primaryColor, 
         placeholder="Seu e-mail"
         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
       />
-      <input
-        type="tel"
+      <PhoneInput
         value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        placeholder="Seu telefone"
+        onChange={setPhone}
+        placeholder="(11) 99999-9999"
         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
       />
       {!compact && (

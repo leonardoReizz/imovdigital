@@ -3,14 +3,22 @@
 import { useState } from 'react';
 import type { ContactSettings } from '@imovdigital/types';
 import { MapPin, MessageCircle, Send, Check, Loader2 } from 'lucide-react';
+import { PhoneInput } from '../PhoneInput';
 
 interface Props {
   settings: ContactSettings;
   primaryColor: string;
   tenantSlug?: string;
+  contactData?: {
+    address?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    whatsapp?: string | null;
+    phone?: string | null;
+  } | null;
 }
 
-export function Contact({ settings, primaryColor, tenantSlug }: Props) {
+export function Contact({ settings, primaryColor, tenantSlug, contactData }: Props) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -57,27 +65,39 @@ export function Contact({ settings, primaryColor, tenantSlug }: Props) {
         <div className="flex flex-col md:flex-row gap-8 md:gap-12">
           {/* Info */}
           <div className="flex-1 space-y-6">
-            {settings.address && (
+            {contactData?.address && (
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 mt-0.5 shrink-0" style={{ color: primaryColor }} />
-                <p className="text-gray-600">{settings.address}</p>
+                <p className="text-gray-600">{contactData.address}</p>
               </div>
             )}
-            {settings.showWhatsApp && settings.whatsAppNumber && (
+            {settings.showWhatsApp && contactData?.whatsapp && (
               <a
-                href={`https://wa.me/${settings.whatsAppNumber.replace(/\D/g, '')}`}
+                href={`https://wa.me/${contactData.whatsapp.replace(/\D/g, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity"
               >
                 <MessageCircle className="w-5 h-5 text-green-600 shrink-0" />
-                <p className="text-gray-600">{settings.whatsAppNumber}</p>
+                <p className="text-gray-600">{contactData.whatsapp}</p>
               </a>
             )}
             {settings.showMap && (
-              <div className="w-full aspect-video bg-gray-100 rounded-xl flex items-center justify-center">
-                <p className="text-sm text-gray-400">Mapa</p>
-              </div>
+              contactData?.latitude && contactData?.longitude ? (
+                <div className="w-full aspect-video rounded-xl overflow-hidden relative bg-gray-100">
+                  <iframe
+                    src={`https://maps.google.com/maps?ll=${contactData.latitude},${contactData.longitude}&z=15&t=m&output=embed`}
+                    className="absolute inset-0 w-full h-full border-0"
+                    loading="lazy"
+                    title="Localização"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+              ) : (
+                <div className="w-full aspect-video bg-gray-100 rounded-xl flex items-center justify-center">
+                  <p className="text-sm text-gray-400">Mapa</p>
+                </div>
+              )
             )}
           </div>
 
@@ -112,11 +132,10 @@ export function Contact({ settings, primaryColor, tenantSlug }: Props) {
                     />
                   )}
                   {showPhoneField && (
-                    <input
-                      type="tel"
+                    <PhoneInput
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder={`Seu WhatsApp ${!showEmailField ? '*' : ''}`}
+                      onChange={setPhone}
+                      placeholder={`(11) 99999-9999 ${!showEmailField ? '*' : ''}`}
                       required={!showEmailField}
                       className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />

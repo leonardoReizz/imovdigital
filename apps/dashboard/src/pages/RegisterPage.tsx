@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { api } from '../lib/api';
+import { formatPhone } from '../components/PhoneInput';
 
 const step1Schema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -202,7 +203,13 @@ export function RegisterPage() {
                   <label className="block text-sm font-medium text-gray-700">Telefone</label>
                   <div className="relative">
                     <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input {...form1.register('phone')} type="tel" placeholder="(11) 99999-9999" className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" />
+                    <input
+                      type="tel"
+                      value={formatPhone(form1.watch('phone') || '')}
+                      onChange={(e) => form1.setValue('phone', e.target.value.replace(/\D/g, '').slice(0, 11))}
+                      placeholder="(11) 99999-9999"
+                      className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                    />
                   </div>
                 </div>
 

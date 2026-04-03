@@ -4,15 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import type { SearchPageConfig } from '@imovdigital/types';
-import { DEFAULT_SEARCH_PAGE_CONFIG } from '@imovdigital/types';
+import { DEFAULT_SEARCH_PAGE_CONFIG, PROPERTY_TYPE_LABELS } from '@imovdigital/types';
 
 const TYPE_OPTIONS = [
   { value: '', label: 'Todos os tipos' },
-  { value: 'APARTMENT', label: 'Apartamento' },
-  { value: 'HOUSE', label: 'Casa' },
-  { value: 'COMMERCIAL', label: 'Comercial' },
-  { value: 'LAND', label: 'Terreno' },
-  { value: 'RURAL', label: 'Rural' },
+  ...Object.entries(PROPERTY_TYPE_LABELS).map(([value, label]) => ({ value, label })),
 ];
 
 const LISTING_OPTIONS = [

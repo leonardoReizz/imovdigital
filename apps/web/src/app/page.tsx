@@ -31,6 +31,7 @@ export default async function HomePage() {
       properties={propertiesRes.data}
       cities={filters.cities}
       tenantSlug={slug}
+      contactData={tenant.contact}
     />
   );
 }

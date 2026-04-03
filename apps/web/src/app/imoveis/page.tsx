@@ -8,6 +8,8 @@ import { PropertyFilters } from '@/components/PropertyFilters';
 import type { Property, SearchPageConfig } from '@imovdigital/types';
 import { DEFAULT_SEARCH_PAGE_CONFIG } from '@imovdigital/types';
 import { SidebarFilters } from '@/components/SidebarFilters';
+import { MobileFilterDrawer } from '@/components/MobileFilterDrawer';
+import { Footer } from '@/components/sections/Footer';
 import { Home } from 'lucide-react';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -62,6 +64,12 @@ export default async function ImoveisPage({ searchParams }: Props) {
       {sp.filterPosition === 'top' && (
         <Suspense>
           <PropertyFilters primaryColor={primaryColor} total={res.total} tenantSlug={slug} searchConfig={sp} />
+        </Suspense>
+      )}
+
+      {sp.filterPosition === 'sidebar' && (
+        <Suspense>
+          <MobileFilterDrawer primaryColor={primaryColor} tenantSlug={slug} sp={sp as SearchPageConfig} total={res.total} />
         </Suspense>
       )}
 
@@ -142,6 +150,12 @@ export default async function ImoveisPage({ searchParams }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      {siteConfig?.sections && (() => {
+        const footerSection = (siteConfig as any).sections.find((s: any) => s.type === 'footer' && s.visible);
+        return footerSection ? <Footer settings={footerSection.settings} contactData={{ ...(tenant as any).contact }} /> : null;
+      })()}
     </>
   );
 }

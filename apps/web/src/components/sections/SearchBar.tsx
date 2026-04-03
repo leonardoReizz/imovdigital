@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { SearchBarSettings } from '@imovdigital/types';
+import { PROPERTY_TYPE_LABELS } from '@imovdigital/types';
 import { Search } from 'lucide-react';
 
 const RADIUS_MAP = { none: '0', sm: '0.25rem', md: '0.5rem', lg: '0.75rem', full: '9999px' };
@@ -36,11 +37,7 @@ export function SearchBar({ settings, primaryColor, embedded, cities = [], tenan
         return (
           <select name="type" className="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer" defaultValue="">
             <option value="">Todos</option>
-            <option value="APARTMENT">Apartamento</option>
-            <option value="HOUSE">Casa</option>
-            <option value="COMMERCIAL">Comercial</option>
-            <option value="LAND">Terreno</option>
-            <option value="RURAL">Rural</option>
+            {Object.entries(PROPERTY_TYPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
           </select>
         );
       case 'cidade':
