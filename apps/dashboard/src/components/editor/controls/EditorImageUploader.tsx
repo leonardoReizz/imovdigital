@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { useR2Upload } from '../../../hooks/useR2Upload';
+import { api } from '../../../lib/api';
 
 interface EditorImageUploaderProps {
   label: string;
@@ -54,7 +55,10 @@ export function EditorImageUploader({
           />
           <button
             type="button"
-            onClick={() => onChange(null)}
+            onClick={() => {
+              if (value) api.delete('/upload/file', { data: { url: value } }).catch(() => {});
+              onChange(null);
+            }}
             className="absolute top-2 right-2 p-1 bg-black/60 hover:bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
           >
             <X className="w-4 h-4" />
