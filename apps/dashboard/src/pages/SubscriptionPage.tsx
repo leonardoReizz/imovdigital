@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   CreditCard,
   Check,
@@ -13,11 +13,12 @@ import {
   Globe,
   MessageSquare,
   Zap,
-  ExternalLink,
   Shield,
+  ChevronDown,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { formatPrice } from '@imovdigital/utils';
+import { CancellationModal } from '../components/CancellationModal';
 
 interface Plan {
   id: string;
@@ -72,7 +73,8 @@ export function SubscriptionPage() {
   const [info, setInfo] = useState<SubInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkingOut, setCheckingOut] = useState<string | null>(null);
-  const [portalLoading, setPortalLoading] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   const success = searchParams.get('success') === 'true';
   const canceled = searchParams.get('canceled') === 'true';
@@ -93,18 +95,6 @@ export function SubscriptionPage() {
       alert('Erro ao iniciar checkout. Verifique se o Stripe está configurado.');
     } finally {
       setCheckingOut(null);
-    }
-  };
-
-  const handlePortal = async () => {
-    setPortalLoading(true);
-    try {
-      const { data } = await api.post('/subscription/portal');
-      if (data.url) window.location.href = data.url;
-    } catch {
-      alert('Erro ao abrir portal de faturamento.');
-    } finally {
-      setPortalLoading(false);
     }
   };
 
@@ -173,16 +163,6 @@ export function SubscriptionPage() {
             </div>
           </div>
 
-          {isActive && (
-            <button
-              onClick={handlePortal}
-              disabled={portalLoading}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-            >
-              {portalLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ExternalLink className="w-4 h-4" />}
-              Gerenciar Faturamento
-            </button>
-          )}
         </div>
       </motion.div>
 
@@ -302,13 +282,9 @@ export function SubscriptionPage() {
 
                 <div>
                   {isCurrentPlan ? (
-                    <button
-                      onClick={handlePortal}
-                      disabled={portalLoading}
-                      className="px-5 py-2.5 text-sm font-medium bg-gray-100 text-gray-600 rounded-xl"
-                    >
-                      Gerenciar
-                    </button>
+                    <span className="px-5 py-2.5 text-sm font-medium bg-green-50 text-green-700 rounded-xl">
+                      Plano atual
+                    </span>
                   ) : (
                     <button
                       onClick={() => handleCheckout(plan.id)}
@@ -365,6 +341,53 @@ export function SubscriptionPage() {
           <p className="text-gray-400 text-xs mt-1">Configure os planos no banco de dados para ativar o checkout.</p>
         </div>
       )}
+
+      {/* Advanced Options — Cancel */}
+      {isActive && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="bg-white rounded-xl border border-gray-200 mt-8"
+        >
+          <button
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="flex items-center justify-between w-full px-6 py-4 text-left"
+          >
+            <span className="text-sm font-medium text-gray-500">Opções avançadas</span>
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />
+          </button>
+
+          {showAdvanced && (
+            <div className="px-6 pb-6 border-t border-gray-100 pt-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-700">Cancelar assinatura e solicitar reembolso</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Conforme o Código de Defesa do Consumidor (Art. 49), você tem direito ao reembolso integral em até 7 dias após a contratação.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowCancelModal(true)}
+                  className="px-3 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors shrink-0 ml-4"
+                >
+                  Cancelar plano
+                </button>
+              </div>
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* Cancellation Modal */}
+      <AnimatePresence>
+        {showCancelModal && (
+          <CancellationModal
+            onClose={() => setShowCancelModal(false)}
+            onCanceled={() => { setShowCancelModal(false); window.location.reload(); }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* FAQ */}
       <motion.div
