@@ -16,8 +16,10 @@ import {
   User,
   Plus,
   Check,
+  Headphones,
 } from 'lucide-react';
 import { useSubscription } from '../contexts/SubscriptionContext';
+import { SupportWidget } from '../components/SupportWidget';
 import { api } from '../lib/api';
 
 interface NavItem {
@@ -280,6 +282,16 @@ export function DashboardLayout() {
                   <Settings className="w-4 h-4" />
                   Configurações
                 </button>
+                <a
+                  href={`https://wa.me/${import.meta.env.VITE_SUPPORT_WHATSAPP || '5500000000000'}?text=${encodeURIComponent('Olá! Preciso de ajuda com o ImovDigital.')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setUserMenuOpen(false)}
+                  className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                >
+                  <Headphones className="w-4 h-4" />
+                  Suporte
+                </a>
                 <div className="border-t border-gray-100 my-1" />
                 <button
                   onClick={handleLogout}
@@ -299,6 +311,8 @@ export function DashboardLayout() {
           <Outlet />
         </div>
       </main>
+
+      <SupportWidget />
     </div>
   );
 }
