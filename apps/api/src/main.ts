@@ -5,9 +5,16 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
+
+  // Security headers
+  app.use(helmet({
+    contentSecurityPolicy: false, // Disable CSP for SPA serving
+    crossOriginEmbedderPolicy: false,
+  }));
 
   app.setGlobalPrefix('api');
 

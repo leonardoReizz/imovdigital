@@ -1,4 +1,5 @@
 import { Controller, Post, Patch, Delete, Body, Get, UseGuards } from '@nestjs/common';
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -7,6 +8,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Throttle({ short: { ttl: 60000, limit: 5 } }) // 5 per minute
   @Post('register')
   async register(
     @Body()
@@ -21,6 +23,7 @@ export class AuthController {
     return this.authService.register(body);
   }
 
+  @Throttle({ short: { ttl: 60000, limit: 10 } }) // 10 per minute
   @Post('login')
   async login(@Body() body: { email: string; password: string; tenantId?: string }) {
     return this.authService.login(body.email, body.password, body.tenantId);
@@ -55,11 +58,13 @@ export class AuthController {
     return this.authService.createTenant(userId, body.agencyName);
   }
 
+  @Throttle({ short: { ttl: 60000, limit: 3 } }) // 3 per minute
   @Post('forgot-password')
   async forgotPassword(@Body() body: { email: string }) {
     return this.authService.forgotPassword(body.email);
   }
 
+  @Throttle({ short: { ttl: 60000, limit: 5 } }) // 5 per minute
   @Post('verify-reset-code')
   async verifyResetCode(@Body() body: { email: string; code: string }) {
     return this.authService.verifyResetCode(body.email, body.code);

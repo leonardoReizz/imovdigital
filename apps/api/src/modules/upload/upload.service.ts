@@ -41,11 +41,25 @@ export class UploadService {
     return this.config.get('R2_BUCKET_NAME');
   }
 
+  private static readonly ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'image/x-icon'];
+  private static readonly MAX_FILE_SIZE_MB = 10;
+
   async generatePresignedUrl(
     filename: string,
     contentType: string,
     folder: string = 'gallery',
   ) {
+    // Validate content type
+    if (!UploadService.ALLOWED_TYPES.includes(contentType)) {
+      throw new NotFoundException(`Tipo de arquivo não permitido: ${contentType}. Use JPG, PNG, WebP, GIF ou ICO.`);
+    }
+
+    // Validate filename (prevent path traversal)
+    const sanitized = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+    if (sanitized.includes('..')) {
+      throw new NotFoundException('Nome de arquivo inválido');
+    }
+
     const s3 = this.getS3();
     const bucket = this.getBucket();
     const r2PublicUrl = this.config.get('R2_PUBLIC_URL');

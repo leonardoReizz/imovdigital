@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Param, Query, Body, Res, Header } from '@nestjs/common';
 import { Response } from 'express';
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { PublicService } from './public.service';
 
+@SkipThrottle()
 @Controller('public')
 export class PublicController {
   constructor(private readonly publicService: PublicService) {}
@@ -39,6 +41,8 @@ export class PublicController {
     return this.publicService.getSiteConfig(slug);
   }
 
+  @SkipThrottle({ default: false }) // Re-enable throttle for lead creation
+  @Throttle({ short: { ttl: 60000, limit: 10 } }) // 10 per minute
   @Post(':slug/leads')
   async createLead(@Param('slug') slug: string, @Body() body: any) {
     return this.publicService.createLead(slug, body);

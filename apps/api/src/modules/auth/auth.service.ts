@@ -330,13 +330,14 @@ export class AuthService {
     // Always return success to prevent email enumeration
     if (!user) return { message: 'Se o e-mail estiver cadastrado, você receberá um código.' };
 
-    // Generate 6-digit code
+    // Generate 6-digit code and hash it
     const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashedCode = await bcrypt.hash(code, 6);
     const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { resetCode: code, resetCodeExpiry: expiry },
+      data: { resetCode: hashedCode, resetCodeExpiry: expiry },
     });
 
     // Send email via Resend
@@ -376,12 +377,15 @@ export class AuthService {
       throw new BadRequestException('Código inválido ou expirado');
     }
 
-    if (user.resetCode !== code) {
-      throw new BadRequestException('Código inválido ou expirado');
+    if (new Date() > user.resetCodeExpiry) {
+      // Clear expired code
+      await this.prisma.user.update({ where: { id: user.id }, data: { resetCode: null, resetCodeExpiry: null } });
+      throw new BadRequestException('Código expirado. Solicite um novo.');
     }
 
-    if (new Date() > user.resetCodeExpiry) {
-      throw new BadRequestException('Código expirado. Solicite um novo.');
+    const valid = await bcrypt.compare(code, user.resetCode);
+    if (!valid) {
+      throw new BadRequestException('Código inválido ou expirado');
     }
 
     return { valid: true };

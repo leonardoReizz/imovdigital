@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -14,9 +14,17 @@ export class LeadService {
   }
 
   async markSeen(tenantId: string, id: string) {
+    const lead = await this.prisma.lead.findFirst({ where: { id, tenantId } });
+    if (!lead) throw new BadRequestException('Lead não encontrado');
     return this.prisma.lead.update({
       where: { id },
       data: { seen: true },
     });
+  }
+
+  async remove(tenantId: string, id: string) {
+    const lead = await this.prisma.lead.findFirst({ where: { id, tenantId } });
+    if (!lead) throw new BadRequestException('Lead não encontrado');
+    return this.prisma.lead.delete({ where: { id } });
   }
 }

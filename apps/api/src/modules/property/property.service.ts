@@ -51,10 +51,14 @@ export class PropertyService {
   }
 
   async update(tenantId: string, id: string, data: any) {
+    const property = await this.prisma.property.findFirst({ where: { id, tenantId } });
+    if (!property) throw new BadRequestException('Imóvel não encontrado');
     return this.prisma.property.update({ where: { id }, data });
   }
 
   async remove(tenantId: string, id: string) {
+    const property = await this.prisma.property.findFirst({ where: { id, tenantId } });
+    if (!property) throw new BadRequestException('Imóvel não encontrado');
     return this.prisma.property.delete({ where: { id } });
   }
 

@@ -68,6 +68,9 @@ export class UserService {
   }
 
   async update(tenantId: string, id: string, data: { name?: string; phone?: string; role?: string; password?: string }) {
+    const user = await this.prisma.user.findFirst({ where: { id, tenantId } });
+    if (!user) throw new BadRequestException('Membro não encontrado');
+
     const updateData: any = {};
     if (data.name !== undefined) updateData.name = data.name;
     if (data.phone !== undefined) updateData.phone = data.phone || null;

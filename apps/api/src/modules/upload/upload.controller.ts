@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
+import { SkipThrottle } from '@nestjs/throttler';
 import { UploadService } from './upload.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
@@ -36,12 +37,17 @@ export class UploadController {
   }
 
   // Proxy R2 files — no auth required (public images)
+  @SkipThrottle()
   @Get('files/:folder/:filename')
   async serveFile(
     @Param('folder') folder: string,
     @Param('filename') filename: string,
     @Res() res: Response,
   ) {
+    // Prevent path traversal
+    if (folder.includes('..') || filename.includes('..')) {
+      return res.status(400).json({ error: 'Invalid path' });
+    }
     const key = `${folder}/${filename}`;
     const { stream, contentType } = await this.uploadService.getFile(key);
 
