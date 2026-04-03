@@ -19,21 +19,27 @@ export function GlobalSettings() {
 
   return (
     <div className="space-y-5">
-      <EditorImageUploader
-        label="Logo"
-        value={config.logoUrl}
-        onChange={(v) => updateGlobal({ logoUrl: v })}
-        folder="logos"
-        aspectRatio="3/1"
-      />
+      <div>
+        <EditorImageUploader
+          label="Logo"
+          value={config.logoUrl}
+          onChange={(v) => updateGlobal({ logoUrl: v })}
+          folder="logos"
+          aspectRatio="3/1"
+        />
+        <p className="text-[10px] text-gray-400 mt-1">Recomendado: 600×200px, PNG transparente</p>
+      </div>
 
-      <EditorImageUploader
-        label="Favicon"
-        value={config.faviconUrl}
-        onChange={(v) => updateGlobal({ faviconUrl: v })}
-        folder="logos"
-        aspectRatio="1/1"
-      />
+      <div>
+        <EditorImageUploader
+          label="Favicon"
+          value={config.faviconUrl}
+          onChange={(v) => updateGlobal({ faviconUrl: v })}
+          folder="logos"
+          aspectRatio="1/1"
+        />
+        <p className="text-[10px] text-gray-400 mt-1">Recomendado: 32×32px ou 64×64px, PNG ou ICO</p>
+      </div>
 
       <ColorPicker
         label="Cor primária"

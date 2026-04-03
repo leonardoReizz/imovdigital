@@ -4,6 +4,7 @@ import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
+  DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
@@ -93,5 +94,45 @@ export class UploadService {
       stream: response.Body as Readable,
       contentType: response.ContentType || 'application/octet-stream',
     };
+  }
+
+  /**
+   * Extract the R2 key from a URL like /api/files/gallery/xxx.jpg or https://cdn.../gallery/xxx.jpg
+   */
+  private extractKey(url: string): string | null {
+    // /api/files/gallery/xxx.jpg → gallery/xxx.jpg
+    const apiMatch = url.match(/\/api\/files\/(.+)$/);
+    if (apiMatch) return apiMatch[1];
+
+    // https://cdn.example.com/gallery/xxx.jpg → gallery/xxx.jpg
+    const r2PublicUrl = this.config.get('R2_PUBLIC_URL');
+    if (r2PublicUrl && url.startsWith(r2PublicUrl)) {
+      return url.slice(r2PublicUrl.length + 1);
+    }
+
+    // /uploads/gallery/xxx.jpg (dev fallback)
+    const uploadsMatch = url.match(/\/uploads\/(.+)$/);
+    if (uploadsMatch) return uploadsMatch[1];
+
+    return null;
+  }
+
+  async deleteFile(url: string): Promise<void> {
+    const s3 = this.getS3();
+    const bucket = this.getBucket();
+    if (!s3 || !bucket) return;
+
+    const key = this.extractKey(url);
+    if (!key) return;
+
+    try {
+      await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
+    } catch {
+      // Ignore delete errors — file may already be gone
+    }
+  }
+
+  async deleteFiles(urls: string[]): Promise<void> {
+    await Promise.all(urls.map((url) => this.deleteFile(url)));
   }
 }

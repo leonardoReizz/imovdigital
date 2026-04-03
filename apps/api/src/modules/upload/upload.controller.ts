@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Delete,
   Get,
   Body,
   Param,
@@ -25,6 +26,13 @@ export class UploadController {
       body.contentType,
       body.folder,
     );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('upload/file')
+  async deleteFile(@Body() body: { url: string }) {
+    await this.uploadService.deleteFile(body.url);
+    return { deleted: true };
   }
 
   // Proxy R2 files — no auth required (public images)
