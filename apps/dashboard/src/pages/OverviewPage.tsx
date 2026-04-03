@@ -64,6 +64,7 @@ interface DashboardData {
     title: string;
     slug: string;
     price: number;
+    rentPrice: number | null;
     listingType: string;
     active: boolean;
     images: any[];
@@ -297,7 +298,8 @@ export function OverviewPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-gray-900 truncate">{prop.title}</p>
                       <p className={`text-xs font-semibold ${prop.listingType === 'RENT' ? 'text-blue-600' : 'text-gray-500'}`}>
-                        {formatPrice(prop.price)}
+                        {formatPrice(prop.listingType === 'RENT' && prop.rentPrice ? prop.rentPrice : prop.price)}
+                        {prop.listingType === 'RENT' && <span className="font-normal text-gray-400">/mês</span>}
                       </p>
                     </div>
                     <span className={`w-2 h-2 rounded-full shrink-0 ${prop.active ? 'bg-green-400' : 'bg-gray-300'}`} />

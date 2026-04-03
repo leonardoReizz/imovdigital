@@ -52,7 +52,7 @@ export class TenantService {
         where: { tenantId },
         orderBy: { createdAt: 'desc' },
         take: 5,
-        select: { id: true, title: true, slug: true, price: true, listingType: true, active: true, images: true, createdAt: true },
+        select: { id: true, title: true, slug: true, price: true, rentPrice: true, listingType: true, active: true, images: true, createdAt: true },
       }),
       this.prisma.property.groupBy({
         by: ['type'],
