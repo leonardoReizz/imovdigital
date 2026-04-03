@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Section, SectionType } from '@imovdigital/types';
 import { useEditorStore } from '../../store/editorStore';
 import {
@@ -206,9 +207,53 @@ function AgentsSettingsPanel({ section }: { section: Section<'agents'> }) {
 
 // ─── Testimonials Settings ───────────────────────────────────
 
+function StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button key={star} type="button" onClick={() => onChange(star)} className={`text-lg ${star <= value ? 'text-yellow-400' : 'text-gray-200'}`}>
+          ★
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function TestimonialsSettingsPanel({ section }: { section: Section<'testimonials'> }) {
+  const updateSection = useEditorStore((s) => s.updateSection);
   const update = useSectionUpdater(section.id);
   const s = section.settings;
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [draft, setDraft] = useState({ name: '', text: '', rating: 5 });
+
+  const items = s.items || [];
+
+  const addItem = () => {
+    if (!draft.name.trim() || !draft.text.trim()) return;
+    const newItems = [...items, { ...draft, avatarUrl: null }];
+    updateSection(section.id, { items: newItems });
+    setDraft({ name: '', text: '', rating: 5 });
+  };
+
+  const updateItem = (index: number) => {
+    if (!draft.name.trim() || !draft.text.trim()) return;
+    const newItems = [...items];
+    newItems[index] = { ...newItems[index], ...draft };
+    updateSection(section.id, { items: newItems });
+    setEditingIndex(null);
+    setDraft({ name: '', text: '', rating: 5 });
+  };
+
+  const removeItem = (index: number) => {
+    updateSection(section.id, { items: items.filter((_: any, i: number) => i !== index) });
+    if (editingIndex === index) { setEditingIndex(null); setDraft({ name: '', text: '', rating: 5 }); }
+  };
+
+  const startEdit = (index: number) => {
+    const item = items[index];
+    setDraft({ name: item.name, text: item.text, rating: item.rating });
+    setEditingIndex(index);
+  };
 
   return (
     <div className="space-y-4">
@@ -222,9 +267,52 @@ function TestimonialsSettingsPanel({ section }: { section: Section<'testimonials
           { value: 'grid', label: 'Grade' },
         ]}
       />
-      <p className="text-xs text-gray-400">
-        Depoimentos podem ser adicionados na seção de preview.
-      </p>
+
+      {/* Existing items */}
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-gray-500">Depoimentos ({items.length})</p>
+        {items.map((item: any, i: number) => (
+          <div key={i} className="bg-gray-50 rounded-lg p-3 space-y-1">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-700">{item.name}</span>
+                <span className="text-xs text-yellow-500">{'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}</span>
+              </div>
+              <div className="flex gap-1">
+                <button type="button" onClick={() => startEdit(i)} className="text-xs text-blue-600 hover:underline">Editar</button>
+                <button type="button" onClick={() => removeItem(i)} className="text-xs text-red-500 hover:underline">Remover</button>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 line-clamp-2">"{item.text}"</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Add/Edit form */}
+      <div className="bg-blue-50/50 rounded-lg p-3 space-y-3 border border-blue-100">
+        <p className="text-xs font-medium text-blue-700">{editingIndex !== null ? 'Editar depoimento' : 'Novo depoimento'}</p>
+        <TextInput label="Nome" value={draft.name} onChange={(v) => setDraft((d) => ({ ...d, name: v }))} placeholder="Nome do cliente" />
+        <TextareaField label="Depoimento" value={draft.text} onChange={(v) => setDraft((d) => ({ ...d, text: v }))} placeholder="O que o cliente disse..." rows={2} />
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-gray-600">Avaliação</label>
+          <StarRating value={draft.rating} onChange={(v) => setDraft((d) => ({ ...d, rating: v }))} />
+        </div>
+        <div className="flex gap-2">
+          {editingIndex !== null && (
+            <button type="button" onClick={() => { setEditingIndex(null); setDraft({ name: '', text: '', rating: 5 }); }} className="px-3 py-1.5 text-xs font-medium text-gray-500 bg-white border border-gray-200 rounded-lg">
+              Cancelar
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={editingIndex !== null ? () => updateItem(editingIndex) : addItem}
+            disabled={!draft.name.trim() || !draft.text.trim()}
+            className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg disabled:opacity-40"
+          >
+            {editingIndex !== null ? 'Salvar' : 'Adicionar'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

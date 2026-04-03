@@ -42,26 +42,38 @@ export function TestimonialsPreview({ settings }: { settings: TestimonialsSettin
       <div className="max-w-6xl mx-auto">
         <h2 style={{ fontSize: isMobile ? 22 : 30 }} className="font-bold text-gray-900 text-center mb-10">{settings.title}</h2>
 
-        {isMobile ? (
-          /* Mobile: single card carousel */
-          <div className="relative">
-            <TestimonialCard item={items[current % items.length]} />
-            {items.length > 1 && (
-              <div className="flex items-center justify-center gap-3 mt-4">
-                <button onClick={() => setCurrent((c) => (c === 0 ? items.length - 1 : c - 1))} className="p-1.5 bg-white rounded-full shadow border border-gray-200">
-                  <ChevronLeft className="w-4 h-4 text-gray-600" />
-                </button>
-                <span className="text-xs text-gray-400">{(current % items.length) + 1}/{items.length}</span>
-                <button onClick={() => setCurrent((c) => c + 1)} className="p-1.5 bg-white rounded-full shadow border border-gray-200">
-                  <ChevronRight className="w-4 h-4 text-gray-600" />
-                </button>
+        {isMobile || settings.layout === 'carousel' ? (
+          /* Carousel */
+          (() => {
+            const perPage = isMobile ? 1 : Math.min(3, items.length);
+            const totalPages = Math.ceil(items.length / perPage);
+            const page = current % totalPages;
+            const visible = items.slice(page * perPage, page * perPage + perPage);
+            return (
+              <div className="relative">
+                <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${perPage}, 1fr)` }}>
+                  {visible.map((item, i) => (
+                    <TestimonialCard key={page * perPage + i} item={item} />
+                  ))}
+                </div>
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-3 mt-6">
+                    <button onClick={() => setCurrent((c) => (c === 0 ? totalPages - 1 : c - 1))} className="p-1.5 bg-white rounded-full shadow border border-gray-200">
+                      <ChevronLeft className="w-4 h-4 text-gray-600" />
+                    </button>
+                    <span className="text-xs text-gray-400">{page + 1}/{totalPages}</span>
+                    <button onClick={() => setCurrent((c) => c + 1)} className="p-1.5 bg-white rounded-full shadow border border-gray-200">
+                      <ChevronRight className="w-4 h-4 text-gray-600" />
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            );
+          })()
         ) : (
-          /* Desktop/Tablet: grid */
+          /* Grid */
           <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${Math.min(items.length, 3)}, 1fr)` }}>
-            {items.slice(0, 3).map((item, i) => (
+            {items.map((item, i) => (
               <TestimonialCard key={i} item={item} />
             ))}
           </div>
