@@ -12,6 +12,9 @@ RUN pnpm install --frozen-lockfile
 
 RUN pnpm --filter @imovdigital/types build || true
 RUN pnpm --filter @imovdigital/utils build || true
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 RUN pnpm --filter @imovdigital/web build
 
 # ============================================
