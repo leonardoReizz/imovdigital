@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { CLIENT_API_URL } from '@/lib/client-api';
 import type { SearchPageConfig } from '@imovdigital/types';
 import { DEFAULT_SEARCH_PAGE_CONFIG, PROPERTY_TYPE_LABELS } from '@imovdigital/types';
 
@@ -63,7 +64,7 @@ export function PropertyFilters({ primaryColor, total, tenantSlug, searchConfig 
 
   // Load cities on mount
   useEffect(() => {
-    fetch(`/api/public/${tenantSlug}/filters`, { cache: 'no-store' })
+    fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((data) => setCities(data.cities || []))
       .catch(() => {});
@@ -79,7 +80,7 @@ export function PropertyFilters({ primaryColor, total, tenantSlug, searchConfig 
       setNeighborhoods([]);
       return;
     }
-    fetch(`/api/public/${tenantSlug}/filters?city=${encodeURIComponent(newCity)}`, { cache: 'no-store' })
+    fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters?city=${encodeURIComponent(newCity)}`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((data) => setNeighborhoods(data.neighborhoods || []))
       .catch(() => setNeighborhoods([]));
@@ -88,7 +89,7 @@ export function PropertyFilters({ primaryColor, total, tenantSlug, searchConfig 
   // On mount, if city is already selected in URL, load its neighborhoods
   useEffect(() => {
     if (city) {
-      fetch(`/api/public/${tenantSlug}/filters?city=${encodeURIComponent(city)}`, { cache: 'no-store' })
+      fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters?city=${encodeURIComponent(city)}`, { cache: 'no-store' })
         .then((r) => r.json())
         .then((data) => setNeighborhoods(data.neighborhoods || []))
         .catch(() => {});

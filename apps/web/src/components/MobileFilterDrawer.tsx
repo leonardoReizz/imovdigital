@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SlidersHorizontal, X } from 'lucide-react';
+import { CLIENT_API_URL } from '@/lib/client-api';
 import type { SearchPageConfig } from '@imovdigital/types';
 import { PROPERTY_TYPE_LABELS } from '@imovdigital/types';
 
@@ -26,7 +27,7 @@ export function MobileFilterDrawer({ primaryColor, tenantSlug, sp, total }: Prop
   const hasFilters = !!(params.type || params.listingType || params.bedrooms || params.bathrooms || params.parkingSpots || params.city || params.neighborhood || params.minPrice || params.maxPrice);
 
   useEffect(() => {
-    fetch(`/api/public/${tenantSlug}/filters`, { cache: 'no-store' })
+    fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => setCities(d.cities || []))
       .catch(() => {});
@@ -34,7 +35,7 @@ export function MobileFilterDrawer({ primaryColor, tenantSlug, sp, total }: Prop
 
   useEffect(() => {
     if (!local.city) { setNeighborhoods([]); return; }
-    fetch(`/api/public/${tenantSlug}/filters?city=${encodeURIComponent(local.city)}`, { cache: 'no-store' })
+    fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters?city=${encodeURIComponent(local.city)}`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => setNeighborhoods(d.neighborhoods || []))
       .catch(() => {});

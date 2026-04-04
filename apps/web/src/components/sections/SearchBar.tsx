@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import type { SearchBarSettings } from '@imovdigital/types';
 import { PROPERTY_TYPE_LABELS } from '@imovdigital/types';
 import { Search } from 'lucide-react';
+import { CLIENT_API_URL } from '@/lib/client-api';
 
 const RADIUS_MAP = { none: '0', sm: '0.25rem', md: '0.5rem', lg: '0.75rem', full: '9999px' };
 const FIELD_LABELS: Record<string, string> = { tipo: 'Tipo', cidade: 'Cidade', bairro: 'Bairro', preco: 'Modalidade', quartos: 'Quartos' };
@@ -25,7 +26,7 @@ export function SearchBar({ settings, primaryColor, embedded, cities = [], tenan
       setNeighborhoods([]);
       return;
     }
-    fetch(`/api/public/${tenantSlug}/filters?city=${encodeURIComponent(selectedCity)}`, { cache: 'no-store' })
+    fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters?city=${encodeURIComponent(selectedCity)}`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((data) => setNeighborhoods(data.neighborhoods || []))
       .catch(() => setNeighborhoods([]));

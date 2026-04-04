@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { ContactSettings } from '@imovdigital/types';
 import { MapPin, MessageCircle, Send, Check, Loader2 } from 'lucide-react';
 import { PhoneInput } from '../PhoneInput';
+import { CLIENT_API_URL } from '@/lib/client-api';
 
 interface Props {
   settings: ContactSettings;
@@ -39,7 +40,7 @@ export function Contact({ settings, primaryColor, tenantSlug, contactData }: Pro
     setSending(true);
     setError('');
     try {
-      await fetch(`/api/public/${tenantSlug}/leads`, {
+      await fetch(`${CLIENT_API_URL}/public/${tenantSlug}/leads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

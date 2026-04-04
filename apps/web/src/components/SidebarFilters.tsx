@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { X } from 'lucide-react';
+import { CLIENT_API_URL } from '@/lib/client-api';
 import type { SearchPageConfig } from '@imovdigital/types';
 import { PROPERTY_TYPE_LABELS } from '@imovdigital/types';
 
@@ -45,7 +46,7 @@ export function SidebarFilters({ primaryColor, tenantSlug, sp }: Props) {
 
   // Load cities
   useEffect(() => {
-    fetch(`/api/public/${tenantSlug}/filters`, { cache: 'no-store' })
+    fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => setCities(d.cities || []))
       .catch(() => {});
@@ -54,7 +55,7 @@ export function SidebarFilters({ primaryColor, tenantSlug, sp }: Props) {
   // Load neighborhoods when city changes
   useEffect(() => {
     if (!city) { setNeighborhoods([]); return; }
-    fetch(`/api/public/${tenantSlug}/filters?city=${encodeURIComponent(city)}`, { cache: 'no-store' })
+    fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters?city=${encodeURIComponent(city)}`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => setNeighborhoods(d.neighborhoods || []))
       .catch(() => setNeighborhoods([]));

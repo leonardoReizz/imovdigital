@@ -4,6 +4,8 @@ import { useState, useRef } from 'react';
 import { Send, Check, Loader2 } from 'lucide-react';
 import { PhoneInput } from './PhoneInput';
 
+import { CLIENT_API_URL } from '@/lib/client-api';
+
 interface LeadFormProps {
   tenantSlug: string;
   propertyId?: string;
@@ -44,7 +46,7 @@ export function LeadForm({ tenantSlug, propertyId, propertyTitle, primaryColor, 
     setSending(true);
     setError('');
     try {
-      const res = await fetch(`/api/public/${encodeURIComponent(tenantSlug)}/leads`, {
+      const res = await fetch(`${CLIENT_API_URL}/public/${encodeURIComponent(tenantSlug)}/leads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
