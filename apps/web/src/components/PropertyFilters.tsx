@@ -63,39 +63,28 @@ export function PropertyFilters({ primaryColor, total, tenantSlug, searchConfig 
 
   const hasFilters = !!(type || listingType || bedrooms || bathrooms || parkingSpots || city || neighborhood || minPrice || maxPrice);
 
-  // Load cities on mount
-  useEffect(() => {
-    fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters`, { cache: 'no-store' })
+  // Load cities + neighborhoods
+  const loadFilters = (filterCity?: string) => {
+    const url = filterCity
+      ? `${CLIENT_API_URL}/public/${tenantSlug}/filters?city=${encodeURIComponent(filterCity)}`
+      : `${CLIENT_API_URL}/public/${tenantSlug}/filters`;
+    fetch(url, { cache: 'no-store' })
       .then((r) => r.json())
-      .then((data) => setCities(data.cities || []))
+      .then((data) => {
+        setCities(data.cities || []);
+        setNeighborhoods(data.neighborhoods || []);
+      })
       .catch(() => {});
-  }, [tenantSlug]);
-
-  // When city select changes, fetch neighborhoods immediately
-  const handleCityChange = (newCity: string) => {
-    // Update URL
-    updateParams({ city: newCity, neighborhood: '' });
-
-    // Fetch neighborhoods for this city
-    if (!newCity) {
-      setNeighborhoods([]);
-      return;
-    }
-    fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters?city=${encodeURIComponent(newCity)}`, { cache: 'no-store' })
-      .then((r) => r.json())
-      .then((data) => setNeighborhoods(data.neighborhoods || []))
-      .catch(() => setNeighborhoods([]));
   };
 
-  // On mount, if city is already selected in URL, load its neighborhoods
   useEffect(() => {
-    if (city) {
-      fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters?city=${encodeURIComponent(city)}`, { cache: 'no-store' })
-        .then((r) => r.json())
-        .then((data) => setNeighborhoods(data.neighborhoods || []))
-        .catch(() => {});
-    }
-  }, []);
+    loadFilters(city || undefined);
+  }, [tenantSlug]);
+
+  const handleCityChange = (newCity: string) => {
+    updateParams({ city: newCity, neighborhood: '' });
+    loadFilters(newCity || undefined);
+  };
 
   const updateParams = (updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());

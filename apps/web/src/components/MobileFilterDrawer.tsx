@@ -28,17 +28,15 @@ export function MobileFilterDrawer({ primaryColor, tenantSlug, sp, total }: Prop
   const hasFilters = !!(params.type || params.listingType || params.bedrooms || params.bathrooms || params.parkingSpots || params.city || params.neighborhood || params.minPrice || params.maxPrice);
 
   useEffect(() => {
-    fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters`, { cache: 'no-store' })
+    const url = local.city
+      ? `${CLIENT_API_URL}/public/${tenantSlug}/filters?city=${encodeURIComponent(local.city)}`
+      : `${CLIENT_API_URL}/public/${tenantSlug}/filters`;
+    fetch(url, { cache: 'no-store' })
       .then((r) => r.json())
-      .then((d) => setCities(d.cities || []))
-      .catch(() => {});
-  }, [tenantSlug]);
-
-  useEffect(() => {
-    if (!local.city) { setNeighborhoods([]); return; }
-    fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters?city=${encodeURIComponent(local.city)}`, { cache: 'no-store' })
-      .then((r) => r.json())
-      .then((d) => setNeighborhoods(d.neighborhoods || []))
+      .then((d) => {
+        setCities(d.cities || []);
+        setNeighborhoods(d.neighborhoods || []);
+      })
       .catch(() => {});
   }, [tenantSlug, local.city]);
 

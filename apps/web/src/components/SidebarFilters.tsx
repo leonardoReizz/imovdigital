@@ -45,21 +45,18 @@ export function SidebarFilters({ primaryColor, tenantSlug, sp }: Props) {
 
   const hasFilters = !!(type || listingType || bedrooms || bathrooms || parkingSpots || city || neighborhood || minPrice || maxPrice);
 
-  // Load cities
+  // Load cities + neighborhoods
   useEffect(() => {
-    fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters`, { cache: 'no-store' })
+    const url = city
+      ? `${CLIENT_API_URL}/public/${tenantSlug}/filters?city=${encodeURIComponent(city)}`
+      : `${CLIENT_API_URL}/public/${tenantSlug}/filters`;
+    fetch(url, { cache: 'no-store' })
       .then((r) => r.json())
-      .then((d) => setCities(d.cities || []))
+      .then((d) => {
+        setCities(d.cities || []);
+        setNeighborhoods(d.neighborhoods || []);
+      })
       .catch(() => {});
-  }, [tenantSlug]);
-
-  // Load neighborhoods when city changes
-  useEffect(() => {
-    if (!city) { setNeighborhoods([]); return; }
-    fetch(`${CLIENT_API_URL}/public/${tenantSlug}/filters?city=${encodeURIComponent(city)}`, { cache: 'no-store' })
-      .then((r) => r.json())
-      .then((d) => setNeighborhoods(d.neighborhoods || []))
-      .catch(() => setNeighborhoods([]));
   }, [tenantSlug, city]);
 
   const updateParams = (updates: Record<string, string>) => {

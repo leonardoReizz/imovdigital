@@ -39,7 +39,7 @@ export function CustomSelect({ options, value, onChange, placeholder = 'Selecion
           open ? 'border-gray-400 ring-2 ring-gray-200' : 'border-gray-200 hover:border-gray-300'
         }`}
       >
-        <span className={selected ? 'text-gray-900' : 'text-gray-400'}>
+        <span className={`truncate ${selected ? 'text-gray-900' : 'text-gray-400'}`}>
           {selected ? selected.label : placeholder}
         </span>
         <ChevronDown className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
