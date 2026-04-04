@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Property } from '@imovdigital/types';
 import { formatPrice } from '@imovdigital/utils';
+import { resolveFileUrl } from '@/lib/api';
 import { MapPin, BedDouble, Bath, Car, Home } from 'lucide-react';
 
 interface Props {
@@ -21,7 +22,7 @@ export function PropertyCard({ property, primaryColor, layout = 'vertical', show
       <Link href={`/imoveis/${property.slug}`} className="group flex bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
         <div className="relative w-48 sm:w-64 shrink-0 bg-gray-100">
           {hasImage ? (
-            <img src={property.images[0].url} alt={property.images[0].alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <img src={resolveFileUrl(property.images[0].url)} alt={property.images[0].alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           ) : (
             <div className="w-full h-full flex items-center justify-center"><Home className="w-10 h-10 text-gray-200" /></div>
           )}
@@ -52,7 +53,7 @@ export function PropertyCard({ property, primaryColor, layout = 'vertical', show
     <Link href={`/imoveis/${property.slug}`} className="group block bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg hover:border-gray-200 transition-all">
       <div className="relative aspect-[16/10] bg-gray-100 overflow-hidden">
         {hasImage ? (
-          <img src={property.images[0].url} alt={property.images[0].alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <img src={resolveFileUrl(property.images[0].url)} alt={property.images[0].alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
           <div className="w-full h-full flex items-center justify-center"><Home className="w-10 h-10 text-gray-200" /></div>
         )}

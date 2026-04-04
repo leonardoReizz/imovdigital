@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { resolveTenantSlug } from '@/lib/tenant';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, resolveFileUrl } from '@/lib/api';
 import { SiteHeader } from '@/components/SiteHeader';
 import { PropertyCard } from '@/components/PropertyCard';
 import { formatPrice } from '@imovdigital/utils';
@@ -125,11 +125,11 @@ export default async function PropertyPage({ params }: Props) {
         {hasImages ? (
           pd.galleryStyle === 'single' ? (
             <div className="rounded-2xl overflow-hidden aspect-[2.5/1] bg-gray-100">
-              <img src={images[0].url} alt={images[0].alt || property.title} className="w-full h-full object-cover" />
+              <img src={resolveFileUrl(images[0].url)} alt={images[0].alt || property.title} className="w-full h-full object-cover" />
             </div>
           ) : pd.galleryStyle === 'carousel' ? (
             <div className="relative rounded-2xl overflow-hidden aspect-[2.5/1] bg-gray-100">
-              <img src={images[0].url} alt={images[0].alt || property.title} className="w-full h-full object-cover" />
+              <img src={resolveFileUrl(images[0].url)} alt={images[0].alt || property.title} className="w-full h-full object-cover" />
               {images.length > 1 && (
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-3 py-1 rounded-full">
                   1/{images.length}
@@ -139,11 +139,11 @@ export default async function PropertyPage({ params }: Props) {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-4 sm:grid-rows-2 gap-1 rounded-2xl overflow-hidden h-[250px] sm:h-[420px]">
               <div className="sm:col-span-2 sm:row-span-2 overflow-hidden">
-                <img src={images[0].url} alt={images[0].alt || property.title} className="w-full h-full object-cover" />
+                <img src={resolveFileUrl(images[0].url)} alt={images[0].alt || property.title} className="w-full h-full object-cover" />
               </div>
               {images.slice(1, 5).map((img, i) => (
                 <div key={i} className="hidden sm:block overflow-hidden">
-                  <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
+                  <img src={resolveFileUrl(img.url)} alt={img.alt} className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>

@@ -1,4 +1,5 @@
 import type { AboutSettings } from '@imovdigital/types';
+import { resolveFileUrl } from '@/lib/api';
 import { Building2 } from 'lucide-react';
 
 export function About({ settings, primaryColor }: { settings: AboutSettings; primaryColor: string }) {
@@ -8,7 +9,7 @@ export function About({ settings, primaryColor }: { settings: AboutSettings; pri
         <div className={`flex flex-col md:flex-row items-center gap-8 md:gap-12 ${settings.imagePosition === 'left' ? '' : 'md:flex-row-reverse'}`}>
           <div className="flex-1 w-full">
             {settings.imageUrl ? (
-              <img src={settings.imageUrl} alt={settings.title} className="w-full rounded-xl object-cover aspect-[4/3]" />
+              <img src={resolveFileUrl(settings.imageUrl)} alt={settings.title} className="w-full rounded-xl object-cover aspect-[4/3]" />
             ) : (
               <div className="w-full aspect-[4/3] bg-gray-100 rounded-xl flex items-center justify-center">
                 <Building2 className="w-16 h-16 text-gray-200" />

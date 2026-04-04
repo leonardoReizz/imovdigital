@@ -1,4 +1,5 @@
 import type { FooterSettings } from '@imovdigital/types';
+import { resolveFileUrl } from '@/lib/api';
 import { Instagram, Facebook, Youtube, Linkedin } from 'lucide-react';
 
 interface Props {
@@ -26,7 +27,7 @@ export function Footer({ settings, contactData }: Props) {
         <div className="flex flex-col md:flex-row items-start gap-8 md:gap-12 mb-8">
           <div className="flex-1">
             {settings.logoUrl ? (
-              <img src={settings.logoUrl} alt="" className="mb-4 object-contain" style={{ height: settings.logoSize || 32 }} />
+              <img src={resolveFileUrl(settings.logoUrl)} alt="" className="mb-4 object-contain" style={{ height: settings.logoSize || 32 }} />
             ) : (
               <div className="h-8 w-24 bg-white/10 rounded mb-4" />
             )}
