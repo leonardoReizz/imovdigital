@@ -16,24 +16,8 @@ process.on('unhandledRejection', (reason) => {
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
 
-  const baseDomain = process.env.BASE_DOMAIN || 'imovdigital.com.br';
   app.enableCors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // allow non-browser requests
-      const allowed = [
-        process.env.DASHBOARD_URL || 'http://localhost:5173',
-        process.env.WEB_URL || 'http://localhost:5174',
-      ];
-      if (
-        allowed.includes(origin) ||
-        origin.endsWith(`.${baseDomain}`) ||
-        origin === `https://${baseDomain}` ||
-        origin.includes('localhost')
-      ) {
-        return callback(null, true);
-      }
-      callback(null, false);
-    },
+    origin: true, // Allow all origins — API uses JWT auth, not cookies
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'stripe-signature'],
     credentials: true,
