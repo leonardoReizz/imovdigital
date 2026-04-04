@@ -272,10 +272,11 @@ export class TenantService {
       this.logger.log(`Certbot for ${domain}: ${certResult}`);
 
       // 3. Write nginx config for this domain
+      const d = '$';
       const nginxConf = `server {
     listen 80;
     server_name ${domain};
-    return 301 https://\\$host\\$request_uri;
+    return 301 https://${d}host${d}request_uri;
 }
 
 server {
@@ -286,10 +287,10 @@ server {
 
     location / {
         proxy_pass http://srv-captain--${webApp}:3000;
-        proxy_set_header Host \\$host;
-        proxy_set_header X-Real-IP \\$remote_addr;
-        proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \\$scheme;
+        proxy_set_header Host ${d}host;
+        proxy_set_header X-Real-IP ${d}remote_addr;
+        proxy_set_header X-Forwarded-For ${d}proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto ${d}scheme;
     }
 
     location /.well-known/acme-challenge/ {
