@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { CLIENT_API_URL } from '@/lib/client-api';
+import { CustomSelect } from './CustomSelect';
 import type { SearchPageConfig } from '@imovdigital/types';
 import { PROPERTY_TYPE_LABELS } from '@imovdigital/types';
 
@@ -105,21 +106,24 @@ export function MobileFilterDrawer({ primaryColor, tenantSlug, sp, total }: Prop
               {sp.showTypeFilter && (
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-gray-500">Tipo</label>
-                  <select value={local.type || ''} onChange={(e) => set('type', e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none">
-                    <option value="">Todos</option>
-                    {Object.entries(PROPERTY_TYPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                  </select>
+                  <CustomSelect
+                    options={Object.entries(PROPERTY_TYPE_LABELS).map(([v, l]) => ({ value: v, label: l }))}
+                    value={local.type || ''}
+                    onChange={(v) => set('type', v)}
+                    placeholder="Todos"
+                  />
                 </div>
               )}
 
               {sp.showListingFilter && (
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-gray-500">Modalidade</label>
-                  <select value={local.listingType || ''} onChange={(e) => set('listingType', e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none">
-                    <option value="">Todos</option>
-                    <option value="SALE">Venda</option>
-                    <option value="RENT">Aluguel</option>
-                  </select>
+                  <CustomSelect
+                    options={[{ value: 'SALE', label: 'Venda' }, { value: 'RENT', label: 'Aluguel' }]}
+                    value={local.listingType || ''}
+                    onChange={(v) => set('listingType', v)}
+                    placeholder="Todos"
+                  />
                 </div>
               )}
 
@@ -165,20 +169,24 @@ export function MobileFilterDrawer({ primaryColor, tenantSlug, sp, total }: Prop
               {sp.showCityFilter && (
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-gray-500">Cidade</label>
-                  <select value={local.city || ''} onChange={(e) => set('city', e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none">
-                    <option value="">Todas</option>
-                    {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
+                  <CustomSelect
+                    options={cities.map((c) => ({ value: c, label: c }))}
+                    value={local.city || ''}
+                    onChange={(v) => set('city', v)}
+                    placeholder="Todas"
+                  />
                 </div>
               )}
 
               {sp.showNeighborhoodFilter && (
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-gray-500">Bairro</label>
-                  <select value={local.neighborhood || ''} onChange={(e) => set('neighborhood', e.target.value)} disabled={!local.city} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none disabled:opacity-50">
-                    <option value="">{local.city ? 'Todos' : 'Selecione a cidade'}</option>
-                    {neighborhoods.map((n) => <option key={n} value={n}>{n}</option>)}
-                  </select>
+                  <CustomSelect
+                    options={neighborhoods.map((n) => ({ value: n, label: n }))}
+                    value={local.neighborhood || ''}
+                    onChange={(v) => set('neighborhood', v)}
+                    placeholder={local.city ? 'Todos' : 'Selecione a cidade'}
+                  />
                 </div>
               )}
 

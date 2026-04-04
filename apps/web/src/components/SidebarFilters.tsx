@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { X } from 'lucide-react';
 import { CLIENT_API_URL } from '@/lib/client-api';
+import { CustomSelect } from './CustomSelect';
 import type { SearchPageConfig } from '@imovdigital/types';
 import { PROPERTY_TYPE_LABELS } from '@imovdigital/types';
 
@@ -93,18 +94,14 @@ export function SidebarFilters({ primaryColor, tenantSlug, sp }: Props) {
         {sp.showTypeFilter && (
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-gray-500">Tipo</label>
-            <select value={type} onChange={(e) => updateParams({ type: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none">
-              {TYPE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
+            <CustomSelect options={TYPE_OPTIONS} value={type} onChange={(v) => updateParams({ type: v })} placeholder="Todos os tipos" />
           </div>
         )}
 
         {sp.showListingFilter && (
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-gray-500">Modalidade</label>
-            <select value={listingType} onChange={(e) => updateParams({ listingType: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none">
-              {LISTING_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
+            <CustomSelect options={LISTING_OPTIONS} value={listingType} onChange={(v) => updateParams({ listingType: v })} placeholder="Venda e Aluguel" />
           </div>
         )}
 
@@ -150,20 +147,24 @@ export function SidebarFilters({ primaryColor, tenantSlug, sp }: Props) {
         {sp.showCityFilter && (
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-gray-500">Cidade</label>
-            <select value={city} onChange={(e) => updateParams({ city: e.target.value, neighborhood: '' })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none">
-              <option value="">Todas</option>
-              {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
+            <CustomSelect
+              options={cities.map((c) => ({ value: c, label: c }))}
+              value={city}
+              onChange={(v) => updateParams({ city: v, neighborhood: '' })}
+              placeholder="Todas"
+            />
           </div>
         )}
 
         {sp.showNeighborhoodFilter && (
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-gray-500">Bairro</label>
-            <select value={neighborhood} onChange={(e) => updateParams({ neighborhood: e.target.value })} disabled={!city} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none disabled:opacity-50">
-              <option value="">{city ? 'Todos' : 'Selecione a cidade'}</option>
-              {neighborhoods.map((n) => <option key={n} value={n}>{n}</option>)}
-            </select>
+            <CustomSelect
+              options={neighborhoods.map((n) => ({ value: n, label: n }))}
+              value={neighborhood}
+              onChange={(v) => updateParams({ neighborhood: v })}
+              placeholder={city ? 'Todos' : 'Selecione a cidade'}
+            />
           </div>
         )}
 

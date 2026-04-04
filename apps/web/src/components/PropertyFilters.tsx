@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { CLIENT_API_URL } from '@/lib/client-api';
+import { CustomSelect } from './CustomSelect';
 import type { SearchPageConfig } from '@imovdigital/types';
 import { DEFAULT_SEARCH_PAGE_CONFIG, PROPERTY_TYPE_LABELS } from '@imovdigital/types';
 
@@ -159,26 +160,26 @@ export function PropertyFilters({ primaryColor, total, tenantSlug, searchConfig 
             {/* Row 1: selects */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {sp.showTypeFilter && (
-                <select value={type} onChange={(e) => updateParams({ type: e.target.value })} className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none">
-                  {TYPE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                </select>
+                <CustomSelect options={TYPE_OPTIONS} value={type} onChange={(v) => updateParams({ type: v })} placeholder="Todos os tipos" />
               )}
               {sp.showListingFilter && (
-                <select value={listingType} onChange={(e) => updateParams({ listingType: e.target.value })} className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none">
-                  {LISTING_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                </select>
+                <CustomSelect options={LISTING_OPTIONS} value={listingType} onChange={(v) => updateParams({ listingType: v })} placeholder="Venda e Aluguel" />
               )}
               {sp.showCityFilter && (
-                <select value={city} onChange={(e) => handleCityChange(e.target.value)} className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none">
-                  <option value="">Todas as cidades</option>
-                  {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
+                <CustomSelect
+                  options={cities.map((c) => ({ value: c, label: c }))}
+                  value={city}
+                  onChange={handleCityChange}
+                  placeholder="Todas as cidades"
+                />
               )}
               {sp.showNeighborhoodFilter && (
-                <select value={neighborhood} onChange={(e) => updateParams({ neighborhood: e.target.value })} className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white outline-none">
-                  <option value="">Todos os bairros</option>
-                  {neighborhoods.map((n) => <option key={n} value={n}>{n}</option>)}
-                </select>
+                <CustomSelect
+                  options={neighborhoods.map((n) => ({ value: n, label: n }))}
+                  value={neighborhood}
+                  onChange={(v) => updateParams({ neighborhood: v })}
+                  placeholder="Todos os bairros"
+                />
               )}
             </div>
 
@@ -263,13 +264,7 @@ export function PropertyFilters({ primaryColor, total, tenantSlug, searchConfig 
           <p className="text-sm text-gray-500">
             {total} {total === 1 ? 'imóvel encontrado' : 'imóveis encontrados'}
           </p>
-          <select
-            value={sort}
-            onChange={(e) => updateParams({ sort: e.target.value })}
-            className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 outline-none"
-          >
-            {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
+          <CustomSelect options={SORT_OPTIONS} value={sort} onChange={(v) => updateParams({ sort: v })} placeholder="Ordenar" className="w-44" />
         </div>
       </div>
     </div>
