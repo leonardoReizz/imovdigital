@@ -8,6 +8,11 @@ import { PublicService } from './public.service';
 export class PublicController {
   constructor(private readonly publicService: PublicService) {}
 
+  @Get('resolve-domain')
+  async resolveDomain(@Query('domain') domain: string) {
+    return this.publicService.resolveDomain(domain);
+  }
+
   @Get(':slug')
   async tenant(@Param('slug') slug: string) {
     return this.publicService.findTenant(slug);
@@ -29,11 +34,6 @@ export class PublicController {
     @Param('propertySlug') propertySlug: string,
   ) {
     return this.publicService.findProperty(slug, propertySlug);
-  }
-
-  @Get('resolve-domain')
-  async resolveDomain(@Query('domain') domain: string) {
-    return this.publicService.resolveDomain(domain);
   }
 
   @Get(':slug/site-config')
