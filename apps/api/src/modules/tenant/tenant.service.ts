@@ -233,69 +233,70 @@ export class TenantService {
       };
     }
 
-    // DNS verified — register domain in Caprover and enable SSL
-    const caproverResult = await this.registerDomainInCaprover(tenant.customDomain);
+    // DNS verified — register domain in Caddy for auto-SSL
+    const caddyResult = await this.registerDomainInCaddy(tenant.customDomain);
 
     return {
       verified: true,
       domain: tenant.customDomain,
-      ssl: caproverResult.ssl,
-      ...(caproverResult.error && { sslError: caproverResult.error }),
+      ssl: caddyResult.ssl,
+      ...(caddyResult.error && { sslError: caddyResult.error }),
     };
   }
 
-  private async registerDomainInCaprover(domain: string): Promise<{ ssl: boolean; error?: string }> {
-    const caproverUrl = this.config.get('CAPROVER_URL');
-    const caproverPassword = this.config.get('CAPROVER_PASSWORD');
-    const caproverApp = this.config.get('CAPROVER_WEB_APP') || 'imovdigital-cliente';
+  private async registerDomainInCaddy(domain: string): Promise<{ ssl: boolean; error?: string }> {
+    const caddyUrl = this.config.get('CADDY_API_URL');
+    const webAppUrl = this.config.get('CADDY_UPSTREAM') || 'srv-captain--imovdigital-cliente:3000';
 
-    if (!caproverUrl || !caproverPassword) {
-      this.logger.warn('Caprover not configured, skipping domain registration');
-      return { ssl: false, error: 'Caprover não configurado' };
+    if (!caddyUrl) {
+      this.logger.warn('Caddy not configured, skipping domain registration');
+      return { ssl: false, error: 'Caddy não configurado' };
     }
 
     try {
-      // 1. Login to Caprover
-      const loginRes = await fetch(`${caproverUrl}/api/v2/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-namespace': 'captain' },
-        body: JSON.stringify({ password: caproverPassword }),
-      });
-      const loginData = await loginRes.json();
-      const token = loginData.data?.token;
-      if (!token) throw new Error('Caprover login failed');
-
-      const headers = {
-        'Content-Type': 'application/json',
-        'x-namespace': 'captain',
-        'x-captain-auth': token,
+      // Add route via Caddy Admin API
+      const caddyConfig = {
+        '@id': `custom-${domain}`,
+        match: [{ host: [domain] }],
+        handle: [
+          {
+            handler: 'reverse_proxy',
+            upstreams: [{ dial: webAppUrl }],
+            headers: {
+              request: {
+                set: {
+                  'Host': ['{http.request.host}'],
+                  'X-Real-IP': ['{http.request.remote.host}'],
+                  'X-Forwarded-For': ['{http.request.remote.host}'],
+                  'X-Forwarded-Proto': ['{http.request.scheme}'],
+                },
+              },
+            },
+          },
+        ],
+        terminal: true,
       };
 
-      // 2. Add custom domain to app
-      await fetch(`${caproverUrl}/api/v2/user/apps/appDefinitions/customdomain`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ appName: caproverApp, customDomain: domain }),
-      });
-      this.logger.log(`Domain ${domain} added to Caprover app ${caproverApp}`);
+      // First, try to delete existing route (ignore errors)
+      await fetch(`${caddyUrl}/id/custom-${domain}`, { method: 'DELETE' }).catch(() => {});
 
-      // 3. Enable SSL
-      const sslRes = await fetch(`${caproverUrl}/api/v2/user/apps/appDefinitions/enablecustomdomainssl`, {
+      // Add route to Caddy
+      const res = await fetch(`${caddyUrl}/config/apps/http/servers/srv0/routes`, {
         method: 'POST',
-        headers,
-        body: JSON.stringify({ appName: caproverApp, customDomain: domain }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(caddyConfig),
       });
-      const sslData = await sslRes.json();
 
-      if (sslData.status === 100) {
-        this.logger.log(`SSL enabled for ${domain}`);
+      if (res.ok) {
+        this.logger.log(`Domain ${domain} registered in Caddy with auto-SSL`);
         return { ssl: true };
       }
 
-      this.logger.warn(`SSL failed for ${domain}: ${sslData.description}`);
-      return { ssl: false, error: sslData.description || 'Erro ao ativar SSL' };
+      const error = await res.text();
+      this.logger.warn(`Caddy registration failed for ${domain}: ${error}`);
+      return { ssl: false, error };
     } catch (err: any) {
-      this.logger.error(`Caprover registration failed for ${domain}:`, err.message);
+      this.logger.error(`Caddy registration failed for ${domain}:`, err.message);
       return { ssl: false, error: err.message };
     }
   }
