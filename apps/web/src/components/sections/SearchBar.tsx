@@ -5,9 +5,14 @@ import type { SearchBarSettings } from '@imovdigital/types';
 import { PROPERTY_TYPE_LABELS } from '@imovdigital/types';
 import { Search } from 'lucide-react';
 import { CLIENT_API_URL } from '@/lib/client-api';
+import { CustomSelect } from '../CustomSelect';
 
 const RADIUS_MAP = { none: '0', sm: '0.25rem', md: '0.5rem', lg: '0.75rem', full: '9999px' };
 const FIELD_LABELS: Record<string, string> = { tipo: 'Tipo', cidade: 'Cidade', bairro: 'Bairro', preco: 'Modalidade', quartos: 'Quartos' };
+
+const TYPE_OPTIONS = Object.entries(PROPERTY_TYPE_LABELS).map(([v, l]) => ({ value: v, label: l }));
+const LISTING_OPTIONS = [{ value: 'SALE', label: 'Venda' }, { value: 'RENT', label: 'Aluguel' }];
+const BEDROOM_OPTIONS = [{ value: '1', label: '1+' }, { value: '2', label: '2+' }, { value: '3', label: '3+' }, { value: '4', label: '4+' }];
 
 interface Props {
   settings: SearchBarSettings;
@@ -20,6 +25,7 @@ interface Props {
 export function SearchBar({ settings, primaryColor, embedded, cities = [], tenantSlug }: Props) {
   const [selectedCity, setSelectedCity] = useState('');
   const [neighborhoods, setNeighborhoods] = useState<string[]>([]);
+  const [values, setValues] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!selectedCity || !tenantSlug) {
@@ -32,51 +38,54 @@ export function SearchBar({ settings, primaryColor, embedded, cities = [], tenan
       .catch(() => setNeighborhoods([]));
   }, [selectedCity, tenantSlug]);
 
+  const set = (key: string, val: string) => setValues((p) => ({ ...p, [key]: val }));
+
   function renderField(field: string) {
     switch (field) {
       case 'tipo':
         return (
-          <select name="type" className="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer" defaultValue="">
-            <option value="">Todos</option>
-            {Object.entries(PROPERTY_TYPE_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-          </select>
+          <>
+            <input type="hidden" name="type" value={values.type || ''} />
+            <CustomSelect options={TYPE_OPTIONS} value={values.type || ''} onChange={(v) => set('type', v)} placeholder="Todos" />
+          </>
         );
       case 'cidade':
         return (
-          <select
-            name="city"
-            className="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer"
-            value={selectedCity}
-            onChange={(e) => setSelectedCity(e.target.value)}
-          >
-            <option value="">Todas</option>
-            {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
+          <>
+            <input type="hidden" name="city" value={selectedCity} />
+            <CustomSelect
+              options={cities.map((c) => ({ value: c, label: c }))}
+              value={selectedCity}
+              onChange={(v) => { setSelectedCity(v); set('city', v); }}
+              placeholder="Todas"
+            />
+          </>
         );
       case 'bairro':
         return (
-          <select name="neighborhood" className="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer" defaultValue="" disabled={!selectedCity}>
-            <option value="">{selectedCity ? 'Todos' : 'Selecione a cidade'}</option>
-            {neighborhoods.map((n) => <option key={n} value={n}>{n}</option>)}
-          </select>
+          <>
+            <input type="hidden" name="neighborhood" value={values.neighborhood || ''} />
+            <CustomSelect
+              options={neighborhoods.map((n) => ({ value: n, label: n }))}
+              value={values.neighborhood || ''}
+              onChange={(v) => set('neighborhood', v)}
+              placeholder={selectedCity ? 'Todos' : 'Selecione a cidade'}
+            />
+          </>
         );
       case 'preco':
         return (
-          <select name="listingType" className="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer" defaultValue="">
-            <option value="">Venda/Aluguel</option>
-            <option value="SALE">Venda</option>
-            <option value="RENT">Aluguel</option>
-          </select>
+          <>
+            <input type="hidden" name="listingType" value={values.listingType || ''} />
+            <CustomSelect options={LISTING_OPTIONS} value={values.listingType || ''} onChange={(v) => set('listingType', v)} placeholder="Venda/Aluguel" />
+          </>
         );
       case 'quartos':
         return (
-          <select name="bedrooms" className="w-full bg-transparent text-sm text-gray-700 outline-none cursor-pointer" defaultValue="">
-            <option value="">Qualquer</option>
-            <option value="1">1+</option>
-            <option value="2">2+</option>
-            <option value="3">3+</option>
-            <option value="4">4+</option>
-          </select>
+          <>
+            <input type="hidden" name="bedrooms" value={values.bedrooms || ''} />
+            <CustomSelect options={BEDROOM_OPTIONS} value={values.bedrooms || ''} onChange={(v) => set('bedrooms', v)} placeholder="Qualquer" />
+          </>
         );
       default:
         return null;
