@@ -233,70 +233,82 @@ export class TenantService {
       };
     }
 
-    // DNS verified — register domain in Caddy for auto-SSL
-    const caddyResult = await this.registerDomainInCaddy(tenant.customDomain);
+    // DNS verified — generate SSL certificate and configure nginx
+    const sslResult = await this.setupCustomDomainSSL(tenant.customDomain);
 
     return {
       verified: true,
       domain: tenant.customDomain,
-      ssl: caddyResult.ssl,
-      ...(caddyResult.error && { sslError: caddyResult.error }),
+      ssl: sslResult.ssl,
+      ...(sslResult.error && { sslError: sslResult.error }),
     };
   }
 
-  private async registerDomainInCaddy(domain: string): Promise<{ ssl: boolean; error?: string }> {
-    const caddyUrl = this.config.get('CADDY_API_URL');
-    const webAppUrl = this.config.get('CADDY_UPSTREAM') || 'srv-captain--imovdigital-cliente:3000';
+  private async setupCustomDomainSSL(domain: string): Promise<{ ssl: boolean; error?: string }> {
+    const sslEmail = this.config.get('SSL_EMAIL') || 'ssl@imovdigital.com.br';
+    const webApp = this.config.get('CAPROVER_WEB_APP') || 'imovdigital-cliente';
 
-    if (!caddyUrl) {
-      this.logger.warn('Caddy not configured, skipping domain registration');
-      return { ssl: false, error: 'Caddy não configurado' };
+    // Sanitize domain to prevent injection
+    if (!/^[a-z0-9]([a-z0-9.-]*[a-z0-9])?(\.[a-z]{2,})+$/.test(domain)) {
+      return { ssl: false, error: 'Domínio inválido' };
     }
 
     try {
-      // Add route via Caddy Admin API
-      const caddyConfig = {
-        '@id': `custom-${domain}`,
-        match: [{ host: [domain] }],
-        handle: [
-          {
-            handler: 'reverse_proxy',
-            upstreams: [{ dial: webAppUrl }],
-            headers: {
-              request: {
-                set: {
-                  'Host': ['{http.request.host}'],
-                  'X-Real-IP': ['{http.request.remote.host}'],
-                  'X-Forwarded-For': ['{http.request.remote.host}'],
-                  'X-Forwarded-Proto': ['{http.request.scheme}'],
-                },
-              },
-            },
-          },
-        ],
-        terminal: true,
-      };
+      const { execSync } = require('child_process');
+      const fs = require('fs');
 
-      // First, try to delete existing route (ignore errors)
-      await fetch(`${caddyUrl}/id/custom-${domain}`, { method: 'DELETE' }).catch(() => {});
+      // 1. Create webroot directory for ACME challenge
+      const webrootPath = `/captain-domains/${domain}/.well-known/acme-challenge`;
+      fs.mkdirSync(webrootPath, { recursive: true });
 
-      // Add route to Caddy
-      const res = await fetch(`${caddyUrl}/config/apps/http/servers/srv0/routes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(caddyConfig),
-      });
+      // 2. Generate SSL certificate via certbot (Docker socket mounted)
+      const certbotContainer = execSync('docker ps -q -f name=captain-certbot', { encoding: 'utf-8' }).trim();
+      if (!certbotContainer) throw new Error('Certbot container not found');
 
-      if (res.ok) {
-        this.logger.log(`Domain ${domain} registered in Caddy with auto-SSL`);
-        return { ssl: true };
-      }
+      const certResult = execSync(
+        `docker exec ${certbotContainer} certbot certonly --webroot -w /captain-webroot/${domain} -d ${domain} --non-interactive --agree-tos --email ${sslEmail}`,
+        { timeout: 120000, encoding: 'utf-8' },
+      );
+      this.logger.log(`Certbot for ${domain}: ${certResult}`);
 
-      const error = await res.text();
-      this.logger.warn(`Caddy registration failed for ${domain}: ${error}`);
-      return { ssl: false, error };
+      // 3. Write nginx config for this domain
+      const nginxConf = `server {
+    listen 80;
+    server_name ${domain};
+    return 301 https://\\$host\\$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name ${domain};
+    ssl_certificate /letencrypt/etc/live/${domain}/fullchain.pem;
+    ssl_certificate_key /letencrypt/etc/live/${domain}/privkey.pem;
+
+    location / {
+        proxy_pass http://srv-captain--${webApp}:3000;
+        proxy_set_header Host \\$host;
+        proxy_set_header X-Real-IP \\$remote_addr;
+        proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \\$scheme;
+    }
+
+    location /.well-known/acme-challenge/ {
+        root /usr/share/nginx/domains/${domain};
+    }
+}
+`;
+      // Write to nginx conf.d on the host (mounted volume)
+      fs.writeFileSync(`/captain-nginx-conf/custom-${domain}.conf`, nginxConf);
+      this.logger.log(`Nginx config written for ${domain}`);
+
+      // 4. Reload nginx
+      const nginxContainer = execSync('docker ps -q -f name=captain-nginx', { encoding: 'utf-8' }).trim();
+      execSync(`docker exec ${nginxContainer} nginx -s reload`, { timeout: 10000, encoding: 'utf-8' });
+      this.logger.log(`Nginx reloaded for ${domain}`);
+
+      return { ssl: true };
     } catch (err: any) {
-      this.logger.error(`Caddy registration failed for ${domain}:`, err.message);
+      this.logger.error(`SSL setup failed for ${domain}:`, err.message);
       return { ssl: false, error: err.message };
     }
   }
