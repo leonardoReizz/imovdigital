@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Home, Search, Info, Phone, Menu } from 'lucide-react';
+import { resolveFileUrl } from '@/lib/api';
 
 interface SiteHeaderProps {
   logoUrl: string | null;
@@ -14,7 +15,7 @@ export function SiteHeader({ logoUrl, logoSize, siteName, primaryColor }: SiteHe
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-8 py-3">
         <Link href="/" className="flex items-center gap-3 shrink-0">
           {logoUrl ? (
-            <img src={logoUrl} alt={siteName} className="object-contain" style={{ height: logoSize || 32 }} />
+            <img src={resolveFileUrl(logoUrl)} alt={siteName} className="object-contain" style={{ height: logoSize || 32 }} />
           ) : (
             <span className="text-lg font-bold" style={{ color: primaryColor }}>{siteName}</span>
           )}

@@ -1,10 +1,11 @@
 import type { CTABannerSettings } from '@imovdigital/types';
+import { resolveFileUrl } from '@/lib/api';
 
 export function CTABanner({ settings }: { settings: CTABannerSettings }) {
   const bgStyle: React.CSSProperties = settings.backgroundType === 'gradient'
     ? { background: `linear-gradient(135deg, ${settings.backgroundValue}, ${settings.backgroundValue}dd)` }
     : settings.backgroundType === 'image'
-      ? { backgroundImage: `url(${settings.backgroundValue})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+      ? { backgroundImage: `url(${resolveFileUrl(settings.backgroundValue)})`, backgroundSize: 'cover', backgroundPosition: 'center' }
       : { backgroundColor: settings.backgroundValue };
 
   return (

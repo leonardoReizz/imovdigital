@@ -1,5 +1,6 @@
 import type { HeroSettings, SearchBarSettings } from '@imovdigital/types';
 import { SearchBar } from './SearchBar';
+import { resolveFileUrl } from '@/lib/api';
 
 const HEIGHT_MAP = { small: '300px', medium: '450px', large: '600px', full: '100vh' };
 
@@ -8,7 +9,7 @@ export function Hero({ settings, searchBar, primaryColor, cities, tenantSlug }: 
 
   const bgStyle: React.CSSProperties = {};
   if (settings.backgroundType === 'image' && settings.backgroundUrl) {
-    bgStyle.backgroundImage = `url(${settings.backgroundUrl})`;
+    bgStyle.backgroundImage = `url(${resolveFileUrl(settings.backgroundUrl)})`;
     bgStyle.backgroundSize = 'cover';
     bgStyle.backgroundPosition = 'center';
   } else if (settings.backgroundType === 'gradient') {
