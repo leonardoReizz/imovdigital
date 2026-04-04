@@ -46,7 +46,7 @@ export function SearchBar({ settings, primaryColor, embedded, cities = [], tenan
         return (
           <>
             <input type="hidden" name="type" value={values.type || ''} />
-            <CustomSelect options={TYPE_OPTIONS} value={values.type || ''} onChange={(v) => set('type', v)} placeholder="Todos" />
+            <CustomSelect compact options={TYPE_OPTIONS} value={values.type || ''} onChange={(v) => set('type', v)} placeholder="Todos" />
           </>
         );
       case 'cidade':
@@ -54,6 +54,7 @@ export function SearchBar({ settings, primaryColor, embedded, cities = [], tenan
           <>
             <input type="hidden" name="city" value={selectedCity} />
             <CustomSelect
+              compact
               options={cities.map((c) => ({ value: c, label: c }))}
               value={selectedCity}
               onChange={(v) => { setSelectedCity(v); set('city', v); }}
@@ -66,6 +67,7 @@ export function SearchBar({ settings, primaryColor, embedded, cities = [], tenan
           <>
             <input type="hidden" name="neighborhood" value={values.neighborhood || ''} />
             <CustomSelect
+              compact
               options={neighborhoods.map((n) => ({ value: n, label: n }))}
               value={values.neighborhood || ''}
               onChange={(v) => set('neighborhood', v)}
@@ -77,14 +79,14 @@ export function SearchBar({ settings, primaryColor, embedded, cities = [], tenan
         return (
           <>
             <input type="hidden" name="listingType" value={values.listingType || ''} />
-            <CustomSelect options={LISTING_OPTIONS} value={values.listingType || ''} onChange={(v) => set('listingType', v)} placeholder="Venda/Aluguel" />
+            <CustomSelect compact options={LISTING_OPTIONS} value={values.listingType || ''} onChange={(v) => set('listingType', v)} placeholder="Venda/Aluguel" />
           </>
         );
       case 'quartos':
         return (
           <>
             <input type="hidden" name="bedrooms" value={values.bedrooms || ''} />
-            <CustomSelect options={BEDROOM_OPTIONS} value={values.bedrooms || ''} onChange={(v) => set('bedrooms', v)} placeholder="Qualquer" />
+            <CustomSelect compact options={BEDROOM_OPTIONS} value={values.bedrooms || ''} onChange={(v) => set('bedrooms', v)} placeholder="Qualquer" />
           </>
         );
       default:
@@ -93,15 +95,16 @@ export function SearchBar({ settings, primaryColor, embedded, cities = [], tenan
   }
 
   const bar = (
-    <form action="/imoveis" className="max-w-4xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-0 p-3 shadow-lg" style={{ backgroundColor: settings.backgroundColor, borderRadius: RADIUS_MAP[settings.borderRadius] }}>
-      {settings.fields.map((field) => (
-        <div key={field} className="flex-1 px-3 py-2 sm:border-r border-gray-100 last:border-0">
-          <label className="text-xs text-gray-400 block mb-0.5">{FIELD_LABELS[field]}</label>
+    <form action="/imoveis" className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-none sm:flex sm:flex-row items-stretch sm:items-center gap-0 p-3 shadow-lg" style={{ backgroundColor: settings.backgroundColor, borderRadius: RADIUS_MAP[settings.borderRadius] }}>
+      {settings.fields.map((field, i) => (
+        <div key={field} className={`flex-1 px-3 py-2.5 ${i < settings.fields.length - 1 ? 'sm:border-r border-gray-100' : ''}`}>
+          <label className="text-[11px] text-gray-400 block mb-1 font-medium">{FIELD_LABELS[field]}</label>
           {renderField(field)}
         </div>
       ))}
-      <button type="submit" className="p-3 text-white rounded-lg shrink-0 ml-2" style={{ backgroundColor: primaryColor }}>
+      <button type="submit" className="col-span-2 p-3 text-white rounded-lg shrink-0 sm:ml-2 mt-2 sm:mt-0 flex items-center justify-center gap-2" style={{ backgroundColor: primaryColor }}>
         <Search className="w-5 h-5" />
+        <span className="sm:hidden text-sm font-medium">Buscar</span>
       </button>
     </form>
   );
