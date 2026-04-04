@@ -1,15 +1,13 @@
 # ============================================
-# Single-stage build — simple and reliable
+# API only — NestJS
 # ============================================
 FROM node:20-alpine
 
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 WORKDIR /app
 
-# Copy everything
 COPY . .
 
-# Install all dependencies
 RUN pnpm install --frozen-lockfile
 
 # Generate Prisma client
@@ -19,17 +17,10 @@ RUN pnpm --filter @imovdigital/api exec prisma generate
 RUN pnpm --filter @imovdigital/types build || true
 RUN pnpm --filter @imovdigital/utils build || true
 
-# Build dashboard
-RUN pnpm --filter @imovdigital/dashboard build
-
 # Build API
 RUN pnpm --filter @imovdigital/api build
-
-# Move dashboard build into API's public folder
-RUN mkdir -p apps/api/public/dashboard && cp -r apps/dashboard/dist/* apps/api/public/dashboard/
 
 ENV NODE_ENV=production
 EXPOSE 3000
 
-WORKDIR /app
 CMD ["node", "apps/api/dist/main.js"]
