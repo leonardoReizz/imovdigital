@@ -34,7 +34,12 @@ export function LoginPage() {
       const res = await api.post('/auth/login', data);
       localStorage.setItem('accessToken', res.data.accessToken);
       localStorage.setItem('refreshToken', res.data.refreshToken);
-      navigate('/dashboard');
+
+      if (res.data.requiresTwoFactor) {
+        navigate('/two-factor');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err: any) {
       const msg = err?.response?.data?.message;
       setServerError(

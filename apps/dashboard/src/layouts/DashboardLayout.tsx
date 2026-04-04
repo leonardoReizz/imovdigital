@@ -53,10 +53,27 @@ const navItems: NavItem[] = [
   { to: '/dashboard/organization', label: 'Organização', icon: Settings },
 ];
 
+function parseJwt(token: string) {
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch { return null; }
+}
+
 export function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { limits, isTrial, trialDaysLeft, trialExpired } = useSubscription();
+
+  // Check 2FA: if token exists but tfv is false, redirect to 2FA page
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      const payload = parseJwt(token);
+      if (payload && payload.tfv === false) {
+        navigate('/two-factor', { replace: true });
+      }
+    }
+  }, []);
 
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');

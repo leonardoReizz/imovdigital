@@ -14,6 +14,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { OrganizationPage } from './pages/OrganizationPage';
 import { DomainPage } from './pages/DomainPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { TwoFactorPage } from './pages/TwoFactorPage';
 import { SiteEditor } from './pages/editor/SiteEditor';
 
 export function App() {
@@ -22,6 +23,7 @@ export function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/two-factor" element={<TwoFactorPage />} />
       <Route path="/dashboard/editor" element={<SiteEditor />} />
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route index element={<OverviewPage />} />

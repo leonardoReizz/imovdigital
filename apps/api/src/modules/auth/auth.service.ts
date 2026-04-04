@@ -133,12 +133,33 @@ export class AuthService {
       throw new UnauthorizedException('Imobiliária não encontrada');
     }
 
-    const tokens = await this.generateTokens(
-      user.id,
-      user.email,
-      user.tenantId,
-      user.role,
-    );
+    // Check if any tenant requires 2FA
+    const requires2FA = users.some((u) => u.tenant.twoFactorEnabled);
+
+    if (requires2FA) {
+      // Send 2FA code and return partial response
+      await this.sendTwoFactorCode(user);
+
+      // Generate tokens without 2FA verified
+      const tokens = await this.generateTokens(user.id, user.email, user.tenantId, user.role, false);
+
+      const tenants = users.map((u) => ({
+        id: u.tenant.id,
+        name: u.tenant.name,
+        slug: u.tenant.slug,
+        role: u.role,
+      }));
+
+      return {
+        ...tokens,
+        requiresTwoFactor: true,
+        user: { id: user.id, name: user.name, email: user.email, role: user.role },
+        tenant: { id: user.tenant.id, name: user.tenant.name, slug: user.tenant.slug },
+        tenants,
+      };
+    }
+
+    const tokens = await this.generateTokens(user.id, user.email, user.tenantId, user.role, true);
 
     const tenants = users.map((u) => ({
       id: u.tenant.id,
@@ -149,22 +170,14 @@ export class AuthService {
 
     return {
       ...tokens,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-      tenant: {
-        id: user.tenant.id,
-        name: user.tenant.name,
-        slug: user.tenant.slug,
-      },
+      requiresTwoFactor: false,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      tenant: { id: user.tenant.id, name: user.tenant.name, slug: user.tenant.slug },
       tenants,
     };
   }
 
-  async switchTenant(email: string, tenantId: string) {
+  async switchTenant(email: string, tenantId: string, twoFactorVerified: boolean) {
     const user = await this.prisma.user.findFirst({
       where: { email, tenantId, deletedAt: null },
       include: { tenant: true },
@@ -174,11 +187,13 @@ export class AuthService {
       throw new UnauthorizedException('Acesso não encontrado para esta imobiliária');
     }
 
+    // Preserve the 2FA verification from the current session
     const tokens = await this.generateTokens(
       user.id,
       user.email,
       user.tenantId,
       user.role,
+      twoFactorVerified,
     );
 
     return {
@@ -403,6 +418,85 @@ export class AuthService {
     return { message: 'Senha redefinida com sucesso' };
   }
 
+  private async sendTwoFactorCode(user: { id: string; name: string; email: string }) {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashedCode = await bcrypt.hash(code, 10);
+    const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { twoFactorCode: hashedCode, twoFactorCodeExpiry: expiry },
+    });
+
+    const resendKey = this.config.get<string>('RESEND_API_KEY');
+    const fromEmail = this.config.get('EMAIL_FROM') || 'noreply@imovdigital.com.br';
+
+    if (resendKey && resendKey !== 're_...') {
+      const resend = new Resend(resendKey);
+      await resend.emails.send({
+        from: `ImovDigital <${fromEmail}>`,
+        to: user.email,
+        subject: 'Código de verificação - ImovDigital',
+        html: `
+          <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
+            <h2 style="color: #1f2937; margin-bottom: 8px;">Verificação de login</h2>
+            <p style="color: #6b7280; font-size: 14px;">Olá ${user.name},</p>
+            <p style="color: #6b7280; font-size: 14px;">Use o código abaixo para confirmar seu login:</p>
+            <div style="background: #f3f4f6; border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0;">
+              <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #4ca270;">${code}</span>
+            </div>
+            <p style="color: #9ca3af; font-size: 12px;">Este código expira em 10 minutos.</p>
+            <p style="color: #9ca3af; font-size: 12px;">Se você não tentou fazer login, altere sua senha imediatamente.</p>
+          </div>
+        `,
+      });
+    } else {
+      console.log(`[DEV] 2FA code for ${user.email}: ${code}`);
+    }
+  }
+
+  async verifyTwoFactor(userId: string, email: string, tenantId: string, role: string, code: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user || !user.twoFactorCode || !user.twoFactorCodeExpiry) {
+      throw new BadRequestException('Código inválido ou expirado');
+    }
+
+    if (new Date() > user.twoFactorCodeExpiry) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { twoFactorCode: null, twoFactorCodeExpiry: null },
+      });
+      throw new BadRequestException('Código expirado. Faça login novamente.');
+    }
+
+    const valid = await bcrypt.compare(code, user.twoFactorCode);
+    if (!valid) {
+      throw new BadRequestException('Código inválido');
+    }
+
+    // Clear the code
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { twoFactorCode: null, twoFactorCodeExpiry: null },
+    });
+
+    // Generate new tokens with 2FA verified
+    const tokens = await this.generateTokens(userId, email, tenantId, role, true);
+
+    return {
+      ...tokens,
+      verified: true,
+    };
+  }
+
+  async resendTwoFactorCode(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new BadRequestException('Usuário não encontrado');
+    await this.sendTwoFactorCode(user);
+    return { message: 'Código reenviado' };
+  }
+
   async updateProfile(userId: string, data: { name?: string; phone?: string }) {
     const user = await this.prisma.user.update({
       where: { id: userId },
@@ -458,8 +552,9 @@ export class AuthService {
     email: string,
     tenantId: string,
     role: string,
+    twoFactorVerified = false,
   ) {
-    const payload = { sub: userId, email, tenantId, role };
+    const payload = { sub: userId, email, tenantId, role, tfv: twoFactorVerified };
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload),

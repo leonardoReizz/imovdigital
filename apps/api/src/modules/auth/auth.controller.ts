@@ -38,9 +38,30 @@ export class AuthController {
   @Post('switch-tenant')
   async switchTenant(
     @CurrentUser('email') email: string,
+    @CurrentUser('tfv') twoFactorVerified: boolean,
     @Body() body: { tenantId: string },
   ) {
-    return this.authService.switchTenant(email, body.tenantId);
+    return this.authService.switchTenant(email, body.tenantId, !!twoFactorVerified);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ short: { ttl: 60000, limit: 5 } })
+  @Post('verify-two-factor')
+  async verifyTwoFactor(
+    @CurrentUser('sub') userId: string,
+    @CurrentUser('email') email: string,
+    @CurrentUser('tenantId') tenantId: string,
+    @CurrentUser('role') role: string,
+    @Body() body: { code: string },
+  ) {
+    return this.authService.verifyTwoFactor(userId, email, tenantId, role, body.code);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ short: { ttl: 60000, limit: 3 } })
+  @Post('resend-two-factor')
+  async resendTwoFactor(@CurrentUser('sub') userId: string) {
+    return this.authService.resendTwoFactorCode(userId);
   }
 
   @UseGuards(JwtAuthGuard)
