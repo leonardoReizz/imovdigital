@@ -65,7 +65,16 @@ export function RegisterPage() {
       localStorage.setItem('accessToken', res.accessToken);
       localStorage.setItem('refreshToken', res.refreshToken);
       navigate('/dashboard');
-    } catch {
+    } catch (err: any) {
+      const messages: string[] = err?.response?.data?.message;
+      if (Array.isArray(messages)) {
+        const emailError = messages.find((m: string) => /e-?mail.*cadastrado/i.test(m));
+        if (emailError) {
+          setStep(1);
+          setTimeout(() => form1.setError('email', { message: emailError }), 50);
+          return;
+        }
+      }
       setServerError('Não foi possível criar a conta. Tente novamente.');
     }
   };
