@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Send, Check, Loader2 } from 'lucide-react';
 import { PhoneInput } from './PhoneInput';
 
@@ -12,6 +12,8 @@ interface LeadFormProps {
   compact?: boolean;
 }
 
+const RATE_LIMIT_MS = 30_000; // 30s between submissions
+
 export function LeadForm({ tenantSlug, propertyId, propertyTitle, primaryColor, compact }: LeadFormProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -20,26 +22,42 @@ export function LeadForm({ tenantSlug, propertyId, propertyTitle, primaryColor, 
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
+  const lastSubmit = useRef(0);
+
+  const validateEmail = (v: string) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
+    if (email && !validateEmail(email)) {
+      setError('E-mail inválido.');
+      return;
+    }
+
+    const now = Date.now();
+    if (now - lastSubmit.current < RATE_LIMIT_MS) {
+      setError('Aguarde alguns segundos antes de enviar novamente.');
+      return;
+    }
+
     setSending(true);
     setError('');
     try {
-      await fetch(`/api/public/${tenantSlug}/leads`, {
+      const res = await fetch(`/api/public/${encodeURIComponent(tenantSlug)}/leads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name,
-          email: email || undefined,
-          phone: phone || undefined,
-          message: message || (propertyTitle ? `Tenho interesse no imóvel: ${propertyTitle}` : 'Contato pelo site'),
+          name: name.trim().slice(0, 200),
+          email: email.trim().slice(0, 200) || undefined,
+          phone: phone.replace(/\D/g, '').slice(0, 15) || undefined,
+          message: (message || (propertyTitle ? `Tenho interesse no imóvel: ${propertyTitle}` : 'Contato pelo site')).slice(0, 1000),
           propertyId: propertyId || undefined,
           source: 'FORM',
         }),
       });
+      if (!res.ok) throw new Error();
+      lastSubmit.current = now;
       setSent(true);
     } catch {
       setError('Erro ao enviar. Tente novamente.');
@@ -67,6 +85,7 @@ export function LeadForm({ tenantSlug, propertyId, propertyTitle, primaryColor, 
         onChange={(e) => setName(e.target.value)}
         placeholder="Seu nome *"
         required
+        maxLength={200}
         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[--color-primary]/20 focus:border-[--color-primary]"
       />
       <input
@@ -74,6 +93,7 @@ export function LeadForm({ tenantSlug, propertyId, propertyTitle, primaryColor, 
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Seu e-mail"
+        maxLength={200}
         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[--color-primary]/20 focus:border-[--color-primary]"
       />
       <PhoneInput
@@ -88,6 +108,7 @@ export function LeadForm({ tenantSlug, propertyId, propertyTitle, primaryColor, 
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Mensagem (opcional)"
           rows={3}
+          maxLength={1000}
           className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[--color-primary]/20 focus:border-[--color-primary] resize-none"
         />
       )}
