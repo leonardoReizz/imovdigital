@@ -302,7 +302,10 @@ export class PublicService {
   async getHomeSeoData(slug: string) {
     const tenant = await this.prisma.tenant.findUnique({
       where: { slug },
-      include: { _count: { select: { properties: true } } },
+      include: {
+        contactConfig: true,
+        _count: { select: { properties: true } },
+      },
     });
     if (!tenant) throw new NotFoundException('Imobiliária não encontrada');
 
@@ -310,8 +313,15 @@ export class PublicService {
     const siteConfig = await this.prisma.siteConfig.findUnique({ where: { tenantId: tenant.id } });
     const configData = siteConfig?.data as any;
 
-    const title = `${tenant.name} - Imóveis em destaque`;
-    const description = `Encontre os melhores imóveis com ${tenant.name}. ${tenant._count.properties} imóveis disponíveis para venda e aluguel.`;
+    // Build location-aware SEO
+    const city = tenant.contactConfig?.city;
+    const state = tenant.contactConfig?.state;
+    const locationStr = city && state ? ` em ${city}, ${state}` : city ? ` em ${city}` : '';
+
+    const title = `${tenant.name} | Imóveis à Venda e Aluguel${locationStr}`;
+    const description = city
+      ? `${tenant.name} - Imobiliária${locationStr}. ${tenant._count.properties} imóveis disponíveis para venda e aluguel. Encontre casas, apartamentos e muito mais.`
+      : `Encontre os melhores imóveis com ${tenant.name}. ${tenant._count.properties} imóveis disponíveis para venda e aluguel. Casas, apartamentos, terrenos e mais.`;
 
     const openGraph = {
       'og:type': 'website',
@@ -323,18 +333,24 @@ export class PublicService {
       'og:locale': 'pt_BR',
     };
 
+    const address = tenant.contactConfig?.address;
     const jsonLd = {
       '@context': 'https://schema.org',
       '@type': 'RealEstateAgent',
       name: tenant.name,
       url: baseUrl,
       ...(tenant.logoUrl && { logo: tenant.logoUrl }),
-      address: configData?.sections?.find((s: any) => s.type === 'contact')?.settings?.address
-        ? {
-            '@type': 'PostalAddress',
-            addressCountry: 'BR',
-          }
-        : undefined,
+      ...(address && {
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: address,
+          addressLocality: city || undefined,
+          addressRegion: state || undefined,
+          addressCountry: 'BR',
+        },
+      }),
+      ...(tenant.contactConfig?.phone && { telephone: tenant.contactConfig.phone }),
+      ...(tenant.contactConfig?.email && { email: tenant.contactConfig.email }),
     };
 
     return { title, description, openGraph, jsonLd, canonical: baseUrl };
