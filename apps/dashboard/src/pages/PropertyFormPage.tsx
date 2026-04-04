@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -416,9 +416,33 @@ export function PropertyFormPage() {
   const [loadingProperty, setLoadingProperty] = useState(false);
   const [error, setError] = useState('');
   const [activeSection, setActiveSection] = useState('basic');
+  const isClickScrolling = useRef(false);
   const [amenitySearch, setAmenitySearch] = useState('');
   const [seoLoading, setSeoLoading] = useState(false);
   const [seoError, setSeoError] = useState('');
+
+  // Track active section on scroll via IntersectionObserver
+  useEffect(() => {
+    const sectionIds = SECTIONS.map((s) => s.id);
+    const els = sectionIds.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+    if (els.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (isClickScrolling.current) return;
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+            break;
+          }
+        }
+      },
+      { rootMargin: '-20% 0px -60% 0px', threshold: 0 },
+    );
+
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [loadingProperty]);
 
   // Load property data when editing
   useEffect(() => {
@@ -731,7 +755,13 @@ export function PropertyFormPage() {
                 <a
                   key={section.id}
                   href={`#${section.id}`}
-                  onClick={() => setActiveSection(section.id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveSection(section.id);
+                    isClickScrolling.current = true;
+                    document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setTimeout(() => { isClickScrolling.current = false; }, 800);
+                  }}
                   className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeSection === section.id
                       ? 'bg-primary-light text-primary-dark'
