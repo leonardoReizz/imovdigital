@@ -2,6 +2,7 @@ import type { FeaturedListingsSettings, Property } from '@imovdigital/types';
 import { useEditorStore } from '../../../store/editorStore';
 import { PropertyPrice } from './PropertyPrice';
 import { Home, MapPin, BedDouble, Bath, Car, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Img } from '../../Img';
 
 // ─── Property Card (real data) ───────────────────────────────
 
@@ -17,7 +18,7 @@ function RealPropertyCard({ property, showPrice, showBadge }: { property: Proper
     >
       <div className="relative aspect-[16/10] bg-gray-100">
         {hasImage ? (
-          <img src={property.images[0].url} alt={property.images[0].alt} className="w-full h-full object-cover" />
+          <Img src={property.images[0].url} alt={property.images[0].alt} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <Home className="w-10 h-10 text-gray-200" />
@@ -68,7 +69,7 @@ function RealPropertyCardHorizontal({ property, showPrice, showBadge, isMobile }
     >
       <div className="relative w-64 shrink-0 bg-gray-100">
         {hasImage ? (
-          <img src={property.images[0].url} alt={property.images[0].alt} className="w-full h-full object-cover" />
+          <Img src={property.images[0].url} alt={property.images[0].alt} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <Home className="w-10 h-10 text-gray-200" />

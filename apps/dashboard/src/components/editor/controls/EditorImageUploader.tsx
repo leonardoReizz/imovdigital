@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { useR2Upload } from '../../../hooks/useR2Upload';
 import { api } from '../../../lib/api';
+import { Img } from '../../Img';
 
 interface EditorImageUploaderProps {
   label: string;
@@ -47,7 +48,7 @@ export function EditorImageUploader({
 
       {value ? (
         <div className="relative group rounded-lg overflow-hidden border border-gray-200">
-          <img
+          <Img
             src={value}
             alt=""
             className="w-full object-cover"

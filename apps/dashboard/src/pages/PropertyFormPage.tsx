@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
+import { Img } from '../components/Img';
 import {
   ArrowLeft,
   Save,
@@ -1136,7 +1137,7 @@ export function PropertyFormPage() {
                     <div className="flex flex-wrap gap-3">
                       {existingImages.map((img, i) => (
                         <div key={i} className="relative group w-32 h-32 rounded-xl overflow-hidden border-2 border-gray-200">
-                          <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
+                          <Img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
                           <button
                             type="button"
                             onClick={() => {

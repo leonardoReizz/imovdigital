@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Img } from '../../Img';
 
 interface ImageLightboxProps {
   images: { url: string; alt: string }[];
@@ -39,7 +40,7 @@ export function ImageLightbox({ images, initialIndex, onClose }: ImageLightboxPr
       </div>
 
       {/* Image */}
-      <img
+      <Img
         src={images[index].url}
         alt={images[index].alt}
         className="max-w-[90vw] max-h-[85vh] object-contain select-none"
@@ -82,7 +83,7 @@ export function ImageLightbox({ images, initialIndex, onClose }: ImageLightboxPr
                 i === index ? 'border-white' : 'border-transparent opacity-50 hover:opacity-80'
               }`}
             >
-              <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
+              <Img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
             </button>
           ))}
         </div>

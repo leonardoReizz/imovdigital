@@ -6,6 +6,7 @@ import { formatPrice } from '@imovdigital/utils';
 import { PropertyPrice } from './PropertyPrice';
 import { ImageLightbox } from './ImageLightbox';
 import { MapCircle } from './MapCircle';
+import { Img } from '../../Img';
 import {
   ArrowLeft,
   Building2,
@@ -30,14 +31,14 @@ function GalleryGrid({ images, onImageClick }: { images: Property['images']; onI
   return (
     <div className="grid grid-cols-4 grid-rows-2 gap-1 h-[420px]">
       <div className="col-span-2 row-span-2 overflow-hidden cursor-pointer relative group" onClick={() => onImageClick(0)}>
-        <img src={images[0].url} alt={images[0].alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        <Img src={images[0].url} alt={images[0].alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
           <Expand className="w-6 h-6 text-white opacity-0 group-hover:opacity-70 transition-opacity" />
         </div>
       </div>
       {images.slice(1, 5).map((img, i) => (
         <div key={i} className="overflow-hidden cursor-pointer relative group" onClick={() => onImageClick(i + 1)}>
-          <img src={img.url} alt={img.alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          <Img src={img.url} alt={img.alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         </div>
       ))}
@@ -53,7 +54,7 @@ function GalleryCarousel({ images, onImageClick }: { images: Property['images'];
   const [current, setCurrent] = useState(0);
   return (
     <div className="relative h-[420px] overflow-hidden">
-      <img
+      <Img
         src={images[current].url}
         alt={images[current].alt}
         className="w-full h-full object-cover cursor-pointer"
@@ -84,7 +85,7 @@ function GalleryCarousel({ images, onImageClick }: { images: Property['images'];
 function GallerySingle({ images, onImageClick }: { images: Property['images']; onImageClick: (i: number) => void }) {
   return (
     <div className="relative h-[350px] overflow-hidden cursor-pointer group" onClick={() => onImageClick(0)}>
-      <img src={images[0].url} alt={images[0].alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+      <Img src={images[0].url} alt={images[0].alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
       <div className="absolute inset-0 flex items-center justify-center">
         <Expand className="w-8 h-8 text-white opacity-0 group-hover:opacity-70 transition-opacity" />
       </div>
@@ -103,7 +104,7 @@ function GalleryMobile({ images, onImageClick }: { images: Property['images']; o
   const [current, setCurrent] = useState(0);
   return (
     <div className="relative h-[250px] overflow-hidden">
-      <img src={images[current].url} alt={images[current].alt} className="w-full h-full object-cover cursor-pointer" onClick={() => onImageClick(current)} />
+      <Img src={images[current].url} alt={images[current].alt} className="w-full h-full object-cover cursor-pointer" onClick={() => onImageClick(current)} />
       {images.length > 1 && (
         <>
           <button onClick={() => setCurrent((c) => (c === 0 ? images.length - 1 : c - 1))} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 rounded-full shadow flex items-center justify-center">
@@ -259,7 +260,7 @@ function SimilarProperties({ currentProperty, isMobile }: { currentProperty: Pro
             >
               <div className="relative aspect-[16/10] bg-gray-100">
                 {hasImage ? (
-                  <img src={p.images[0].url} alt={p.images[0].alt} className="w-full h-full object-cover" />
+                  <Img src={p.images[0].url} alt={p.images[0].alt} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <Building2 className="w-8 h-8 text-gray-200" />

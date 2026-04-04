@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
+import { Img } from '../components/Img';
 import {
   Plus,
   Search,
@@ -265,7 +266,7 @@ export function PropertiesPage() {
                   {/* Thumbnail */}
                   <div className="w-24 h-24 rounded-lg bg-gray-100 shrink-0 overflow-hidden flex items-center justify-center">
                     {property.images.length > 0 ? (
-                      <img
+                      <Img
                         src={property.images[0].url}
                         alt={property.images[0].alt || property.title}
                         className="w-full h-full object-cover"

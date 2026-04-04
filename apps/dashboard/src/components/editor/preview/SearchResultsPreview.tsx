@@ -11,6 +11,7 @@ import {
   SlidersHorizontal,
   Home,
 } from 'lucide-react';
+import { Img } from '../../Img';
 
 // ─── Card vertical ───────────────────────────────────────────
 
@@ -26,7 +27,7 @@ function PropertyCardVertical({ property }: { property: Property }) {
     >
       <div className="relative aspect-[16/10] bg-gray-100">
         {hasImage ? (
-          <img src={property.images[0].url} alt={property.images[0].alt} className="w-full h-full object-cover" />
+          <Img src={property.images[0].url} alt={property.images[0].alt} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center"><Home className="w-10 h-10 text-gray-200" /></div>
         )}
@@ -63,7 +64,7 @@ function PropertyCardHorizontal({ property }: { property: Property }) {
     >
       <div className="relative w-48 shrink-0 bg-gray-100">
         {hasImage ? (
-          <img src={property.images[0].url} alt={property.images[0].alt} className="w-full h-full object-cover" />
+          <Img src={property.images[0].url} alt={property.images[0].alt} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center"><Home className="w-8 h-8 text-gray-200" /></div>
         )}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useEditorStore } from '../../../store/editorStore';
 import { Home, Search, Menu, X, Info, Phone } from 'lucide-react';
+import { Img } from '../../Img';
 
 export function PreviewHeader() {
   const config = useEditorStore((s) => s.config);
@@ -32,7 +33,7 @@ export function PreviewHeader() {
       >
         <div className="flex items-center gap-3 shrink-0">
           {config?.logoUrl ? (
-            <img
+            <Img
               src={config.logoUrl}
               alt="Logo"
               style={{ height: isMobile ? Math.min((config as any).logoSize || 32, 28) : (config as any).logoSize || 32 }}

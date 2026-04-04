@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { api } from '../lib/api';
+import { api, resolveFileUrl } from '../lib/api';
 
 interface UploadOptions {
   folder?: 'banners' | 'logos' | 'gallery';
@@ -47,7 +47,7 @@ export function useR2Upload() {
       }
 
       setProgress(100);
-      return publicUrl as string;
+      return resolveFileUrl(publicUrl) as string;
     } finally {
       setUploading(false);
     }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { motion } from 'motion/react';
+import { Img } from '../components/Img';
 import {
   Building2,
   MessageSquare,
@@ -288,7 +289,7 @@ export function OverviewPage() {
                   >
                     <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden shrink-0">
                       {Array.isArray(prop.images) && prop.images.length > 0 ? (
-                        <img src={(prop.images[0] as any).url} alt="" className="w-full h-full object-cover" />
+                        <Img src={(prop.images[0] as any).url} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <Building2 className="w-4 h-4 text-gray-300" />

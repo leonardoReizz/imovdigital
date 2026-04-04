@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Img } from '../components/Img';
 import {
   Users,
   Plus,
@@ -356,7 +357,7 @@ export function TeamPage() {
                   {/* Avatar */}
                   <div className="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
                     {member.avatarUrl ? (
-                      <img src={member.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" />
+                      <Img src={member.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" />
                     ) : (
                       <UserIcon className="w-5 h-5 text-gray-400" />
                     )}

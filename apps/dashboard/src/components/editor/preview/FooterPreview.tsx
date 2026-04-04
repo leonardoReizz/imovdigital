@@ -1,5 +1,6 @@
 import type { FooterSettings } from '@imovdigital/types';
 import { Instagram, Facebook, Youtube, Linkedin } from 'lucide-react';
+import { Img } from '../../Img';
 
 export function FooterPreview({ settings }: { settings: FooterSettings }) {
   return (
@@ -12,7 +13,7 @@ export function FooterPreview({ settings }: { settings: FooterSettings }) {
           {/* Brand */}
           <div className="flex-1">
             {settings.logoUrl ? (
-              <img src={settings.logoUrl} alt="" className="mb-4 object-contain" style={{ height: settings.logoSize || 32 }} />
+              <Img src={settings.logoUrl} alt="" className="mb-4 object-contain" style={{ height: settings.logoSize || 32 }} />
             ) : (
               <div className="h-8 w-24 bg-white/10 rounded mb-4" />
             )}
