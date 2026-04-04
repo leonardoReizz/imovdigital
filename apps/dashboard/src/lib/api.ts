@@ -57,4 +57,13 @@ api.interceptors.response.use(
   },
 );
 
+/** Resolve relative /api/files/... URLs to absolute when API is on a different domain */
+export function resolveFileUrl(url: string | null | undefined): string {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  const apiOrigin = import.meta.env.VITE_API_URL;
+  if (apiOrigin && url.startsWith('/api/')) return `${apiOrigin}${url}`;
+  return url;
+}
+
 export { api };

@@ -15,16 +15,13 @@ RUN pnpm --filter @imovdigital/types build || true
 RUN pnpm --filter @imovdigital/utils build || true
 
 # Build dashboard
-ARG VITE_API_URL
-ENV VITE_API_URL=${VITE_API_URL}
 RUN pnpm --filter @imovdigital/dashboard build
 
 # ─── Serve with nginx ──────────────────────────
 FROM nginx:alpine
 
-# SPA config: all routes → index.html, proxy /api to API service
 COPY --from=builder /app/apps/dashboard/dist /usr/share/nginx/html
-COPY nginx-dashboard.conf /etc/nginx/conf.d/default.conf
+COPY nginx-dashboard.conf /etc/nginx/templates/default.conf.template
 
 EXPOSE 80
 
