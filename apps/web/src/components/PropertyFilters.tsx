@@ -136,7 +136,7 @@ export function PropertyFilters({ primaryColor, total, tenantSlug, searchConfig 
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-medium transition-colors ${
               showFilters || hasFilters
-                ? 'bg-blue-50 border-blue-200 text-blue-700'
+                ? 'bg-[--color-primary]/10 border-[--color-primary]/30 text-[--color-primary]'
                 : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
             }`}
           >
@@ -190,7 +190,7 @@ export function PropertyFilters({ primaryColor, total, tenantSlug, searchConfig 
                     <div className="flex gap-1.5">
                       {BEDROOM_OPTIONS.filter((o) => o.value).map((o) => (
                         <button key={o.value} onClick={() => updateParams({ bedrooms: bedrooms === o.value ? '' : o.value })}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${bedrooms === o.value ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${bedrooms === o.value ? 'border-[--color-primary] bg-[--color-primary]/10 text-[--color-primary]' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}
                         >{o.label}</button>
                       ))}
                     </div>
@@ -202,7 +202,7 @@ export function PropertyFilters({ primaryColor, total, tenantSlug, searchConfig 
                     <div className="flex gap-1.5">
                       {['1', '2', '3', '4'].map((v) => (
                         <button key={v} onClick={() => updateParams({ bathrooms: bathrooms === v ? '' : v })}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${bathrooms === v ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${bathrooms === v ? 'border-[--color-primary] bg-[--color-primary]/10 text-[--color-primary]' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}
                         >{v}+</button>
                       ))}
                     </div>
@@ -214,7 +214,7 @@ export function PropertyFilters({ primaryColor, total, tenantSlug, searchConfig 
                     <div className="flex gap-1.5">
                       {['1', '2', '3', '4'].map((v) => (
                         <button key={v} onClick={() => updateParams({ parkingSpots: parkingSpots === v ? '' : v })}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${parkingSpots === v ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${parkingSpots === v ? 'border-[--color-primary] bg-[--color-primary]/10 text-[--color-primary]' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}
                         >{v}+</button>
                       ))}
                     </div>

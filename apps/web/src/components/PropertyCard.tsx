@@ -30,7 +30,7 @@ export function PropertyCard({ property, primaryColor, layout = 'vertical', show
           )}
         </div>
         <div className="p-4 sm:p-5 flex-1 flex flex-col justify-center gap-1.5">
-          <p className="text-base font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{property.title}</p>
+          <p className="text-base font-medium text-gray-900 group-hover:text-[--color-primary] transition-colors">{property.title}</p>
           <p className="text-xs text-gray-500 flex items-center gap-1"><MapPin className="w-3 h-3" />{property.neighborhood}, {property.city}</p>
           <div className="flex items-center gap-3 text-xs text-gray-400">
             {property.bedrooms > 0 && <span className="flex items-center gap-1"><BedDouble className="w-3 h-3" /> {property.bedrooms}</span>}
@@ -39,7 +39,7 @@ export function PropertyCard({ property, primaryColor, layout = 'vertical', show
             <span>{property.area}m²</span>
           </div>
           {showPrice && (
-            <p className={`text-lg font-bold mt-1 ${isRent ? 'text-blue-600' : 'text-gray-900'}`}>
+            <p className={`text-lg font-bold mt-1 ${isRent ? 'text-[--color-primary]' : 'text-gray-900'}`}>
               {formatPrice(mainPrice)}{isRent && <span className="text-sm font-normal text-gray-500">/mês</span>}
             </p>
           )}
@@ -67,11 +67,11 @@ export function PropertyCard({ property, primaryColor, layout = 'vertical', show
       </div>
       <div className="p-4 space-y-1.5">
         {showPrice && (
-          <p className={`text-lg font-bold ${isRent ? 'text-blue-600' : 'text-gray-900'}`}>
+          <p className={`text-lg font-bold ${isRent ? 'text-[--color-primary]' : 'text-gray-900'}`}>
             {formatPrice(mainPrice)}{isRent && <span className="text-sm font-normal text-gray-500">/mês</span>}
           </p>
         )}
-        <p className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors truncate">{property.title}</p>
+        <p className="text-sm font-medium text-gray-900 group-hover:text-[--color-primary] transition-colors truncate">{property.title}</p>
         <p className="text-xs text-gray-500 flex items-center gap-1"><MapPin className="w-3 h-3" />{property.neighborhood}, {property.city}</p>
         <div className="flex items-center gap-3 text-xs text-gray-400 pt-1">
           {property.bedrooms > 0 && <span className="flex items-center gap-1"><BedDouble className="w-3 h-3" /> {property.bedrooms}</span>}

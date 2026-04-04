@@ -128,7 +128,7 @@ export function MobileFilterDrawer({ primaryColor, tenantSlug, sp, total }: Prop
                   <div className="flex flex-wrap gap-1.5">
                     {['1', '2', '3', '4', '5'].map((v) => (
                       <button key={v} type="button" onClick={() => toggleChip('bedrooms', v)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${local.bedrooms === v ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'}`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${local.bedrooms === v ? 'border-[--color-primary] bg-[--color-primary]/10 text-[--color-primary]' : 'border-gray-200 text-gray-600'}`}
                       >{v}+</button>
                     ))}
                   </div>
@@ -141,7 +141,7 @@ export function MobileFilterDrawer({ primaryColor, tenantSlug, sp, total }: Prop
                   <div className="flex flex-wrap gap-1.5">
                     {['1', '2', '3', '4'].map((v) => (
                       <button key={v} type="button" onClick={() => toggleChip('bathrooms', v)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${local.bathrooms === v ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'}`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${local.bathrooms === v ? 'border-[--color-primary] bg-[--color-primary]/10 text-[--color-primary]' : 'border-gray-200 text-gray-600'}`}
                       >{v}+</button>
                     ))}
                   </div>
@@ -154,7 +154,7 @@ export function MobileFilterDrawer({ primaryColor, tenantSlug, sp, total }: Prop
                   <div className="flex flex-wrap gap-1.5">
                     {['1', '2', '3', '4'].map((v) => (
                       <button key={v} type="button" onClick={() => toggleChip('parkingSpots', v)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${local.parkingSpots === v ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'}`}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${local.parkingSpots === v ? 'border-[--color-primary] bg-[--color-primary]/10 text-[--color-primary]' : 'border-gray-200 text-gray-600'}`}
                       >{v}+</button>
                     ))}
                   </div>

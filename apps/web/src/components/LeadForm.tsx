@@ -67,20 +67,20 @@ export function LeadForm({ tenantSlug, propertyId, propertyTitle, primaryColor, 
         onChange={(e) => setName(e.target.value)}
         placeholder="Seu nome *"
         required
-        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[--color-primary]/20 focus:border-[--color-primary]"
       />
       <input
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Seu e-mail"
-        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[--color-primary]/20 focus:border-[--color-primary]"
       />
       <PhoneInput
         value={phone}
         onChange={setPhone}
         placeholder="(11) 99999-9999"
-        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[--color-primary]/20 focus:border-[--color-primary]"
       />
       {!compact && (
         <textarea
@@ -88,7 +88,7 @@ export function LeadForm({ tenantSlug, propertyId, propertyTitle, primaryColor, 
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Mensagem (opcional)"
           rows={3}
-          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
+          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[--color-primary]/20 focus:border-[--color-primary] resize-none"
         />
       )}
       {error && <p className="text-xs text-red-500">{error}</p>}

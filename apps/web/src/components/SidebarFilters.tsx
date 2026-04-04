@@ -113,7 +113,7 @@ export function SidebarFilters({ primaryColor, tenantSlug, sp }: Props) {
             <div className="flex flex-wrap gap-1.5">
               {NUM_OPTIONS.map((v) => (
                 <button key={v} type="button" onClick={() => toggleChip('bedrooms', v)}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${bedrooms === v ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${bedrooms === v ? 'border-[--color-primary] bg-[--color-primary]/10 text-[--color-primary]' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}
                 >{v}+</button>
               ))}
             </div>
@@ -126,7 +126,7 @@ export function SidebarFilters({ primaryColor, tenantSlug, sp }: Props) {
             <div className="flex flex-wrap gap-1.5">
               {['1', '2', '3', '4'].map((v) => (
                 <button key={v} type="button" onClick={() => toggleChip('bathrooms', v)}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${bathrooms === v ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${bathrooms === v ? 'border-[--color-primary] bg-[--color-primary]/10 text-[--color-primary]' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}
                 >{v}+</button>
               ))}
             </div>
@@ -139,7 +139,7 @@ export function SidebarFilters({ primaryColor, tenantSlug, sp }: Props) {
             <div className="flex flex-wrap gap-1.5">
               {['1', '2', '3', '4'].map((v) => (
                 <button key={v} type="button" onClick={() => toggleChip('parkingSpots', v)}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${parkingSpots === v ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${parkingSpots === v ? 'border-[--color-primary] bg-[--color-primary]/10 text-[--color-primary]' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}
                 >{v}+</button>
               ))}
             </div>

@@ -36,14 +36,7 @@ export class AuthService {
       throw new ConflictException('Este e-mail já está cadastrado');
     }
 
-    let slug = generateSlug(dto.agencyName);
-
-    const existingSlug = await this.prisma.tenant.findUnique({
-      where: { slug },
-    });
-    if (existingSlug) {
-      slug = `${slug}-${Date.now().toString(36)}`;
-    }
+    let slug = await this.generateUniqueSlug(dto.agencyName);
 
     const trialPlan = await this.prisma.plan.findFirst({
       orderBy: { monthlyPrice: 'asc' },
@@ -213,9 +206,7 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new UnauthorizedException('Usuário não encontrado');
 
-    const slug = generateSlug(agencyName);
-    const existingSlug = await this.prisma.tenant.findUnique({ where: { slug } });
-    const finalSlug = existingSlug ? `${slug}-${Date.now().toString(36)}` : slug;
+    const finalSlug = await this.generateUniqueSlug(agencyName);
 
     const trialPlan = await this.prisma.plan.findFirst({ orderBy: { monthlyPrice: 'asc' } });
     if (!trialPlan) throw new Error('Nenhum plano encontrado');
@@ -479,5 +470,19 @@ export class AuthService {
     ]);
 
     return { accessToken, refreshToken };
+  }
+
+  private async generateUniqueSlug(name: string): Promise<string> {
+    const base = generateSlug(name);
+    const existing = await this.prisma.tenant.findUnique({ where: { slug: base } });
+    if (!existing) return base;
+
+    for (let i = 2; i <= 99; i++) {
+      const candidate = `${base}-${i}`;
+      const found = await this.prisma.tenant.findUnique({ where: { slug: candidate } });
+      if (!found) return candidate;
+    }
+
+    return `${base}-${Date.now().toString(36)}`;
   }
 }

@@ -40,7 +40,7 @@ export function ShareButton({ title, primaryColor }: ShareButtonProps) {
     {
       label: 'Facebook',
       icon: <Facebook className="w-5 h-5" />,
-      color: 'text-blue-600 hover:bg-blue-50',
+      color: 'text-[--color-primary] hover:bg-[--color-primary]/10',
       onClick: () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank'),
     },
     {

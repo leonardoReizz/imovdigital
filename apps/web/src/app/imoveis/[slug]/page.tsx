@@ -112,9 +112,9 @@ export default async function PropertyPage({ params }: Props) {
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-2">
         <div className="flex items-center gap-2 text-sm text-gray-500">
-          <Link href="/" className="hover:text-blue-600">Início</Link>
+          <Link href="/" className="hover:text-[--color-primary]">Início</Link>
           <span>/</span>
-          <Link href="/imoveis" className="hover:text-blue-600">Imóveis</Link>
+          <Link href="/imoveis" className="hover:text-[--color-primary]">Imóveis</Link>
           <span>/</span>
           <span className="text-gray-900 font-medium truncate">{property.title}</span>
         </div>
@@ -186,12 +186,12 @@ export default async function PropertyPage({ params }: Props) {
 
             {/* Price */}
             <div>
-              <span className={`text-3xl font-bold ${isRent ? 'text-blue-600' : 'text-gray-900'}`} style={!isRent ? { color: primaryColor } : {}}>
+              <span className="text-3xl font-bold text-[--color-primary]">
                 {formatPrice(mainPrice)}
               </span>
               {isRent && <span className="text-gray-500 ml-1">/mês</span>}
               {property.listingType === 'BOTH' && property.rentPrice && (
-                <p className="text-sm font-semibold text-blue-600 mt-1">{formatPrice(property.rentPrice)}/mês</p>
+                <p className="text-sm font-semibold text-[--color-primary] mt-1">{formatPrice(property.rentPrice)}/mês</p>
               )}
             </div>
 
