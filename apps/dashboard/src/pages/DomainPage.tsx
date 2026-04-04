@@ -175,6 +175,7 @@ export function DomainPage() {
   }
 
   const currentSubdomain = `${tenant?.slug}.${BASE_DOMAIN}`;
+  const originDomain = `origin.${BASE_DOMAIN}`;
   const slugChanged = slug !== tenant?.slug;
   const canSaveSlug = slugChanged && slugCheck?.available && !slugSaving;
   const hasDomain = Boolean(tenant?.customDomain);
@@ -417,10 +418,10 @@ export function DomainPage() {
                 <tr>
                   <td className="px-4 py-3 font-mono font-semibold text-gray-900">CNAME</td>
                   <td className="px-4 py-3 font-mono text-gray-700">{tenant?.customDomain}</td>
-                  <td className="px-4 py-3 font-mono text-gray-700">{currentSubdomain}</td>
+                  <td className="px-4 py-3 font-mono text-gray-700">{originDomain}</td>
                   <td className="px-2 py-3">
                     <button
-                      onClick={() => copyToClipboard(currentSubdomain, 'cname')}
+                      onClick={() => copyToClipboard(originDomain, 'cname')}
                       className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                     >
                       {copied === 'cname' ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
@@ -433,9 +434,9 @@ export function DomainPage() {
 
           <div className="mt-4 space-y-2 text-xs text-gray-500">
             <p>1. Acesse o painel de DNS do registrador do seu domínio</p>
-            <p>2. Crie um registro <strong>CNAME</strong> com os valores acima</p>
+            <p>2. Crie um registro <strong>CNAME</strong> apontando para <strong>{originDomain}</strong></p>
             <p>3. Aguarde a propagação do DNS (pode levar até 24h)</p>
-            <p>4. Clique em "Verificar DNS" para confirmar a configuração</p>
+            <p>4. Clique em "Verificar DNS" — o certificado SSL será gerado automaticamente</p>
           </div>
         </motion.div>
       )}

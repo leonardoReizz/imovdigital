@@ -1,10 +1,12 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import * as dns from 'dns/promises';
 
 @Injectable()
 export class TenantService {
+  private readonly logger = new Logger(TenantService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
@@ -190,42 +192,111 @@ export class TenantService {
     }
 
     const baseDomain = this.config.get('BASE_DOMAIN') || 'imovdigital.com.br';
+    const originDomain = `origin.${baseDomain}`;
     const expectedCname = `${tenant.slug}.${baseDomain}`;
+    const serverIp = this.config.get('SERVER_IP') || '';
+
+    // Check DNS: accept CNAME to origin.imovdigital.com.br, slug.imovdigital.com.br, or A record to server IP
+    let dnsOk = false;
+    let dnsInfo = '';
 
     try {
       const records = await dns.resolveCname(tenant.customDomain);
-      const hasCname = records.some((r) => r === expectedCname || r === `${expectedCname}.`);
-
-      if (hasCname) {
-        return { verified: true, domain: tenant.customDomain, cname: expectedCname };
-      }
-
-      return {
-        verified: false,
-        domain: tenant.customDomain,
-        expected: expectedCname,
-        found: records,
-        reason: `CNAME não aponta para ${expectedCname}`,
-      };
+      dnsOk = records.some((r) =>
+        r === originDomain || r === `${originDomain}.` ||
+        r === expectedCname || r === `${expectedCname}.`
+      );
+      dnsInfo = records.join(', ');
     } catch {
-      // Try A record or TXT as fallback info
+      // No CNAME, try A record
       try {
         const aRecords = await dns.resolve4(tenant.customDomain);
-        return {
-          verified: false,
-          domain: tenant.customDomain,
-          expected: expectedCname,
-          found: aRecords,
-          reason: `Configure um CNAME apontando para ${expectedCname}`,
-        };
+        dnsOk = serverIp ? aRecords.includes(serverIp) : false;
+        dnsInfo = aRecords.join(', ');
       } catch {
         return {
           verified: false,
           domain: tenant.customDomain,
-          expected: expectedCname,
-          reason: `Nenhum registro DNS encontrado. Configure um CNAME apontando para ${expectedCname}`,
+          expected: originDomain,
+          reason: `Nenhum registro DNS encontrado. Configure um CNAME apontando para ${originDomain}`,
         };
       }
+    }
+
+    if (!dnsOk) {
+      return {
+        verified: false,
+        domain: tenant.customDomain,
+        expected: originDomain,
+        found: dnsInfo,
+        reason: `DNS não aponta para ${originDomain}. Configure um CNAME apontando para ${originDomain}`,
+      };
+    }
+
+    // DNS verified — register domain in Caprover and enable SSL
+    const caproverResult = await this.registerDomainInCaprover(tenant.customDomain);
+
+    return {
+      verified: true,
+      domain: tenant.customDomain,
+      ssl: caproverResult.ssl,
+      ...(caproverResult.error && { sslError: caproverResult.error }),
+    };
+  }
+
+  private async registerDomainInCaprover(domain: string): Promise<{ ssl: boolean; error?: string }> {
+    const caproverUrl = this.config.get('CAPROVER_URL');
+    const caproverPassword = this.config.get('CAPROVER_PASSWORD');
+    const caproverApp = this.config.get('CAPROVER_WEB_APP') || 'imovdigital-cliente';
+
+    if (!caproverUrl || !caproverPassword) {
+      this.logger.warn('Caprover not configured, skipping domain registration');
+      return { ssl: false, error: 'Caprover não configurado' };
+    }
+
+    try {
+      // 1. Login to Caprover
+      const loginRes = await fetch(`${caproverUrl}/api/v2/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-namespace': 'captain' },
+        body: JSON.stringify({ password: caproverPassword }),
+      });
+      const loginData = await loginRes.json();
+      const token = loginData.data?.token;
+      if (!token) throw new Error('Caprover login failed');
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'x-namespace': 'captain',
+        'x-captain-auth': token,
+      };
+
+      // 2. Add custom domain to app
+      await fetch(`${caproverUrl}/api/v2/user/apps/appDefinitions/customdomain`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ appName: caproverApp, customDomain: domain }),
+      });
+      this.logger.log(`Domain ${domain} added to Caprover app ${caproverApp}`);
+
+      // 3. Enable SSL
+      const sslRes = await fetch(`${caproverUrl}/api/v2/user/apps/appDefinitions/enablecustomdomainssl`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ appName: caproverApp, customDomain: domain }),
+      });
+      const sslData = await sslRes.json();
+
+      if (sslData.status === 100) {
+        this.logger.log(`SSL enabled for ${domain}`);
+        return { ssl: true };
+      }
+
+      this.logger.warn(`SSL failed for ${domain}: ${sslData.description}`);
+      return { ssl: false, error: sslData.description || 'Erro ao ativar SSL' };
+    } catch (err: any) {
+      this.logger.error(`Caprover registration failed for ${domain}:`, err.message);
+      return { ssl: false, error: err.message };
     }
   }
 }
