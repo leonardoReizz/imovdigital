@@ -100,6 +100,7 @@ model Tenant {
   trialEndsAt          DateTime?
   stripeCustomerId     String?
   stripeSubscriptionId String?
+  billingInterval      String             @default("monthly")
   twoFactorEnabled     Boolean            @default(false)
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt

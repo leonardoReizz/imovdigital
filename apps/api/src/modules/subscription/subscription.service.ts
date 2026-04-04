@@ -36,19 +36,6 @@ export class SubscriptionService {
       : 0;
     const trialExpired = tenant.subscriptionStatus === 'TRIAL' && trialEndsAt && trialEndsAt < now;
 
-    // Detect current billing interval from Stripe
-    let currentBilling: 'monthly' | 'yearly' = 'monthly';
-    if (tenant.stripeSubscriptionId) {
-      try {
-        const stripe = this.getStripe();
-        if (stripe) {
-          const sub = await stripe.subscriptions.retrieve(tenant.stripeSubscriptionId);
-          const interval = sub.items?.data?.[0]?.price?.recurring?.interval;
-          if (interval === 'year') currentBilling = 'yearly';
-        }
-      } catch {}
-    }
-
     return {
       tenant: {
         id: tenant.id,
@@ -61,7 +48,7 @@ export class SubscriptionService {
         hasSubscription: !!tenant.stripeSubscriptionId,
       },
       currentPlan: tenant.plan,
-      currentBilling,
+      currentBilling: tenant.billingInterval as 'monthly' | 'yearly',
       plans,
       usage: {
         properties: tenant._count.properties,
@@ -225,6 +212,7 @@ export class SubscriptionService {
         const session = event.data.object as Stripe.Checkout.Session;
         const tenantId = session.metadata?.tenantId;
         const planId = session.metadata?.planId;
+        const billing = session.metadata?.billing || 'monthly';
         if (tenantId && planId) {
           await this.prisma.tenant.update({
             where: { id: tenantId },
@@ -232,6 +220,7 @@ export class SubscriptionService {
               planId,
               subscriptionStatus: 'ACTIVE',
               stripeSubscriptionId: session.subscription as string,
+              billingInterval: billing,
             },
           });
         }
@@ -244,12 +233,14 @@ export class SubscriptionService {
           where: { stripeSubscriptionId: sub.id },
         });
         if (tenant) {
+          const interval = sub.items?.data?.[0]?.price?.recurring?.interval;
+          const billingInterval = interval === 'year' ? 'yearly' : 'monthly';
           const status = sub.status === 'active' ? 'ACTIVE' :
                          sub.status === 'past_due' ? 'OVERDUE' :
                          sub.status === 'canceled' ? 'CANCELED' : tenant.subscriptionStatus;
           await this.prisma.tenant.update({
             where: { id: tenant.id },
-            data: { subscriptionStatus: status },
+            data: { subscriptionStatus: status, billingInterval },
           });
         }
         break;
