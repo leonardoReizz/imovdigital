@@ -26,13 +26,12 @@ export class PrismaService
   }
 
   async onModuleInit() {
-    // Retry connection on startup
     let retries = 3;
     while (retries > 0) {
       try {
         await this.$connect();
         this.logger.log('Database connected');
-        break;
+        return;
       } catch (err) {
         retries--;
         this.logger.warn(`Database connection failed, ${retries} retries left...`);
@@ -40,36 +39,9 @@ export class PrismaService
         await new Promise((r) => setTimeout(r, 2000));
       }
     }
-
-    // Middleware: auto-reconnect on connection errors
-    this.$use(async (params, next) => {
-      try {
-        return await next(params);
-      } catch (err: any) {
-        const msg = err?.message || '';
-        if (msg.includes('Connection') || msg.includes('Closed') || msg.includes('connection')) {
-          this.logger.warn(`Connection lost during ${params.model}.${params.action}, reconnecting...`);
-          await this.$disconnect();
-          await this.$connect();
-          return next(params);
-        }
-        throw err;
-      }
-    });
   }
 
   async onModuleDestroy() {
     await this.$disconnect();
-  }
-
-  /** Reconnect if connection was closed (Neon idle timeout) */
-  async ensureConnection() {
-    try {
-      await this.$queryRaw`SELECT 1`;
-    } catch {
-      this.logger.warn('Connection lost, reconnecting...');
-      await this.$disconnect();
-      await this.$connect();
-    }
   }
 }
