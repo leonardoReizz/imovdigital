@@ -36,6 +36,19 @@ export class SubscriptionService {
       : 0;
     const trialExpired = tenant.subscriptionStatus === 'TRIAL' && trialEndsAt && trialEndsAt < now;
 
+    // Detect current billing interval from Stripe
+    let currentBilling: 'monthly' | 'yearly' = 'monthly';
+    if (tenant.stripeSubscriptionId) {
+      try {
+        const stripe = this.getStripe();
+        if (stripe) {
+          const sub = await stripe.subscriptions.retrieve(tenant.stripeSubscriptionId);
+          const interval = sub.items?.data?.[0]?.price?.recurring?.interval;
+          if (interval === 'year') currentBilling = 'yearly';
+        }
+      } catch {}
+    }
+
     return {
       tenant: {
         id: tenant.id,
@@ -48,6 +61,7 @@ export class SubscriptionService {
         hasSubscription: !!tenant.stripeSubscriptionId,
       },
       currentPlan: tenant.plan,
+      currentBilling,
       plans,
       usage: {
         properties: tenant._count.properties,
@@ -63,7 +77,7 @@ export class SubscriptionService {
     };
   }
 
-  async createCheckoutSession(tenantId: string, planId: string) {
+  async createCheckoutSession(tenantId: string, planId: string, billing: 'monthly' | 'yearly' = 'monthly') {
     const stripe = this.getStripe();
     if (!stripe) throw new BadRequestException('Stripe não configurado');
 
@@ -72,6 +86,10 @@ export class SubscriptionService {
 
     const plan = await this.prisma.plan.findUnique({ where: { id: planId } });
     if (!plan || !plan.stripePriceId) throw new BadRequestException('Plano não encontrado ou sem preço no Stripe');
+
+    const priceId = billing === 'yearly' && plan.stripeYearlyPriceId
+      ? plan.stripeYearlyPriceId
+      : plan.stripePriceId;
 
     // Get or create Stripe customer
     let customerId = tenant.stripeCustomerId;
@@ -93,10 +111,10 @@ export class SubscriptionService {
       customer: customerId,
       mode: 'subscription',
       payment_method_types: ['card'],
-      line_items: [{ price: plan.stripePriceId, quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${dashboardUrl}/dashboard/subscription?success=true`,
       cancel_url: `${dashboardUrl}/dashboard/subscription?canceled=true`,
-      metadata: { tenantId, planId },
+      metadata: { tenantId, planId, billing },
     });
 
     return { url: session.url };

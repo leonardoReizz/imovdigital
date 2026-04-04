@@ -15,6 +15,7 @@ import {
   Zap,
   Shield,
   ChevronDown,
+  Sparkles,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { formatPrice } from '@imovdigital/utils';
@@ -25,10 +26,12 @@ interface Plan {
   name: string;
   slug: string;
   monthlyPrice: number;
+  yearlyPrice: number | null;
   propertyLimit: number;
   userLimit: number;
   features: Record<string, boolean>;
   stripePriceId: string | null;
+  stripeYearlyPriceId: string | null;
 }
 
 interface SubInfo {
@@ -43,6 +46,7 @@ interface SubInfo {
     stripeSubscriptionId: string | null;
   };
   currentPlan: Plan;
+  currentBilling: 'monthly' | 'yearly';
   plans: Plan[];
   usage: { properties: number; users: number };
   limits: {
@@ -68,11 +72,18 @@ const TRIAL_LIMITS = [
   { icon: MessageSquare, label: 'Painel de leads', included: false },
 ];
 
+const PLAN_ICONS: Record<string, React.ElementType> = {
+  basico: Building2,
+  profissional: Zap,
+  multiunidade: Sparkles,
+};
+
 export function SubscriptionPage() {
   const [searchParams] = useSearchParams();
   const [info, setInfo] = useState<SubInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkingOut, setCheckingOut] = useState<string | null>(null);
+  const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
 
@@ -89,7 +100,7 @@ export function SubscriptionPage() {
   const handleCheckout = async (planId: string) => {
     setCheckingOut(planId);
     try {
-      const { data } = await api.post('/subscription/checkout', { planId });
+      const { data } = await api.post('/subscription/checkout', { planId, billing });
       if (data.url) window.location.href = data.url;
     } catch {
       alert('Erro ao iniciar checkout. Verifique se o Stripe está configurado.');
@@ -108,13 +119,14 @@ export function SubscriptionPage() {
 
   if (!info) return null;
 
-  const { tenant, currentPlan, plans, usage, limits } = info;
+  const { tenant, currentPlan, currentBilling, plans, usage, limits } = info;
   const isTrial = tenant.subscriptionStatus === 'TRIAL';
   const isActive = tenant.subscriptionStatus === 'ACTIVE';
   const statusCfg = STATUS_CONFIG[tenant.subscriptionStatus] || STATUS_CONFIG.TRIAL;
+  const paidPlans = plans.filter((p) => p.monthlyPrice > 0);
 
   return (
-    <div className="max-w-4xl">
+    <div className="max-w-5xl mx-auto">
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900">Assinatura</h2>
         <p className="text-sm text-gray-500 mt-1">Gerencie seu plano e acompanhe o uso</p>
@@ -162,7 +174,6 @@ export function SubscriptionPage() {
               )}
             </div>
           </div>
-
         </div>
       </motion.div>
 
@@ -175,7 +186,7 @@ export function SubscriptionPage() {
           className="bg-white rounded-xl border border-gray-200 p-6 mb-6"
         >
           <h3 className="text-base font-semibold text-gray-900 mb-4">Limitações do teste grátis</h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {TRIAL_LIMITS.map((item) => (
               <div key={item.label} className="flex items-center gap-3 py-2">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${item.included ? 'bg-green-50' : 'bg-gray-100'}`}>
@@ -203,7 +214,7 @@ export function SubscriptionPage() {
         className="bg-white rounded-xl border border-gray-200 p-6 mb-8"
       >
         <h3 className="text-base font-semibold text-gray-900 mb-4">Uso atual</h3>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-gray-600">Imóveis</span>
@@ -214,7 +225,7 @@ export function SubscriptionPage() {
                 className="h-full rounded-full transition-all"
                 style={{
                   width: `${Math.min(100, (usage.properties / limits.properties) * 100)}%`,
-                  backgroundColor: usage.properties >= limits.properties ? '#ef4444' : '#2563eb',
+                  backgroundColor: usage.properties >= limits.properties ? '#ef4444' : 'var(--color-primary)',
                 }}
               />
             </div>
@@ -229,7 +240,7 @@ export function SubscriptionPage() {
                 className="h-full rounded-full transition-all"
                 style={{
                   width: `${Math.min(100, (usage.users / limits.users) * 100)}%`,
-                  backgroundColor: usage.users >= limits.users ? '#ef4444' : '#2563eb',
+                  backgroundColor: usage.users >= limits.users ? '#ef4444' : 'var(--color-primary)',
                 }}
               />
             </div>
@@ -237,104 +248,188 @@ export function SubscriptionPage() {
         </div>
       </motion.div>
 
-      {/* Plans */}
-      <h3 className="text-lg font-bold text-gray-900 mb-4">
-        {isTrial ? 'Escolha um plano' : 'Planos disponíveis'}
-      </h3>
+      {/* Plans Header + Billing Toggle */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <h3 className="text-lg font-bold text-gray-900">
+          {isTrial ? 'Escolha um plano' : 'Planos disponíveis'}
+        </h3>
 
-      <div className="grid grid-cols-1 gap-4">
-        {plans.filter((p) => p.monthlyPrice > 0).map((plan, i) => {
-          const isCurrentPlan = plan.id === currentPlan.id && isActive;
-          const isPopular = i === 1; // Second plan is "popular"
+        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1 self-start">
+          <button
+            onClick={() => setBilling('monthly')}
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+              billing === 'monthly'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Mensal
+          </button>
+          <button
+            onClick={() => setBilling('yearly')}
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
+              billing === 'yearly'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Anual
+            <span className="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">
+              -17%
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Plans Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {paidPlans.map((plan, i) => {
+          const isCurrentPlan = plan.id === currentPlan.id && isActive && billing === currentBilling;
+          const isPopular = i === 1;
+          const PlanIcon = PLAN_ICONS[plan.slug] || Building2;
+
+          const monthlyEquivalent = billing === 'yearly' && plan.yearlyPrice
+            ? Math.round(plan.yearlyPrice / 12)
+            : plan.monthlyPrice;
+          const totalPrice = billing === 'yearly' && plan.yearlyPrice
+            ? plan.yearlyPrice
+            : plan.monthlyPrice;
+          const savings = billing === 'yearly' && plan.yearlyPrice
+            ? (plan.monthlyPrice * 12) - plan.yearlyPrice
+            : 0;
+          const hasYearly = !!plan.yearlyPrice;
 
           return (
             <motion.div
               key={plan.id}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 + i * 0.05 }}
-              className={`relative bg-white rounded-xl border-2 p-6 transition-colors ${
-                isPopular ? 'border-primary shadow-lg shadow-primary/10' : 'border-gray-200'
+              transition={{ delay: 0.15 + i * 0.06 }}
+              className={`relative bg-white rounded-2xl border-2 p-6 flex flex-col transition-all ${
+                isPopular
+                  ? 'border-primary shadow-lg shadow-primary/10 scale-[1.02]'
+                  : 'border-gray-200 hover:border-gray-300'
               }`}
             >
               {isPopular && (
-                <div className="absolute -top-3 left-6 bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[11px] font-bold px-4 py-1 rounded-full flex items-center gap-1 whitespace-nowrap">
                   <Zap className="w-3 h-3" />
                   Mais popular
                 </div>
               )}
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-lg font-bold text-gray-900">{plan.name}</h4>
-                    {isCurrentPlan && (
-                      <span className="text-xs font-semibold bg-green-50 text-green-700 px-2 py-0.5 rounded-full">
-                        Plano atual
-                      </span>
+              {/* Header */}
+              <div className="mb-5">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${
+                  isPopular ? 'bg-primary/10' : 'bg-gray-100'
+                }`}>
+                  <PlanIcon className={`w-5 h-5 ${isPopular ? 'text-primary' : 'text-gray-600'}`} />
+                </div>
+                <h4 className="text-lg font-bold text-gray-900">{plan.name}</h4>
+                {isCurrentPlan && (
+                  <span className="inline-block text-[11px] font-semibold bg-green-50 text-green-700 px-2 py-0.5 rounded-full mt-1">
+                    Plano atual
+                  </span>
+                )}
+              </div>
+
+              {/* Price */}
+              <div className="mb-5">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-black text-gray-900">
+                    {formatPrice(monthlyEquivalent)}
+                  </span>
+                  <span className="text-sm text-gray-400">/mês</span>
+                </div>
+                {billing === 'yearly' && hasYearly ? (
+                  <div className="mt-1.5 space-y-0.5">
+                    <p className="text-xs text-gray-400">
+                      {formatPrice(totalPrice)} cobrado anualmente
+                    </p>
+                    {savings > 0 && (
+                      <p className="text-xs font-semibold text-emerald-600">
+                        Economia de {formatPrice(savings)}/ano
+                      </p>
                     )}
                   </div>
-                  <div className="flex items-baseline gap-1 mt-1">
-                    <span className="text-3xl font-bold text-gray-900">{formatPrice(plan.monthlyPrice)}</span>
-                    <span className="text-sm text-gray-500">/mês</span>
-                  </div>
-                </div>
-
-                <div>
-                  {isCurrentPlan ? (
-                    <span className="px-5 py-2.5 text-sm font-medium bg-green-50 text-green-700 rounded-xl">
-                      Plano atual
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => handleCheckout(plan.id)}
-                      disabled={checkingOut !== null}
-                      className={`px-5 py-2.5 text-sm font-medium rounded-xl transition-colors ${
-                        isPopular
-                          ? 'bg-primary text-white hover:bg-primary-dark shadow-lg shadow-primary/20'
-                          : 'bg-gray-900 text-white hover:bg-gray-800'
-                      } disabled:opacity-50`}
-                    >
-                      {checkingOut === plan.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        'Assinar'
-                      )}
-                    </button>
-                  )}
-                </div>
+                ) : billing === 'yearly' && !hasYearly ? (
+                  <p className="text-xs text-gray-400 mt-1.5">Plano anual em breve</p>
+                ) : (
+                  <p className="text-xs text-gray-400 mt-1.5">Cobrado mensalmente</p>
+                )}
               </div>
 
               {/* Features */}
-              <div className="flex items-center gap-6 mt-4 pt-4 border-t border-gray-100 text-sm text-gray-600">
-                <span className="flex items-center gap-1.5">
-                  <Building2 className="w-4 h-4 text-gray-400" />
-                  {plan.propertyLimit} imóveis
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Users className="w-4 h-4 text-gray-400" />
-                  {plan.userLimit} usuários
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Globe className="w-4 h-4 text-gray-400" />
+              <ul className="space-y-2.5 mb-6 flex-1">
+                <li className="flex items-center gap-2 text-sm text-gray-700">
+                  <Check className="w-4 h-4 text-primary shrink-0" />
+                  <span>{plan.propertyLimit <= 0 ? <strong>Imóveis ilimitados</strong> : <><strong>{plan.propertyLimit}</strong> imóveis</>}</span>
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-700">
+                  <Check className="w-4 h-4 text-primary shrink-0" />
+                  <span>{plan.userLimit <= 0 ? <strong>Usuários ilimitados</strong> : <><strong>{plan.userLimit}</strong> usuários</>}</span>
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-700">
+                  <Check className="w-4 h-4 text-primary shrink-0" />
                   Domínio próprio
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <MessageSquare className="w-4 h-4 text-gray-400" />
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-700">
+                  <Check className="w-4 h-4 text-primary shrink-0" />
+                  Editor visual
+                </li>
+                <li className="flex items-center gap-2 text-sm text-gray-700">
+                  <Check className="w-4 h-4 text-primary shrink-0" />
                   Leads ilimitados
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Shield className="w-4 h-4 text-gray-400" />
-                  Suporte prioritário
-                </span>
-              </div>
+                </li>
+                {plan.features?.prioritySupport && (
+                  <li className="flex items-center gap-2 text-sm text-gray-700">
+                    <Check className="w-4 h-4 text-primary shrink-0" />
+                    Suporte prioritário
+                  </li>
+                )}
+                {plan.slug === 'multiunidade' && (
+                  <li className="flex items-center gap-2 text-sm text-gray-700">
+                    <Check className="w-4 h-4 text-primary shrink-0" />
+                    Multi-filial
+                  </li>
+                )}
+              </ul>
+
+              {/* CTA */}
+              {isCurrentPlan ? (
+                <div className="px-5 py-3 text-sm font-medium bg-green-50 text-green-700 rounded-xl text-center">
+                  Plano atual
+                </div>
+              ) : billing === 'yearly' && !hasYearly ? (
+                <div className="px-5 py-3 text-sm font-medium bg-gray-50 text-gray-400 rounded-xl text-center">
+                  Em breve
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleCheckout(plan.id)}
+                  disabled={checkingOut !== null}
+                  className={`w-full px-5 py-3 text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 ${
+                    isPopular
+                      ? 'bg-primary text-white hover:bg-primary-dark shadow-lg shadow-primary/20'
+                      : 'bg-gray-900 text-white hover:bg-gray-800'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {checkingOut === plan.id ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : plan.id === currentPlan.id && isActive && billing !== currentBilling ? (
+                    billing === 'yearly' ? 'Mudar para anual' : 'Mudar para mensal'
+                  ) : (
+                    'Assinar'
+                  )}
+                </button>
+              )}
             </motion.div>
           );
         })}
       </div>
 
       {/* No plans message */}
-      {plans.filter((p) => p.monthlyPrice > 0).length === 0 && (
+      {paidPlans.length === 0 && (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <CreditCard className="w-10 h-10 text-gray-200 mx-auto mb-3" />
           <p className="text-gray-500 text-sm">Nenhum plano pago configurado ainda.</p>
@@ -409,6 +504,10 @@ export function SubscriptionPage() {
           <div>
             <p className="font-medium text-gray-700">Posso mudar de plano depois?</p>
             <p className="text-gray-500 mt-0.5">Sim. Você pode fazer upgrade ou downgrade pelo portal de faturamento. A diferença é calculada automaticamente.</p>
+          </div>
+          <div>
+            <p className="font-medium text-gray-700">Qual a diferença entre mensal e anual?</p>
+            <p className="text-gray-500 mt-0.5">O plano anual é cobrado uma vez por ano com desconto de até 17%. Você economiza o equivalente a 2 meses.</p>
           </div>
         </div>
       </motion.div>

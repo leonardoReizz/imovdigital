@@ -244,7 +244,7 @@ export function ContactPage() {
             <MessageCircle className="w-5 h-5 text-green-500" />
             WhatsApp e Telefone
           </h3>
-          <div className="grid grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Field label="WhatsApp" icon={MessageCircle}>
               <PhoneInput value={form.whatsapp} onChange={(v) => update('whatsapp', v)} placeholder="(11) 99999-9999" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm" />
             </Field>
@@ -318,7 +318,7 @@ export function ContactPage() {
             <Field label="Endereço completo">
               <Input value={form.address} onChange={(v) => update('address', v)} placeholder="Rua Exemplo, 123 - Sala 1" />
             </Field>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Field label="Cidade">
                 <Input value={form.city} onChange={(v) => update('city', v)} placeholder="São Paulo" />
               </Field>

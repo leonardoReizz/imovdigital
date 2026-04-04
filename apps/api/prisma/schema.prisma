@@ -67,14 +67,16 @@ enum LeadSource {
 // ==========================================
 
 model Plan {
-  id            String @id @default(uuid())
-  name          String
-  slug          String @unique
-  monthlyPrice  Int    // in cents (BRL)
-  propertyLimit Int
-  userLimit     Int
-  features      Json   @default("{}")
-  stripePriceId String?
+  id                  String @id @default(uuid())
+  name                String
+  slug                String @unique
+  monthlyPrice        Int    // in cents (BRL)
+  yearlyPrice         Int?   // in cents (BRL) — annual total
+  propertyLimit       Int
+  userLimit           Int
+  features            Json   @default("{}")
+  stripePriceId       String?
+  stripeYearlyPriceId String?
 
   tenants Tenant[]
 

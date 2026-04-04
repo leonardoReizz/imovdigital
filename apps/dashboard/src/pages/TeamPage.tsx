@@ -149,7 +149,7 @@ function MemberModal({
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-gray-700">Cargo</label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {(['ADMIN', 'AGENT'] as const).map((r) => {
                 const cfg = ROLE_CONFIG[r];
                 return (
@@ -303,7 +303,7 @@ export function TeamPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {[
           { label: 'Proprietários', count: owners.length, color: 'amber', icon: Crown },
           { label: 'Administradores', count: admins.length, color: 'blue', icon: Shield },

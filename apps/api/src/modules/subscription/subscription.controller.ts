@@ -27,9 +27,9 @@ export class SubscriptionController {
   @Post('checkout')
   async createCheckout(
     @CurrentUser('tenantId') tenantId: string,
-    @Body() body: { planId: string },
+    @Body() body: { planId: string; billing?: 'monthly' | 'yearly' },
   ) {
-    return this.subscriptionService.createCheckoutSession(tenantId, body.planId);
+    return this.subscriptionService.createCheckoutSession(tenantId, body.planId, body.billing || 'monthly');
   }
 
   @UseGuards(JwtAuthGuard)

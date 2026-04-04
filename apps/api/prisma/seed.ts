@@ -8,28 +8,34 @@ async function main() {
       name: 'Básico',
       slug: 'basico',
       monthlyPrice: 14900, // R$149,00
+      yearlyPrice: 149000, // R$1.490,00/ano (≈R$124/mês)
       propertyLimit: 30,
       userLimit: 2,
       features: { customDomain: false, analytics: false },
       stripePriceId: null,
+      stripeYearlyPriceId: null,
     },
     {
       name: 'Profissional',
       slug: 'profissional',
       monthlyPrice: 29900, // R$299,00
+      yearlyPrice: 299000, // R$2.990,00/ano (≈R$249/mês)
       propertyLimit: 150,
       userLimit: 5,
       features: { customDomain: true, analytics: true },
       stripePriceId: null,
+      stripeYearlyPriceId: null,
     },
     {
       name: 'Multiunidade',
       slug: 'multiunidade',
       monthlyPrice: 49900, // R$499,00
+      yearlyPrice: 499000, // R$4.990,00/ano (≈R$415/mês)
       propertyLimit: -1, // unlimited
       userLimit: -1, // unlimited
       features: { customDomain: true, analytics: true, prioritySupport: true },
       stripePriceId: null,
+      stripeYearlyPriceId: null,
     },
   ];
 

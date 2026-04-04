@@ -166,7 +166,7 @@ export function SettingsPage() {
         </AnimatePresence>
 
         <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-gray-700">Nome completo</label>
               <input
@@ -249,7 +249,7 @@ export function SettingsPage() {
             {passwordForm.formState.errors.currentPassword && <p className="text-xs text-red-500">{passwordForm.formState.errors.currentPassword.message}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-gray-700">Nova senha</label>
               <div className="relative">
