@@ -13,7 +13,6 @@ import {
   Globe,
   MessageSquare,
   Zap,
-  Shield,
   ChevronDown,
   Sparkles,
 } from 'lucide-react';
