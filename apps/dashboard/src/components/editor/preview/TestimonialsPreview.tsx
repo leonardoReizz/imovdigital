@@ -14,7 +14,7 @@ function TestimonialCard({ item }: { item: { name: string; text: string; rating:
           />
         ))}
       </div>
-      <p className="text-sm text-gray-600 mb-4">"{item.text}"</p>
+      <p className="text-sm text-gray-600 mb-4">&ldquo;{item.text}&rdquo;</p>
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
           <User className="w-4 h-4 text-gray-300" />
@@ -43,7 +43,6 @@ export function TestimonialsPreview({ settings }: { settings: TestimonialsSettin
         <h2 style={{ fontSize: isMobile ? 22 : 30 }} className="font-bold text-gray-900 text-center mb-10">{settings.title}</h2>
 
         {isMobile || settings.layout === 'carousel' ? (
-          /* Carousel */
           (() => {
             const perPage = isMobile ? 1 : Math.min(3, items.length);
             const totalPages = Math.ceil(items.length / perPage);
@@ -51,18 +50,18 @@ export function TestimonialsPreview({ settings }: { settings: TestimonialsSettin
             const visible = items.slice(page * perPage, page * perPage + perPage);
             return (
               <div className="relative">
-                <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${perPage}, 1fr)` }}>
+                <div className="grid gap-6" style={{ gridTemplateColumns: isMobile ? '1fr' : `repeat(${Math.min(3, items.length)}, 1fr)` }}>
                   {visible.map((item, i) => (
                     <TestimonialCard key={page * perPage + i} item={item} />
                   ))}
                 </div>
                 {totalPages > 1 && (
                   <div className="flex items-center justify-center gap-3 mt-6">
-                    <button onClick={() => setCurrent((c) => (c === 0 ? totalPages - 1 : c - 1))} className="p-1.5 bg-white rounded-full shadow border border-gray-200">
+                    <button onClick={() => setCurrent((c) => (c === 0 ? totalPages - 1 : c - 1))} className="p-2 bg-white rounded-full shadow border border-gray-200 hover:bg-gray-50">
                       <ChevronLeft className="w-4 h-4 text-gray-600" />
                     </button>
                     <span className="text-xs text-gray-400">{page + 1}/{totalPages}</span>
-                    <button onClick={() => setCurrent((c) => c + 1)} className="p-1.5 bg-white rounded-full shadow border border-gray-200">
+                    <button onClick={() => setCurrent((c) => c + 1)} className="p-2 bg-white rounded-full shadow border border-gray-200 hover:bg-gray-50">
                       <ChevronRight className="w-4 h-4 text-gray-600" />
                     </button>
                   </div>
@@ -71,8 +70,7 @@ export function TestimonialsPreview({ settings }: { settings: TestimonialsSettin
             );
           })()
         ) : (
-          /* Grid */
-          <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${Math.min(items.length, 3)}, 1fr)` }}>
+          <div className="grid gap-6" style={{ gridTemplateColumns: isMobile ? '1fr' : `repeat(${Math.min(items.length, 3)}, 1fr)` }}>
             {items.map((item, i) => (
               <TestimonialCard key={i} item={item} />
             ))}

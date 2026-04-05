@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import type { Section, SectionType } from '@imovdigital/types';
 import { SECTION_LABELS } from '@imovdigital/types';
@@ -200,13 +200,29 @@ function PageFooter() {
 export function SitePreview() {
   const config = useEditorStore((s) => s.config);
   const breakpoint = useEditorStore((s) => s.previewBreakpoint);
+  const setBreakpoint = useEditorStore((s) => s.setBreakpoint);
   const previewPage = useEditorStore((s) => s.previewPage);
   const loadProperties = useEditorStore((s) => s.loadProperties);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Load properties on mount for real data in previews
   useEffect(() => {
     loadProperties();
   }, [loadProperties]);
+
+  // Auto-detect breakpoint from container width when screen is small
+  useEffect(() => {
+    const el = containerRef.current?.parentElement;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width || 0;
+      if (width > 0 && width < 500 && breakpoint === 'desktop') {
+        setBreakpoint('mobile');
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [breakpoint, setBreakpoint]);
 
   if (!config) {
     return (
@@ -225,6 +241,7 @@ export function SitePreview() {
       <style>{`#${previewId}, #${previewId} * { font-family: '${config.fontFamily}', sans-serif !important; }`}</style>
       <div className="flex justify-center p-4">
         <div
+          ref={containerRef}
           id={previewId}
           className="bg-white shadow-xl transition-all duration-300"
           style={{

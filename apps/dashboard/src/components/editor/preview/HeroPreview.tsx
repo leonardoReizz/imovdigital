@@ -1,14 +1,16 @@
 import type { HeroSettings, SearchBarSettings } from '@imovdigital/types';
 import { useEditorStore } from '../../../store/editorStore';
 import { SearchBarPreview } from './SearchBarPreview';
+import { Img } from '../../Img';
 
 const HEIGHT_MAP = { small: '300px', medium: '450px', large: '600px', full: '100vh' };
 
 export function HeroPreview({ settings }: { settings: HeroSettings }) {
   const primaryColor = useEditorStore((s) => s.config?.primaryColor || '#2563eb');
   const config = useEditorStore((s) => s.config);
+  const breakpoint = useEditorStore((s) => s.previewBreakpoint);
+  const isMobile = breakpoint === 'mobile';
 
-  // Find the search bar section to embed it inside the hero
   const searchBarSection = config?.sections.find((s) => s.type === 'search_bar' && s.visible);
   const searchBarSettings = searchBarSection?.settings as SearchBarSettings | undefined;
   const searchBarPosition = searchBarSettings?.position;
@@ -30,82 +32,60 @@ export function HeroPreview({ settings }: { settings: HeroSettings }) {
     bgStyle.backgroundColor = primaryColor;
   }
 
-  // Vertical alignment for text
-  const verticalAlign =
-    searchBarPosition === 'below_hero' ? 'justify-start pt-20' :
-    searchBarPosition === 'above_hero' ? 'justify-end pb-20' :
-    'justify-center';
-
   return (
     <div className="relative overflow-hidden" style={{ ...bgStyle, minHeight: HEIGHT_MAP[settings.height] }}>
-      {/* Overlay */}
       <div
         className="absolute inset-0"
         style={{ backgroundColor: settings.overlayColor, opacity: settings.overlayOpacity / 100 }}
       />
 
-      {/* Content */}
       <div
-        className={`relative z-10 flex flex-col h-full px-8 py-12 ${verticalAlign}`}
-        style={{ minHeight: HEIGHT_MAP[settings.height], textAlign: settings.textAlign }}
+        className="relative z-10 flex flex-col justify-center"
+        style={{
+          minHeight: HEIGHT_MAP[settings.height],
+          textAlign: settings.textAlign,
+          padding: isMobile ? '40px 16px' : '48px 32px',
+        }}
       >
-        {/* Search bar above text */}
         {embedSearchBar && searchBarPosition === 'above_hero' && (
           <div className="mb-8">
             <SearchBarPreview settings={searchBarSettings} embedded />
           </div>
         )}
 
-        {/* Hero text content */}
         <div className={`max-w-4xl w-full ${settings.textAlign === 'center' ? 'mx-auto' : settings.textAlign === 'right' ? 'ml-auto' : ''}`}>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'inherit' }}>
+          <h1
+            className="font-bold text-white mb-4"
+            style={{ fontSize: isMobile ? 28 : 48, lineHeight: 1.15 }}
+          >
             {settings.headline}
           </h1>
-          <p className="text-lg md:text-xl text-white/80 mb-8" style={{ fontFamily: 'inherit' }}>
+          <p
+            className="text-white/80 mb-8"
+            style={{ fontSize: isMobile ? 16 : 20 }}
+          >
             {settings.subheadline}
           </p>
 
-          {/* Search bar in center (between text and CTA) */}
           {embedSearchBar && searchBarPosition === 'center_hero' && (
             <div className="mb-8">
               <SearchBarPreview settings={searchBarSettings} embedded />
             </div>
           )}
 
-          {settings.ctaLabel && !embedSearchBar && (
+          {settings.ctaLabel && (
             <button
-              className="px-8 py-3 rounded-lg text-white font-semibold text-lg shadow-lg"
-              style={{ backgroundColor: primaryColor }}
-            >
-              {settings.ctaLabel}
-            </button>
-          )}
-
-          {settings.ctaLabel && embedSearchBar && searchBarPosition !== 'below_hero' && (
-            <button
-              className="px-8 py-3 rounded-lg text-white font-semibold text-lg shadow-lg"
-              style={{ backgroundColor: primaryColor }}
+              className="px-8 py-3 rounded-lg text-white font-semibold shadow-lg"
+              style={{ backgroundColor: primaryColor, fontSize: isMobile ? 14 : 18 }}
             >
               {settings.ctaLabel}
             </button>
           )}
         </div>
 
-        {/* Search bar below text */}
         {embedSearchBar && searchBarPosition === 'below_hero' && (
           <div className="mt-8">
             <SearchBarPreview settings={searchBarSettings} embedded />
-          </div>
-        )}
-
-        {settings.ctaLabel && embedSearchBar && searchBarPosition === 'below_hero' && (
-          <div className={`mt-6 ${settings.textAlign === 'center' ? 'mx-auto' : settings.textAlign === 'right' ? 'ml-auto' : ''}`}>
-            <button
-              className="px-8 py-3 rounded-lg text-white font-semibold text-lg shadow-lg"
-              style={{ backgroundColor: primaryColor }}
-            >
-              {settings.ctaLabel}
-            </button>
           </div>
         )}
       </div>

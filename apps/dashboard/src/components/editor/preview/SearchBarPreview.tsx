@@ -8,7 +8,7 @@ const FIELD_LABELS: Record<string, string> = {
   tipo: 'Tipo',
   cidade: 'Cidade',
   bairro: 'Bairro',
-  preco: 'Preço',
+  preco: 'Modalidade',
   quartos: 'Quartos',
 };
 
@@ -28,55 +28,45 @@ export function SearchBarPreview({ settings, embedded }: SearchBarPreviewProps) 
     navigatePreview({ type: 'search' });
   };
 
-  // Mobile: single search input style
-  if (isMobile) {
-    const mobileBar = (
-      <div
-        className="mx-auto flex items-center gap-2 p-2 shadow-lg cursor-pointer"
-        style={{
-          backgroundColor: settings.backgroundColor,
-          borderRadius: RADIUS_MAP[settings.borderRadius],
-        }}
-        onClick={handleSearch}
-      >
-        <Search className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
-        <span className="flex-1 text-sm text-gray-400 truncate">{settings.placeholder}</span>
-        <button
-          className="p-2 text-white rounded-lg shrink-0"
-          style={{ backgroundColor: primaryColor }}
-          onClick={handleSearch}
-        >
-          <Search className="w-4 h-4" />
-        </button>
-      </div>
-    );
-
-    if (embedded) return mobileBar;
-    if (settings.position !== 'standalone') return null;
-    return <div className="px-4 py-4 bg-gray-50">{mobileBar}</div>;
-  }
-
-  // Desktop/Tablet: full fields
   const bar = (
     <div
-      className="max-w-4xl mx-auto flex items-center gap-3 p-3 shadow-lg"
+      className="max-w-4xl mx-auto p-3 shadow-lg"
       style={{
         backgroundColor: settings.backgroundColor,
         borderRadius: RADIUS_MAP[settings.borderRadius],
+        display: isMobile ? 'grid' : 'flex',
+        gridTemplateColumns: isMobile ? '1fr 1fr' : undefined,
+        gap: isMobile ? 0 : undefined,
+        alignItems: 'center',
       }}
     >
-      {settings.fields.map((field) => (
-        <div key={field} className="flex-1 px-3 py-2 border-r border-gray-100 last:border-0 cursor-pointer" onClick={handleSearch}>
-          <span className="text-xs text-gray-400">{FIELD_LABELS[field]}</span>
-          <p className="text-sm text-gray-300 mt-0.5">Selecionar...</p>
+      {settings.fields.map((field, i) => (
+        <div
+          key={field}
+          className="cursor-pointer"
+          style={{
+            flex: isMobile ? undefined : 1,
+            padding: isMobile ? '8px 12px' : '8px 12px',
+            borderRight: !isMobile && i < settings.fields.length - 1 ? '1px solid #f3f4f6' : undefined,
+          }}
+          onClick={handleSearch}
+        >
+          <span className="text-[11px] text-gray-400 block mb-0.5 font-medium">{FIELD_LABELS[field]}</span>
+          <p className="text-sm text-gray-300 truncate">Selecionar...</p>
         </div>
       ))}
       <button
-        className="p-3 text-white rounded-lg shrink-0 hover:opacity-90 transition-opacity"
-        style={{ backgroundColor: primaryColor }}
+        className="text-white shrink-0 flex items-center justify-center gap-2"
+        style={{
+          backgroundColor: primaryColor,
+          borderRadius: '0.5rem',
+          padding: isMobile ? '10px' : '12px',
+          ...(isMobile ? { gridColumn: '1 / -1', marginTop: 8 } : { marginLeft: 8 }),
+        }}
         onClick={handleSearch}
       >
         <Search className="w-5 h-5" />
+        {isMobile && <span className="text-sm font-medium">Buscar</span>}
       </button>
     </div>
   );
@@ -85,7 +75,7 @@ export function SearchBarPreview({ settings, embedded }: SearchBarPreviewProps) 
   if (settings.position !== 'standalone') return null;
 
   return (
-    <div className="px-8 py-6 bg-gray-50">
+    <div style={{ padding: isMobile ? '16px' : '24px 32px' }} className="bg-gray-50">
       {bar}
     </div>
   );
