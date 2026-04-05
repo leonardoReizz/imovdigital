@@ -1,7 +1,6 @@
 import type { HeroSettings, SearchBarSettings } from '@imovdigital/types';
 import { useEditorStore } from '../../../store/editorStore';
 import { SearchBarPreview } from './SearchBarPreview';
-import { Img } from '../../Img';
 
 const HEIGHT_MAP = { small: '300px', medium: '450px', large: '600px', full: '100vh' };
 

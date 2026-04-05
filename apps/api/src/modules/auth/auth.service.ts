@@ -285,11 +285,13 @@ export class AuthService {
         throw new UnauthorizedException('Token inválido');
       }
 
+      // Preserve 2FA verification status from the refresh token
       return this.generateTokens(
         user.id,
         user.email,
         user.tenantId,
         user.role,
+        payload.tfv ?? true,
       );
     } catch {
       throw new UnauthorizedException('Token expirado ou inválido');
@@ -322,6 +324,7 @@ export class AuthService {
         name: user.tenant.name,
         slug: user.tenant.slug,
         subscriptionStatus: user.tenant.subscriptionStatus,
+        twoFactorEnabled: user.tenant.twoFactorEnabled,
         plan: {
           name: user.tenant.plan.name,
           slug: user.tenant.plan.slug,

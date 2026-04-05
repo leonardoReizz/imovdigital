@@ -64,14 +64,18 @@ export function DashboardLayout() {
   const location = useLocation();
   const { limits, isTrial, trialDaysLeft, trialExpired } = useSubscription();
 
-  // Check 2FA: if token exists but tfv is false, redirect to 2FA page
+  // Check 2FA: if token has tfv=false, verify with API if 2FA is still required
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
-    if (token) {
-      const payload = parseJwt(token);
-      if (payload && payload.tfv === false) {
-        navigate('/two-factor', { replace: true });
-      }
+    if (!token) return;
+    const payload = parseJwt(token);
+    if (payload && payload.tfv === false) {
+      // Check if tenant still has 2FA enabled before redirecting
+      api.get('/auth/me').then(({ data }: any) => {
+        if (data.tenant?.twoFactorEnabled) {
+          navigate('/two-factor', { replace: true });
+        }
+      }).catch(() => {});
     }
   }, []);
 

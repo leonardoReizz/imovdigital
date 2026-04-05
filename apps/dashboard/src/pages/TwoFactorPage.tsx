@@ -18,9 +18,12 @@ export function TwoFactorPage() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const cooldownRef = useRef<ReturnType<typeof setInterval>>();
 
-  // Send code automatically on page load
+  // Send code automatically on page load (only if token exists)
   useEffect(() => {
-    api.post('/auth/resend-two-factor').catch(() => {});
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      api.post('/auth/resend-two-factor').catch(() => {});
+    }
     inputRefs.current[0]?.focus();
   }, []);
 

@@ -1,7 +1,7 @@
 import type { FeaturedListingsSettings, Property } from '@imovdigital/types';
 import { useEditorStore } from '../../../store/editorStore';
 import { PropertyPrice } from './PropertyPrice';
-import { Home, MapPin, BedDouble, Bath, Car, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, MapPin, BedDouble, Bath, Car } from 'lucide-react';
 import { Img } from '../../Img';
 
 function RealPropertyCard({ property, showPrice, showBadge, primaryColor, onClick }: {
@@ -45,7 +45,7 @@ function RealPropertyCard({ property, showPrice, showBadge, primaryColor, onClic
   );
 }
 
-function PlaceholderCard({ showPrice, showBadge }: { showPrice: boolean; showBadge: boolean }) {
+function PlaceholderCard({ showPrice }: { showPrice: boolean }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden opacity-60">
       <div className="relative aspect-[16/10] bg-gray-100 flex items-center justify-center">
@@ -103,7 +103,7 @@ export function FeaturedListingsPreview({ settings }: { settings: FeaturedListin
                 <RealPropertyCard key={p.id} property={p} showPrice={settings.showPrice} showBadge={settings.showBadge} primaryColor={primaryColor} onClick={() => handleClick(p.id)} />
               ))
             : Array.from({ length: gridCount }).map((_, i) => (
-                <PlaceholderCard key={i} showPrice={settings.showPrice} showBadge={settings.showBadge} />
+                <PlaceholderCard key={i} showPrice={settings.showPrice} />
               ))}
         </div>
 
