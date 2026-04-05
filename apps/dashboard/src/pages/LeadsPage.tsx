@@ -10,6 +10,8 @@ import {
   Building2,
   X,
   Loader2,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useSubscription } from '../contexts/SubscriptionContext';
@@ -121,8 +123,8 @@ function LeadsContent() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <div className="min-w-0">
           <h2 className="text-2xl font-bold text-gray-900">Leads</h2>
           <p className="text-sm text-gray-500 mt-0.5">
             {total} {total === 1 ? 'lead' : 'leads'}
@@ -130,9 +132,10 @@ function LeadsContent() {
           </p>
         </div>
         {unseenCount > 0 && (
-          <button onClick={handleMarkAllSeen} className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20">
+          <button onClick={handleMarkAllSeen} className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20 shrink-0 whitespace-nowrap">
             <CheckCheck className="w-4 h-4" />
-            Marcar todos como lidos
+            <span className="hidden sm:inline">Marcar todos como lidos</span>
+            <span className="sm:hidden">Marcar lidos</span>
           </button>
         )}
       </div>
@@ -150,21 +153,21 @@ function LeadsContent() {
               className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
             />
           </div>
-          <div className="flex gap-2">
-            <select value={filterSeen} onChange={(e) => setFilterSeen(e.target.value as any)} className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white outline-none">
+          <div className="flex gap-2 flex-wrap">
+            <select value={filterSeen} onChange={(e) => setFilterSeen(e.target.value as any)} className="flex-1 sm:flex-none px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white outline-none min-w-0">
               <option value="">Todos</option>
               <option value="false">Não lidos</option>
               <option value="true">Lidos</option>
             </select>
-            <select value={filterSource} onChange={(e) => setFilterSource(e.target.value)} className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white outline-none">
-              <option value="">Todas as fontes</option>
+            <select value={filterSource} onChange={(e) => setFilterSource(e.target.value)} className="flex-1 sm:flex-none px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white outline-none min-w-0">
+              <option value="">Fontes</option>
               <option value="FORM">Formulário</option>
               <option value="WHATSAPP">WhatsApp</option>
               <option value="PHONE">Telefone</option>
             </select>
-            <select value={sort} onChange={(e) => setSort(e.target.value)} className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white outline-none">
-              <option value="newest">Mais recentes</option>
-              <option value="oldest">Mais antigos</option>
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className="flex-1 sm:flex-none px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white outline-none min-w-0">
+              <option value="newest">Recentes</option>
+              <option value="oldest">Antigos</option>
             </select>
           </div>
         </div>
@@ -238,7 +241,7 @@ function LeadsContent() {
             </div>
           </div>
 
-          {/* Detail panel */}
+          {/* Detail panel — desktop */}
           <AnimatePresence>
             {selectedLead && (
               <motion.div
@@ -247,89 +250,138 @@ function LeadsContent() {
                 exit={{ opacity: 0, x: 20 }}
                 className="w-96 shrink-0 hidden lg:block"
               >
-                <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-6 space-y-5">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-base font-semibold text-gray-900">{selectedLead.name}</h3>
-                    <button onClick={() => setSelectedLead(null)} className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  {/* Contact */}
-                  <div className="space-y-3">
-                    {selectedLead.email && (
-                      <a href={`mailto:${selectedLead.email}`} className="flex items-center gap-3 text-sm text-gray-600 hover:text-primary transition-colors">
-                        <Mail className="w-4 h-4 text-gray-400" />{selectedLead.email}
-                      </a>
-                    )}
-                    {selectedLead.phone && (
-                      <a href={`tel:${selectedLead.phone}`} className="flex items-center gap-3 text-sm text-gray-600 hover:text-primary transition-colors">
-                        <Phone className="w-4 h-4 text-gray-400" />{selectedLead.phone}
-                      </a>
-                    )}
-                    {selectedLead.phone && (
-                      <a href={`https://wa.me/${selectedLead.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-2 w-full py-2.5 bg-green-500 text-white text-sm font-medium rounded-lg justify-center hover:bg-green-600 transition-colors">
-                        <MessageSquare className="w-4 h-4" />Abrir WhatsApp
-                      </a>
-                    )}
-                  </div>
-
-                  {/* Property */}
-                  {selectedLead.property && (
-                    <div className="bg-gray-50 rounded-xl p-3">
-                      <p className="text-xs text-gray-400 mb-1">Interesse em</p>
-                      <div className="flex items-center gap-2">
-                        <Building2 className="w-4 h-4 text-gray-400" />
-                        <p className="text-sm font-medium text-gray-700">{selectedLead.property.title}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Message */}
-                  {selectedLead.message && (
-                    <div>
-                      <p className="text-xs text-gray-400 mb-1.5">Mensagem</p>
-                      <p className="text-sm text-gray-600 bg-gray-50 rounded-xl p-3 whitespace-pre-line">{selectedLead.message}</p>
-                    </div>
-                  )}
-
-                  {/* Meta */}
-                  <div className="space-y-2 text-xs text-gray-400 pt-2 border-t border-gray-100">
-                    <div className="flex justify-between">
-                      <span>Fonte</span>
-                      <span className={`font-medium px-1.5 py-0.5 rounded ${(SOURCE_CONFIG[selectedLead.source] || SOURCE_CONFIG.FORM).color}`}>
-                        {(SOURCE_CONFIG[selectedLead.source] || SOURCE_CONFIG.FORM).label}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Recebido</span>
-                      <span className="text-gray-600">{new Date(selectedLead.createdAt).toLocaleString('pt-BR')}</span>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2 pt-2 border-t border-gray-100">
-                    {selectedLead.email && (
-                      <a href={`mailto:${selectedLead.email}`} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-                        <Mail className="w-3.5 h-3.5" /> E-mail
-                      </a>
-                    )}
-                    {selectedLead.phone && (
-                      <a href={`tel:${selectedLead.phone}`} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-                        <Phone className="w-3.5 h-3.5" /> Ligar
-                      </a>
-                    )}
-                    <button onClick={() => handleDelete(selectedLead.id)} className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
+                <LeadDetail lead={selectedLead} onClose={() => setSelectedLead(null)} onDelete={handleDelete} />
               </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Detail modal — mobile */}
+          <AnimatePresence>
+            {selectedLead && (
+              <div className="fixed inset-0 z-50 lg:hidden">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 bg-black/40"
+                  onClick={() => setSelectedLead(null)}
+                />
+                <motion.div
+                  initial={{ y: '100%' }}
+                  animate={{ y: 0 }}
+                  exit={{ y: '100%' }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                  className="absolute bottom-0 left-0 right-0 max-h-[85vh] overflow-y-auto bg-white rounded-t-2xl"
+                >
+                  <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-3" />
+                  <div className="p-5">
+                    <LeadDetail lead={selectedLead} onClose={() => setSelectedLead(null)} onDelete={handleDelete} />
+                  </div>
+                </motion.div>
+              </div>
             )}
           </AnimatePresence>
         </div>
       )}
+    </div>
+  );
+}
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button onClick={handleCopy} className="p-1 text-gray-300 hover:text-gray-500 rounded transition-colors shrink-0" title="Copiar">
+      {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+    </button>
+  );
+}
+
+function LeadDetail({ lead, onClose, onDelete }: { lead: Lead; onClose: () => void; onDelete: (id: string) => void }) {
+  const src = SOURCE_CONFIG[lead.source] || SOURCE_CONFIG.FORM;
+  return (
+    <div className="bg-white rounded-xl lg:border lg:border-gray-200 lg:p-6 lg:sticky lg:top-6 space-y-5">
+      <div className="flex items-center justify-between">
+        <h3 className="text-base font-semibold text-gray-900">{lead.name}</h3>
+        <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        {lead.email && (
+          <div className="flex items-center gap-2">
+            <a href={`mailto:${lead.email}`} className="flex items-center gap-3 text-sm text-gray-600 hover:text-primary transition-colors flex-1 min-w-0 truncate">
+              <Mail className="w-4 h-4 text-gray-400 shrink-0" />{lead.email}
+            </a>
+            <CopyButton text={lead.email} />
+          </div>
+        )}
+        {lead.phone && (
+          <div className="flex items-center gap-2">
+            <a href={`tel:${lead.phone}`} className="flex items-center gap-3 text-sm text-gray-600 hover:text-primary transition-colors flex-1 min-w-0">
+              <Phone className="w-4 h-4 text-gray-400 shrink-0" />{lead.phone}
+            </a>
+            <CopyButton text={lead.phone} />
+          </div>
+        )}
+        {lead.phone && (
+          <a href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-2 w-full py-2.5 bg-green-500 text-white text-sm font-medium rounded-lg justify-center hover:bg-green-600 transition-colors">
+            <MessageSquare className="w-4 h-4" />Abrir WhatsApp
+          </a>
+        )}
+      </div>
+
+      {lead.property && (
+        <div className="bg-gray-50 rounded-xl p-3">
+          <p className="text-xs text-gray-400 mb-1">Interesse em</p>
+          <div className="flex items-center gap-2">
+            <Building2 className="w-4 h-4 text-gray-400" />
+            <p className="text-sm font-medium text-gray-700">{lead.property.title}</p>
+          </div>
+        </div>
+      )}
+
+      {lead.message && (
+        <div>
+          <p className="text-xs text-gray-400 mb-1.5">Mensagem</p>
+          <p className="text-sm text-gray-600 bg-gray-50 rounded-xl p-3 whitespace-pre-line">{lead.message}</p>
+        </div>
+      )}
+
+      <div className="space-y-2 text-xs text-gray-400 pt-2 border-t border-gray-100">
+        <div className="flex justify-between">
+          <span>Fonte</span>
+          <span className={`font-medium px-1.5 py-0.5 rounded ${src.color}`}>{src.label}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Recebido</span>
+          <span className="text-gray-600">{new Date(lead.createdAt).toLocaleString('pt-BR')}</span>
+        </div>
+      </div>
+
+      <div className="flex gap-2 pt-2 border-t border-gray-100">
+        {lead.email && (
+          <a href={`mailto:${lead.email}`} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+            <Mail className="w-3.5 h-3.5" /> E-mail
+          </a>
+        )}
+        {lead.phone && (
+          <a href={`tel:${lead.phone}`} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+            <Phone className="w-3.5 h-3.5" /> Ligar
+          </a>
+        )}
+        <button onClick={() => onDelete(lead.id)} className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
     </div>
   );
 }

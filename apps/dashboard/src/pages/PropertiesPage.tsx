@@ -126,27 +126,31 @@ export function PropertiesPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <div className="min-w-0">
           <h2 className="text-2xl font-bold text-gray-900">Imóveis</h2>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-sm text-gray-500 mt-0.5 hidden sm:block">
             {properties.length} cadastrados &middot; {activeCount} ativos &middot; {featuredCount} em destaque
+          </p>
+          <p className="text-xs text-gray-500 mt-0.5 sm:hidden">
+            {properties.length} &middot; {activeCount} ativos
           </p>
         </div>
         {canAddProperty ? (
           <Link
             to="/dashboard/properties/new"
-            className="flex items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl font-medium hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
+            className="flex items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl font-medium hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20 shrink-0 whitespace-nowrap text-sm"
           >
-            <Plus className="w-5 h-5" />
-            Novo Imóvel
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">Novo Imóvel</span>
+            <span className="sm:hidden">Novo</span>
           </Link>
         ) : (
           <Link
             to="/dashboard/subscription"
-            className="flex items-center gap-2 bg-gray-400 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-gray-500 transition-colors"
+            className="flex items-center gap-2 bg-gray-400 text-white px-3 py-2 rounded-xl font-medium hover:bg-gray-500 transition-colors shrink-0 text-xs sm:text-sm"
           >
-            Limite atingido ({limits.properties})
+            Limite ({limits.properties})
           </Link>
         )}
       </div>
@@ -168,7 +172,7 @@ export function PropertiesPage() {
               className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
             />
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3 flex-wrap">
             <div className="relative">
               <select
                 value={filterType}
@@ -324,12 +328,12 @@ export function PropertiesPage() {
                     </div>
 
                     {/* Tags + details */}
-                    <div className="flex items-center justify-between mt-3">
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md font-medium text-gray-600">
+                    <div className="flex items-center justify-between gap-2 mt-3">
+                      <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-gray-500 flex-wrap min-w-0">
+                        <span className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md font-medium text-gray-600 whitespace-nowrap">
                           {TYPE_LABELS[property.type] || property.type}
                         </span>
-                        <span className="inline-flex items-center gap-1 bg-primary-light px-2 py-1 rounded-md font-medium text-primary">
+                        <span className="inline-flex items-center gap-1 bg-primary-light px-2 py-1 rounded-md font-medium text-primary whitespace-nowrap">
                           {LISTING_LABELS[property.listingType] || property.listingType}
                         </span>
                         <span className="hidden sm:inline-flex items-center gap-1">
@@ -342,7 +346,7 @@ export function PropertiesPage() {
                           <Maximize2 className="w-3.5 h-3.5" /> {property.area}m²
                         </span>
                         <span
-                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-md font-medium ${
+                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-md font-medium whitespace-nowrap ${
                             property.active
                               ? 'bg-green-50 text-green-600'
                               : 'bg-gray-100 text-gray-500'
@@ -353,7 +357,7 @@ export function PropertiesPage() {
                       </div>
 
                       {/* Actions */}
-                      <div className="flex items-center gap-1 shrink-0">
+                      <div className="flex items-center gap-0.5 shrink-0">
                         <button
                           onClick={() => toggleActive(property.id, property.active)}
                           title={property.active ? 'Desativar' : 'Ativar'}
