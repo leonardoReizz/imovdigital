@@ -98,6 +98,11 @@ export function DashboardLayout() {
       api.get('/auth/me'),
       api.get('/auth/tenants'),
     ]).then(([meRes, tenantsRes]) => {
+      // Redirect to no-organization page if user has no tenants
+      if (!tenantsRes.data || tenantsRes.data.length === 0) {
+        navigate('/no-organization', { replace: true });
+        return;
+      }
       setUserName(meRes.data.name);
       setUserEmail(meRes.data.email);
       setCurrentTenant({

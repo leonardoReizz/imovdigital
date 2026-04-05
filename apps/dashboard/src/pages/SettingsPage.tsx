@@ -62,19 +62,21 @@ export function SettingsPage() {
   const [showDeleteSection, setShowDeleteSection] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [tenantCount, setTenantCount] = useState(1);
 
   const profileForm = useForm<ProfileForm>({ resolver: zodResolver(profileSchema) });
   const passwordForm = useForm<PasswordForm>({ resolver: zodResolver(passwordSchema) });
   const deleteForm = useForm<DeleteForm>({ resolver: zodResolver(deleteSchema) });
 
   useEffect(() => {
-    api.get('/auth/me')
-      .then(({ data }) => {
-        profileForm.reset({ name: data.name, phone: data.phone || '' });
-        setEmail(data.email);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    Promise.all([
+      api.get('/auth/me'),
+      api.get('/auth/tenants'),
+    ]).then(([meRes, tenantsRes]) => {
+      profileForm.reset({ name: meRes.data.name, phone: meRes.data.phone || '' });
+      setEmail(meRes.data.email);
+      setTenantCount(tenantsRes.data.length);
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   const onProfileSubmit = async (data: ProfileForm) => {
@@ -299,10 +301,28 @@ export function SettingsPage() {
         </h3>
         <p className="text-sm text-gray-500 mb-4">Ações irreversíveis na sua conta</p>
 
+        {tenantCount > 0 && (
+          <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+            <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-amber-800">Você possui {tenantCount} {tenantCount === 1 ? 'organização' : 'organizações'}</p>
+              <p className="text-xs text-amber-600 mt-0.5">
+                Para excluir sua conta, primeiro desative todas as suas organizações em{' '}
+                <a href="/dashboard/organization" className="underline font-medium">Organização</a>.
+              </p>
+            </div>
+          </div>
+        )}
+
         {!showDeleteSection ? (
           <button
-            onClick={() => setShowDeleteSection(true)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-xl hover:bg-red-50 transition-colors"
+            onClick={() => tenantCount === 0 && setShowDeleteSection(true)}
+            disabled={tenantCount > 0}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl transition-colors ${
+              tenantCount > 0
+                ? 'text-gray-400 border border-gray-200 cursor-not-allowed'
+                : 'text-red-600 border border-red-200 hover:bg-red-50'
+            }`}
           >
             <Trash2 className="w-4 h-4" />
             Excluir minha conta
