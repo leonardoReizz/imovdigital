@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { useAutoSave } from '../../hooks/useAutoSave';
+import { api } from '../../lib/api';
 import logoImg from '../../assets/logo.png';
 import { SectionsList } from '../../components/editor/SectionsList';
 import { SectionSettings } from '../../components/editor/SectionSettings';
@@ -68,6 +69,7 @@ export function SiteEditor() {
 
   const [activeTab, setActiveTab] = useState<PanelTab>('sections');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [tenantDomain, setTenantDomain] = useState('');
 
   // Auto-switch tabs when navigating preview
   const isOnPropertyPage = previewPage.type === 'property';
@@ -81,6 +83,9 @@ export function SiteEditor() {
 
   useEffect(() => {
     loadConfig();
+    api.get('/tenant').then((res: any) => {
+      setTenantDomain(res.data.customDomain || `${res.data.slug}.imovdigital.com.br`);
+    }).catch(() => {});
   }, [loadConfig]);
 
   useEffect(() => {
@@ -384,7 +389,7 @@ export function SiteEditor() {
             <div className="flex items-center gap-2 flex-1 bg-gray-50 rounded-lg px-3 py-1.5 border border-gray-200 min-w-0">
               <Globe className="w-3.5 h-3.5 text-gray-400 shrink-0" />
               <span className="text-xs text-gray-500 font-mono truncate">
-                seusite.imovdigital.com.br{getPreviewLabel(previewPage, properties)}
+                {tenantDomain || 'carregando...'}{getPreviewLabel(previewPage, properties)}
               </span>
             </div>
           </div>

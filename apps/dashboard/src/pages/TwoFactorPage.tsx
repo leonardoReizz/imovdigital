@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { motion } from 'motion/react';
 import { Shield, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { api } from '../lib/api';
 import logoImg from '../assets/logo.png';
+
+const COOLDOWNS = [60, 300, 300]; // seconds: 1min, 5min, 5min
 
 export function TwoFactorPage() {
   const navigate = useNavigate();
@@ -11,12 +13,41 @@ export function TwoFactorPage() {
   const [error, setError] = useState('');
   const [verifying, setVerifying] = useState(false);
   const [resending, setResending] = useState(false);
-  const [resent, setResent] = useState(false);
+  const [resendCount, setResendCount] = useState(0);
+  const [cooldown, setCooldown] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const cooldownRef = useRef<ReturnType<typeof setInterval>>();
 
+  // Send code automatically on page load
   useEffect(() => {
+    api.post('/auth/resend-two-factor').catch(() => {});
     inputRefs.current[0]?.focus();
   }, []);
+
+  // Cooldown timer
+  const startCooldown = useCallback((seconds: number) => {
+    setCooldown(seconds);
+    if (cooldownRef.current) clearInterval(cooldownRef.current);
+    cooldownRef.current = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(cooldownRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, []);
+
+  useEffect(() => {
+    return () => { if (cooldownRef.current) clearInterval(cooldownRef.current); };
+  }, []);
+
+  const formatCooldown = (s: number) => {
+    const min = Math.floor(s / 60);
+    const sec = s % 60;
+    return min > 0 ? `${min}:${sec.toString().padStart(2, '0')}` : `${sec}s`;
+  };
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -30,7 +61,6 @@ export function TwoFactorPage() {
       inputRefs.current[index + 1]?.focus();
     }
 
-    // Auto-submit when all 6 digits entered
     if (newCode.every((d) => d) && newCode.join('').length === 6) {
       handleVerify(newCode.join(''));
     }
@@ -72,12 +102,14 @@ export function TwoFactorPage() {
   };
 
   const handleResend = async () => {
+    if (cooldown > 0) return;
     setResending(true);
-    setResent(false);
+    setError('');
     try {
       await api.post('/auth/resend-two-factor');
-      setResent(true);
-      setTimeout(() => setResent(false), 5000);
+      const nextCooldown = COOLDOWNS[Math.min(resendCount, COOLDOWNS.length - 1)];
+      setResendCount((c) => c + 1);
+      startCooldown(nextCooldown);
     } catch {
       setError('Erro ao reenviar código');
     } finally {
@@ -154,7 +186,7 @@ export function TwoFactorPage() {
             <p className="text-xs text-gray-400 mb-2">Não recebeu o código?</p>
             <button
               onClick={handleResend}
-              disabled={resending || resent}
+              disabled={resending || cooldown > 0}
               className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-dark disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
             >
               {resending ? (
@@ -162,7 +194,9 @@ export function TwoFactorPage() {
               ) : (
                 <RefreshCw className="w-3.5 h-3.5" />
               )}
-              {resent ? 'Código reenviado!' : 'Reenviar código'}
+              {cooldown > 0
+                ? `Reenviar em ${formatCooldown(cooldown)}`
+                : 'Reenviar código'}
             </button>
           </div>
         </div>
