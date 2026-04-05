@@ -268,62 +268,93 @@ export function OrganizationPage() {
         </h3>
         <p className="text-sm text-gray-500 mb-4">Ações irreversíveis na organização</p>
 
-        {!showDelete ? (
-          <button
-            onClick={() => setShowDelete(true)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-xl hover:bg-red-50 transition-colors"
-          >
-            <Trash2 className="w-4 h-4" />
-            Desativar organização
-          </button>
-        ) : (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-            <p className="text-sm text-red-700 font-medium mb-1">Desativar "{tenant?.name}"?</p>
-            <p className="text-xs text-red-600/70 mb-4">
-              Todos os imóveis, leads e configurações serão desativados. Os dados serão mantidos por 30 dias.
-            </p>
+        {(() => {
+          const hasActiveSubscription = tenant?.subscriptionStatus === 'ACTIVE';
+          const isTrial = tenant?.subscriptionStatus === 'TRIAL';
+          const canDelete = !hasActiveSubscription;
 
-            <AnimatePresence>
-              {deleteError && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-3">
-                  <div className="flex items-center gap-2 bg-red-100 text-red-700 text-xs px-3 py-2 rounded-lg">
-                    <AlertCircle className="w-3 h-3" />{deleteError}
+          return (
+            <>
+              {hasActiveSubscription && (
+                <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                  <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-amber-800">Assinatura ativa</p>
+                    <p className="text-xs text-amber-600 mt-0.5">
+                      Para desativar a organização, primeiro cancele sua assinatura em{' '}
+                      <a href="/dashboard/subscription" className="underline font-medium">Assinatura</a>.
+                      Após o cancelamento, você poderá desativar a organização quando o período pago encerrar.
+                    </p>
                   </div>
-                </motion.div>
+                </div>
               )}
-            </AnimatePresence>
 
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-red-700">
-                  Digite <strong>{tenant?.name}</strong> para confirmar
-                </label>
-                <input
-                  value={deleteConfirm}
-                  onChange={(e) => setDeleteConfirm(e.target.value)}
-                  placeholder={tenant?.name}
-                  className="w-full px-3 py-2 border border-red-200 rounded-lg text-sm outline-none"
-                />
-              </div>
-              <div className="flex gap-2">
+              {!showDelete ? (
                 <button
-                  onClick={() => { setShowDelete(false); setDeleteConfirm(''); setDeleteError(''); }}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+                  onClick={() => canDelete && setShowDelete(true)}
+                  disabled={!canDelete}
+                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl transition-colors ${
+                    canDelete
+                      ? 'text-red-600 border border-red-200 hover:bg-red-50'
+                      : 'text-gray-400 border border-gray-200 cursor-not-allowed'
+                  }`}
                 >
-                  Cancelar
+                  <Trash2 className="w-4 h-4" />
+                  Desativar organização
                 </button>
-                <button
-                  onClick={handleDeleteOrg}
-                  disabled={deleting || deleteConfirm !== tenant?.name}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
-                >
-                  {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                  Desativar
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+              ) : (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                  <p className="text-sm text-red-700 font-medium mb-1">Desativar &ldquo;{tenant?.name}&rdquo;?</p>
+                  <p className="text-xs text-red-600/70 mb-4">
+                    {isTrial
+                      ? 'Seu período de teste será encerrado imediatamente. Os dados serão mantidos por 30 dias.'
+                      : 'Todos os imóveis, leads e configurações serão desativados. Os dados serão mantidos por 30 dias.'}
+                  </p>
+
+                  <AnimatePresence>
+                    {deleteError && (
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-3">
+                        <div className="flex items-center gap-2 bg-red-100 text-red-700 text-xs px-3 py-2 rounded-lg">
+                          <AlertCircle className="w-3 h-3" />{deleteError}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-red-700">
+                        Digite <strong>{tenant?.name}</strong> para confirmar
+                      </label>
+                      <input
+                        value={deleteConfirm}
+                        onChange={(e) => setDeleteConfirm(e.target.value)}
+                        placeholder={tenant?.name}
+                        className="w-full px-3 py-2 border border-red-200 rounded-lg text-sm outline-none"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => { setShowDelete(false); setDeleteConfirm(''); setDeleteError(''); }}
+                        className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        onClick={handleDeleteOrg}
+                        disabled={deleting || deleteConfirm !== tenant?.name}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
+                      >
+                        {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                        Desativar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          );
+        })()}
       </motion.div>
     </div>
   );
