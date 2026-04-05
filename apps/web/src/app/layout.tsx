@@ -1,15 +1,24 @@
 import type { Metadata } from 'next';
 import { resolveTenantSlug } from '@/lib/tenant';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, resolveFileUrl } from '@/lib/api';
 import './globals.css';
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const slug = await resolveTenantSlug();
-    const seo = await apiFetch(`/public/${slug}/seo/home`);
+    const [seo, siteConfig] = await Promise.all([
+      apiFetch(`/public/${slug}/seo/home`),
+      apiFetch(`/public/${slug}/site-config`).catch(() => null),
+    ]);
+
+    const faviconUrl = resolveFileUrl((siteConfig as any)?.faviconUrl);
+
     return {
       title: seo.title,
       description: seo.description,
+      ...(faviconUrl && {
+        icons: { icon: faviconUrl },
+      }),
       openGraph: {
         title: seo.openGraph['og:title'],
         description: seo.openGraph['og:description'],
