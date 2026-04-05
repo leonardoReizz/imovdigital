@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { generateSlug } from '@imovdigital/utils';
+import { useSubscription } from '../contexts/SubscriptionContext';
 import { GoogleAddressInput } from '../components/GoogleAddressInput';
 import type { AddressData } from '../components/GoogleAddressInput';
 import { ImageUploader, type ImageFile } from '../components/ImageUploader';
@@ -89,11 +90,6 @@ const AMENITIES_OPTIONS = [
   'Vista para o Mar',
 ] as const;
 
-const BRAZILIAN_STATES = [
-  'AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS',
-  'MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC',
-  'SP','SE','TO',
-] as const;
 
 const SECTIONS = [
   { id: 'basic', label: 'Dados Básicos', icon: Building2 },
@@ -409,6 +405,7 @@ const INITIAL_STATE: FormState = {
 export function PropertyFormPage() {
   const navigate = useNavigate();
   const { id: propertyId } = useParams<{ id: string }>();
+  const { isTrial } = useSubscription();
   const isEditing = Boolean(propertyId);
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
   const [images, setImages] = useState<ImageFile[]>([]);
@@ -832,19 +829,9 @@ export function PropertyFormPage() {
               <div className="space-y-5">
                 <GoogleAddressInput onSelect={handleAddressSelect} />
 
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                  <div className="sm:col-span-2">
-                    <Input
-                      label="Rua"
-                      required
-                      placeholder="Ex: Rua das Flores"
-                      value={form.street}
-                      onChange={(e) => update('street', e.target.value)}
-                    />
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
                     label="Número"
-                    required
                     placeholder="123"
                     value={form.number}
                     onChange={(e) => update('number', e.target.value)}
@@ -857,41 +844,44 @@ export function PropertyFormPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                  <Input
-                    label="Bairro"
-                    required
-                    hint="Filtro"
-                    placeholder="Ex: Copacabana"
-                    value={form.neighborhood}
-                    onChange={(e) => update('neighborhood', e.target.value)}
-                  />
-                  <Input
-                    label="Cidade"
-                    required
-                    placeholder="Ex: Rio de Janeiro"
-                    value={form.city}
-                    onChange={(e) => update('city', e.target.value)}
-                  />
-                  <Select
-                    label="Estado"
-                    required
-                    options={BRAZILIAN_STATES.map((s) => ({
-                      value: s,
-                      label: s,
-                    }))}
-                    value={form.state}
-                    onChange={(e) => update('state', e.target.value)}
-                  />
-                  <Input
-                    label="CEP"
-                    required
-                    placeholder="00000-000"
-                    maxLength={9}
-                    value={form.zipCode}
-                    onChange={(e) => update('zipCode', e.target.value)}
-                  />
-                </div>
+                {/* Auto-filled address info (read-only) */}
+                {(form.street || form.neighborhood || form.city) && (
+                  <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 space-y-2">
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Endereço detectado</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                      {form.street && (
+                        <div className="col-span-2">
+                          <p className="text-[11px] text-gray-400">Rua</p>
+                          <p className="text-gray-700">{form.street}</p>
+                        </div>
+                      )}
+                      {form.neighborhood && (
+                        <div>
+                          <p className="text-[11px] text-gray-400">Bairro</p>
+                          <p className="text-gray-700">{form.neighborhood}</p>
+                        </div>
+                      )}
+                      {form.city && (
+                        <div>
+                          <p className="text-[11px] text-gray-400">Cidade</p>
+                          <p className="text-gray-700">{form.city}</p>
+                        </div>
+                      )}
+                      {form.state && (
+                        <div>
+                          <p className="text-[11px] text-gray-400">Estado</p>
+                          <p className="text-gray-700">{form.state}</p>
+                        </div>
+                      )}
+                      {form.zipCode && (
+                        <div>
+                          <p className="text-[11px] text-gray-400">CEP</p>
+                          <p className="text-gray-700">{form.zipCode}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {form.latitude && form.longitude && (
                   <div className="bg-green-50 border border-green-100 rounded-xl p-3 flex items-center gap-2">
@@ -1187,7 +1177,13 @@ export function PropertyFormPage() {
                 </div>
 
                 {/* AI Generate */}
-                {hasEnoughDataForSeo ? (
+                {isTrial ? (
+                  <div className="w-full flex items-center justify-center gap-2.5 bg-gray-100 text-gray-400 py-3 rounded-xl font-semibold cursor-not-allowed">
+                    <Sparkles className="w-5 h-5" />
+                    Gerar com IA
+                    <span className="text-[10px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full ml-1">PRO</span>
+                  </div>
+                ) : hasEnoughDataForSeo ? (
                   <motion.button
                     type="button"
                     onClick={handleGenerateSeo}

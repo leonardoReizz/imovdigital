@@ -7,7 +7,9 @@ import {
   Body,
   Param,
   UseGuards,
+  ForbiddenException,
 } from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
 import { PropertyService } from './property.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -15,7 +17,10 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 @UseGuards(JwtAuthGuard)
 @Controller('properties')
 export class PropertyController {
-  constructor(private readonly propertyService: PropertyService) {}
+  constructor(
+    private readonly propertyService: PropertyService,
+    private readonly prisma: PrismaService,
+  ) {}
 
   @Get()
   async list(@CurrentUser('tenantId') tenantId: string) {
@@ -44,7 +49,14 @@ export class PropertyController {
   }
 
   @Post('generate-seo')
-  async generateSeo(@Body() body: any) {
+  async generateSeo(
+    @CurrentUser('tenantId') tenantId: string,
+    @Body() body: any,
+  ) {
+    const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId } });
+    if (tenant?.subscriptionStatus === 'TRIAL') {
+      throw new ForbiddenException('Recurso disponível apenas para planos pagos.');
+    }
     return this.propertyService.generateSeo(body);
   }
 
