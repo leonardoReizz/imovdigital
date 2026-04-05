@@ -104,9 +104,9 @@ export function TwoFactorPage() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+        <div className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-8 shadow-sm">
           {/* Code inputs */}
-          <div className="flex justify-center gap-3 mb-6" onPaste={handlePaste}>
+          <div className="flex justify-center gap-2 sm:gap-3 mb-6" onPaste={handlePaste}>
             {code.map((digit, i) => (
               <input
                 key={i}
@@ -117,7 +117,7 @@ export function TwoFactorPage() {
                 value={digit}
                 onChange={(e) => handleChange(i, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(i, e)}
-                className={`w-12 h-14 text-center text-xl font-bold border-2 rounded-xl outline-none transition-colors ${
+                className={`w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold border-2 rounded-lg sm:rounded-xl outline-none transition-colors ${
                   error
                     ? 'border-red-300 focus:border-red-500'
                     : digit
