@@ -16,7 +16,11 @@ RUN pnpm --filter @imovdigital/utils build || true
 
 # Build dashboard
 ARG VITE_API_URL
+ARG VITE_GOOGLE_MAPS_API_KEY
+ARG VITE_SUPPORT_WHATSAPP
 ENV VITE_API_URL=${VITE_API_URL}
+ENV VITE_GOOGLE_MAPS_API_KEY=${VITE_GOOGLE_MAPS_API_KEY}
+ENV VITE_SUPPORT_WHATSAPP=${VITE_SUPPORT_WHATSAPP}
 RUN pnpm --filter @imovdigital/dashboard build
 
 # ─── Serve ─────────────────────────────────────
