@@ -5,7 +5,8 @@ import { Shield, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { api } from '../lib/api';
 import logoImg from '../assets/logo.png';
 
-const COOLDOWNS = [60, 300, 300]; // seconds: 1min, 5min, 5min
+// Cooldowns in seconds: auto-send → 30s, 1st resend → 1min, 2nd → 5min, 3rd+ → 5min
+const COOLDOWNS = [30, 60, 300, 300];
 
 export function TwoFactorPage() {
   const navigate = useNavigate();
@@ -15,17 +16,10 @@ export function TwoFactorPage() {
   const [resending, setResending] = useState(false);
   const [resendCount, setResendCount] = useState(0);
   const [cooldown, setCooldown] = useState(0);
+  const [sent, setSent] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const cooldownRef = useRef<ReturnType<typeof setInterval>>();
-
-  // Send code automatically on page load (only if token exists)
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      api.post('/auth/resend-two-factor').catch(() => {});
-    }
-    inputRefs.current[0]?.focus();
-  }, []);
+  const hasSentRef = useRef(false);
 
   // Cooldown timer
   const startCooldown = useCallback((seconds: number) => {
@@ -41,6 +35,24 @@ export function TwoFactorPage() {
       });
     }, 1000);
   }, []);
+
+  // Send code automatically on page load
+  useEffect(() => {
+    if (hasSentRef.current) return;
+    hasSentRef.current = true;
+
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      api.post('/auth/resend-two-factor')
+        .then(() => {
+          setSent(true);
+          startCooldown(COOLDOWNS[0]); // 30s cooldown after auto-send
+          setResendCount(1);
+        })
+        .catch(() => {});
+    }
+    inputRefs.current[0]?.focus();
+  }, [startCooldown]);
 
   useEffect(() => {
     return () => { if (cooldownRef.current) clearInterval(cooldownRef.current); };
@@ -110,6 +122,7 @@ export function TwoFactorPage() {
     setError('');
     try {
       await api.post('/auth/resend-two-factor');
+      setSent(true);
       const nextCooldown = COOLDOWNS[Math.min(resendCount, COOLDOWNS.length - 1)];
       setResendCount((c) => c + 1);
       startCooldown(nextCooldown);
@@ -134,8 +147,10 @@ export function TwoFactorPage() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Verificação de segurança</h1>
           <p className="text-sm text-gray-500 mt-2">
-            Enviamos um código de 6 dígitos para o seu e-mail.<br />
-            Digite o código abaixo para continuar.
+            {sent
+              ? <>Enviamos um código de 6 dígitos para o seu e-mail.<br />Digite o código abaixo para continuar.</>
+              : 'Enviando código para o seu e-mail...'
+            }
           </p>
         </div>
 
