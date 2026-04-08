@@ -18,7 +18,7 @@ export function TwoFactorPage() {
   const [cooldown, setCooldown] = useState(0);
   const [sent, setSent] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const cooldownRef = useRef<ReturnType<typeof setInterval>>();
+  const cooldownRef = useRef<ReturnType<typeof setInterval>>(undefined);
   const hasSentRef = useRef(false);
 
   // Cooldown timer
