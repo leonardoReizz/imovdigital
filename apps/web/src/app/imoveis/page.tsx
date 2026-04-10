@@ -9,6 +9,7 @@ import type { Property, SearchPageConfig } from '@imovdigital/types';
 import { DEFAULT_SEARCH_PAGE_CONFIG } from '@imovdigital/types';
 import { SidebarFilters } from '@/components/SidebarFilters';
 import { MobileFilterDrawer } from '@/components/MobileFilterDrawer';
+import { SortSelect } from '@/components/SortSelect';
 import { Footer } from '@/components/sections/Footer';
 import { Home } from 'lucide-react';
 
@@ -87,11 +88,7 @@ export default async function ImoveisPage({ searchParams }: Props) {
             {sp.filterPosition === 'sidebar' && (
               <div className="flex items-center justify-between mb-6">
                 <p className="text-sm text-gray-500">{res.total} {res.total === 1 ? 'imóvel' : 'imóveis'}</p>
-                <select className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600">
-                  <option>Mais recentes</option>
-                  <option>Menor preço</option>
-                  <option>Maior preço</option>
-                </select>
+                <SortSelect currentSort={params.sort || ''} />
               </div>
             )}
 

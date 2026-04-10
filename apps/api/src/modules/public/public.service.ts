@@ -92,15 +92,38 @@ export class PublicService {
     if (query.minPrice) where.price = { ...(where.price || {}), gte: parseInt(query.minPrice) };
     if (query.maxPrice) where.price = { ...(where.price || {}), lte: parseInt(query.maxPrice) };
 
+    const sortByPrice = query.sort === 'price_asc' || query.sort === 'price_desc';
     let orderBy: any = { createdAt: 'desc' };
-    if (query.sort === 'price_asc') orderBy = { price: 'asc' };
-    else if (query.sort === 'price_desc') orderBy = { price: 'desc' };
-    else if (query.sort === 'featured') orderBy = [{ featured: 'desc' }, { createdAt: 'desc' }];
+    if (query.sort === 'featured') orderBy = [{ featured: 'desc' }, { createdAt: 'desc' }];
+    else if (!sortByPrice && query.sort) orderBy = { createdAt: 'desc' };
 
     const page = Math.max(1, parseInt(query.page) || 1);
     const limit = Math.min(50, Math.max(1, parseInt(query.limit) || 20));
-    const skip = (page - 1) * limit;
 
+    if (sortByPrice) {
+      // Fetch all matching, sort by effective price (price or rentPrice), then paginate
+      const [allData, total] = await Promise.all([
+        this.prisma.property.findMany({ where, orderBy: { createdAt: 'desc' } }),
+        this.prisma.property.count({ where }),
+      ]);
+
+      const getEffectivePrice = (p: any) => {
+        if (p.listingType === 'RENT') return p.rentPrice || p.price || 0;
+        if (p.listingType === 'BOTH') return p.price || p.rentPrice || 0;
+        return p.price || 0;
+      };
+
+      allData.sort((a: any, b: any) => {
+        const priceA = getEffectivePrice(a);
+        const priceB = getEffectivePrice(b);
+        return query.sort === 'price_asc' ? priceA - priceB : priceB - priceA;
+      });
+
+      const data = allData.slice((page - 1) * limit, page * limit);
+      return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
+    }
+
+    const skip = (page - 1) * limit;
     const [data, total] = await Promise.all([
       this.prisma.property.findMany({ where, orderBy, skip, take: limit }),
       this.prisma.property.count({ where }),
