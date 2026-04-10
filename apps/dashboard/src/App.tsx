@@ -5,7 +5,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { OverviewPage } from './pages/OverviewPage';
 import { PropertiesPage } from './pages/PropertiesPage';
 import { PropertyFormPage } from './pages/PropertyFormPage';
-import { LeadsPage } from './pages/LeadsPage';
+import { LeadsPage, LeadsSettingsPage } from './pages/LeadsPage';
 import { BrandingPage } from './pages/BrandingPage';
 import { ContactPage } from './pages/ContactPage';
 import { TeamPage } from './pages/TeamPage';
@@ -16,6 +16,7 @@ import { DomainPage } from './pages/DomainPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { TwoFactorPage } from './pages/TwoFactorPage';
 import { NoOrganizationPage } from './pages/NoOrganizationPage';
+import { TermsPage } from './pages/TermsPage';
 import { SiteEditor } from './pages/editor/SiteEditor';
 
 export function App() {
@@ -26,6 +27,7 @@ export function App() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/two-factor" element={<TwoFactorPage />} />
       <Route path="/no-organization" element={<NoOrganizationPage />} />
+      <Route path="/terms" element={<TermsPage />} />
       <Route path="/dashboard/editor" element={<SiteEditor />} />
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route index element={<OverviewPage />} />
@@ -33,6 +35,7 @@ export function App() {
         <Route path="properties/new" element={<PropertyFormPage />} />
         <Route path="properties/:id/edit" element={<PropertyFormPage />} />
         <Route path="leads" element={<LeadsPage />} />
+        <Route path="leads/settings" element={<LeadsSettingsPage />} />
         <Route path="branding" element={<BrandingPage />} />
         <Route path="domain" element={<DomainPage />} />
         <Route path="contact" element={<ContactPage />} />

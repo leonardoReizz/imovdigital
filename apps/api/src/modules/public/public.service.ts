@@ -141,12 +141,89 @@ export class PublicService {
   }
 
   async createLead(slug: string, data: any) {
-    const tenant = await this.prisma.tenant.findUnique({ where: { slug } });
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { slug },
+      include: { plan: true, contactConfig: true },
+    });
     if (!tenant) throw new NotFoundException('Imobiliária não encontrada');
 
-    return this.prisma.lead.create({
+    const lead = await this.prisma.lead.create({
       data: { ...data, tenantId: tenant.id },
+      include: { property: { select: { title: true, slug: true } } },
     });
+
+    // Send WhatsApp notification via Z-API (only for plans with whatsappNotifications)
+    const features = (tenant.plan.features as any) || {};
+    const phones = tenant.contactConfig?.leadNotifyPhones || [];
+    console.log('[LEAD] features:', features, 'phones:', phones);
+    if (features.whatsappNotifications && phones.length > 0) {
+      this.sendLeadNotifications(phones, lead, slug, tenant.customDomain).catch((err) => {
+        console.error('Z-API notification failed:', err.message);
+      });
+    } else {
+      console.log('[LEAD] Skipping notification:', { whatsappNotifications: features.whatsappNotifications, phonesCount: phones.length });
+    }
+
+    return lead;
+  }
+
+  private async sendLeadNotifications(
+    phones: string[],
+    lead: any,
+    tenantSlug: string,
+    customDomain: string | null,
+  ) {
+    const instanceId = this.config.get('ZAPI_INSTANCE_ID');
+    const token = this.config.get('ZAPI_TOKEN');
+    console.log('[ZAPI] instanceId:', instanceId ? 'set' : 'MISSING', 'token:', token ? 'set' : 'MISSING');
+    if (!instanceId || !token) return;
+
+    const baseUrl = customDomain
+      ? `https://${customDomain}`
+      : `https://${tenantSlug}.${this.config.get('BASE_DOMAIN') || 'imovdigital.com.br'}`;
+
+    const propertyLine = lead.property
+      ? `*Interesse:* ${lead.property.title}\n${baseUrl}/imoveis/${lead.property.slug}`
+      : 'Contato geral pelo site';
+
+    const replyLink = lead.phone
+      ? `https://wa.me/${lead.phone.replace(/\D/g, '')}`
+      : '';
+
+    const message = [
+      '🏠 *Novo lead!*',
+      '',
+      `*Nome:* ${lead.name}`,
+      lead.phone ? `*Telefone:* ${lead.phone}` : null,
+      lead.email ? `*E-mail:* ${lead.email}` : null,
+      lead.message ? `*Mensagem:* ${lead.message}` : null,
+      '',
+      propertyLine,
+      replyLink ? `\n👉 Responder: ${replyLink}` : null,
+    ].filter(Boolean).join('\n');
+
+    const url = `https://api.z-api.io/instances/${instanceId}/token/${token}/send-text`;
+
+    const clientToken = this.config.get('ZAPI_CLIENT_TOKEN') || '';
+
+    for (const phone of phones) {
+      const cleanPhone = phone.replace(/\D/g, '');
+      if (!cleanPhone) continue;
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Client-Token': clientToken,
+          },
+          body: JSON.stringify({ phone: cleanPhone, message }),
+        });
+        const body = await res.text();
+        console.log(`[ZAPI] Sent to ${cleanPhone}: ${res.status} ${body}`);
+      } catch (err: any) {
+        console.error(`[ZAPI] Error sending to ${cleanPhone}:`, err.message);
+      }
+    }
   }
 
   // ─── SEO: Sitemap ───────────────────────────────────────────

@@ -20,6 +20,7 @@ import {
   Headphones,
   Menu,
   X,
+  FileText,
 } from 'lucide-react';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { SupportWidget } from '../components/SupportWidget';
@@ -32,6 +33,7 @@ interface NavItem {
   icon: React.ElementType;
   end?: boolean;
   lockedKey?: 'leads' | 'team';
+  children?: { to: string; label: string }[];
 }
 
 interface TenantOption {
@@ -44,7 +46,10 @@ interface TenantOption {
 const navItems: NavItem[] = [
   { to: '/dashboard', label: 'Visão Geral', icon: LayoutDashboard, end: true },
   { to: '/dashboard/properties', label: 'Imóveis', icon: Building2 },
-  { to: '/dashboard/leads', label: 'Leads', icon: MessageSquare, lockedKey: 'leads' },
+  { to: '/dashboard/leads', label: 'Leads', icon: MessageSquare, lockedKey: 'leads', children: [
+    { to: '/dashboard/leads', label: 'Todos os leads' },
+    { to: '/dashboard/leads/settings', label: 'Configurações' },
+  ] },
   { to: '/dashboard/editor', label: 'Editor do Site', icon: PenTool },
   { to: '/dashboard/domain', label: 'Domínio', icon: Globe },
   { to: '/dashboard/contact', label: 'Contato', icon: Phone },
@@ -89,6 +94,7 @@ export function DashboardLayout() {
   const [newTenantName, setNewTenantName] = useState('');
   const [creatingTenant, setCreatingTenant] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [expandedNav, setExpandedNav] = useState<string | null>(null);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
   const tenantMenuRef = useRef<HTMLDivElement>(null);
@@ -273,6 +279,57 @@ export function DashboardLayout() {
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const locked = isLocked(item);
+          const hasChildren = item.children && item.children.length > 0;
+          const isParentActive = location.pathname.startsWith(item.to);
+
+          if (hasChildren) {
+            const isExpanded = expandedNav === item.to || isParentActive;
+            return (
+              <div key={item.to}>
+                <button
+                  onClick={() => {
+                    if (locked) return;
+                    setExpandedNav(isExpanded ? null : item.to);
+                  }}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors w-full ${
+                    isParentActive
+                      ? 'bg-primary/10 text-primary'
+                      : locked
+                        ? 'text-gray-400 hover:bg-gray-50'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  }`}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span className="flex-1 text-left">{item.label}</span>
+                  {locked && <Lock className="w-3.5 h-3.5 text-gray-300" />}
+                  {!locked && (
+                    <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                  )}
+                </button>
+                {isExpanded && !locked && (
+                  <div className="ml-8 mt-1 space-y-0.5">
+                    {item.children!.map((child) => (
+                      <NavLink
+                        key={child.to}
+                        to={child.to}
+                        end
+                        className={({ isActive }) =>
+                          `block px-3 py-2 rounded-md text-[13px] font-medium transition-colors ${
+                            isActive
+                              ? 'text-primary bg-primary/5'
+                              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                          }`
+                        }
+                      >
+                        {child.label}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           return (
             <NavLink
               key={item.to}
@@ -331,6 +388,15 @@ export function DashboardLayout() {
               >
                 <Headphones className="w-4 h-4" />
                 Suporte
+              </a>
+              <a
+                href="/terms"
+                target="_blank"
+                onClick={() => setUserMenuOpen(false)}
+                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                <FileText className="w-4 h-4" />
+                Termos de uso
               </a>
               <div className="border-t border-gray-100 my-1" />
               <button

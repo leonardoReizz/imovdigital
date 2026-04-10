@@ -12,10 +12,17 @@ import {
   Loader2,
   Copy,
   Check,
+  AlertCircle,
+  Plus,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { UpgradeWall } from '../components/UpgradeWall';
+import { PhoneInput } from '../components/PhoneInput';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Save } from 'lucide-react';
 
 interface Lead {
   id: string;
@@ -60,6 +67,21 @@ export function LeadsPage() {
   }
 
   return <LeadsContent />;
+}
+
+export function LeadsSettingsPage() {
+  const { canAccessLeads, isTrial } = useSubscription();
+
+  if (!canAccessLeads) {
+    return (
+      <UpgradeWall
+        feature="Painel de Leads"
+        description="Receba e gerencie os contatos dos visitantes do seu site. Veja quem se interessou por cada imóvel e entre em contato diretamente."
+      />
+    );
+  }
+
+  return <LeadsSettings isTrial={isTrial} />;
 }
 
 function LeadsContent() {
@@ -382,6 +404,179 @@ function LeadDetail({ lead, onClose, onDelete }: { lead: Lead; onClose: () => vo
           <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>
+    </div>
+  );
+}
+
+// ─── Lead Settings (WhatsApp notifications) ─────────────────
+
+const phoneSchema = z.object({
+  phones: z.array(
+    z.object({
+      value: z.string().refine(
+        (v) => !v.trim() || v.replace(/\D/g, '').length >= 10,
+        'Número inválido',
+      ),
+    }),
+  ),
+});
+
+type PhoneForm = z.infer<typeof phoneSchema>;
+
+function LeadsSettings({ isTrial }: { isTrial: boolean }) {
+  const [loading, setLoading] = useState(true);
+  const [success, setSuccess] = useState('');
+  const [serverError, setServerError] = useState('');
+  const [planFeatures, setPlanFeatures] = useState<any>({});
+  const [initialPhones, setInitialPhones] = useState<string[]>([]);
+
+  const form = useForm<PhoneForm>({
+    resolver: zodResolver(phoneSchema),
+    defaultValues: { phones: [] },
+  });
+
+  const { fields, append, remove } = useFieldArray({ control: form.control, name: 'phones' });
+
+  useEffect(() => {
+    Promise.all([
+      api.get('/contact'),
+      api.get('/subscription'),
+    ]).then(([contactRes, subRes]) => {
+      const saved: string[] = contactRes.data?.leadNotifyPhones || [];
+      setInitialPhones(saved);
+      form.reset({ phones: saved.map((v) => ({ value: v })) });
+      setPlanFeatures(subRes.data?.currentPlan?.features || {});
+    }).catch(() => {}).finally(() => setLoading(false));
+  }, []);
+
+  const hasFeature = !!planFeatures.whatsappNotifications && !isTrial;
+  const maxPhones = planFeatures.prioritySupport ? 5 : 2;
+
+  // Check if form is dirty by comparing current values to initial
+  const currentPhones = form.watch('phones').map((p) => p.value).filter((v) => v.trim());
+  const isDirty = JSON.stringify(currentPhones) !== JSON.stringify(initialPhones);
+
+  const onSubmit = async (data: PhoneForm) => {
+    setServerError('');
+    setSuccess('');
+    const cleaned = data.phones.map((p) => p.value).filter((v) => v.trim());
+    try {
+      await api.patch('/contact', { leadNotifyPhones: cleaned });
+      setInitialPhones(cleaned);
+      setSuccess('Configurações salvas!');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err: any) {
+      setServerError(err?.response?.data?.message || 'Erro ao salvar');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-40">
+        <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-2xl">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">Configurações de Leads</h2>
+        <p className="text-sm text-gray-500 mt-1">Configure como você recebe notificações de novos leads</p>
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-xl border border-gray-200 p-6"
+      >
+        <div className="flex items-center gap-2 mb-1">
+          <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-green-600" />
+            Notificações via WhatsApp
+          </h3>
+          {!hasFeature && (
+            <span className="text-[10px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">PRO</span>
+          )}
+        </div>
+        <p className="text-sm text-gray-500 mb-5">
+          Receba uma mensagem no WhatsApp sempre que um lead preencher o formulário do seu site
+        </p>
+
+        {!hasFeature ? (
+          <div className="bg-gray-50 rounded-xl p-6 text-center">
+            <MessageSquare className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+            <p className="text-sm text-gray-500 mb-1">Disponível nos planos Profissional e Multiunidade</p>
+            <p className="text-xs text-gray-400">Faça upgrade para receber notificações em tempo real</p>
+          </div>
+        ) : (
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <p className="text-xs text-gray-400">
+              Adicione até <strong>{maxPhones}</strong> números para receber notificações quando um lead preencher o formulário.
+            </p>
+
+            {fields.map((field, i) => (
+              <div key={field.id}>
+                <div className="flex items-center gap-2">
+                  <PhoneInput
+                    value={form.watch(`phones.${i}.value`)}
+                    onChange={(v) => form.setValue(`phones.${i}.value`, v, { shouldDirty: true })}
+                    placeholder="(11) 99999-9999"
+                    className={`flex-1 px-4 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary ${
+                      form.formState.errors.phones?.[i]?.value ? 'border-red-300' : 'border-gray-200'
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => remove(i)}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                {form.formState.errors.phones?.[i]?.value && (
+                  <p className="text-xs text-red-500 mt-1">{form.formState.errors.phones[i].value.message}</p>
+                )}
+              </div>
+            ))}
+
+            {fields.length < maxPhones && (
+              <button
+                type="button"
+                onClick={() => append({ value: '' })}
+                className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Adicionar número
+              </button>
+            )}
+
+            {fields.length >= maxPhones && (
+              <p className="text-xs text-gray-400">Limite de {maxPhones} números atingido para o seu plano.</p>
+            )}
+
+            {success && (
+              <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm px-3 py-2 rounded-lg">
+                <Check className="w-4 h-4" />{success}
+              </div>
+            )}
+            {serverError && (
+              <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm px-3 py-2 rounded-lg">
+                <AlertCircle className="w-4 h-4" />{serverError}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={form.formState.isSubmitting || !isDirty}
+              className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {form.formState.isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Salvar
+            </button>
+          </form>
+        )}
+      </motion.div>
     </div>
   );
 }

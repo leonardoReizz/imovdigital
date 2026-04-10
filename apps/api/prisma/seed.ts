@@ -22,7 +22,7 @@ async function main() {
       yearlyPrice: 299000, // R$2.990,00/ano (≈R$249/mês)
       propertyLimit: 150,
       userLimit: 5,
-      features: { customDomain: true, analytics: true },
+      features: { customDomain: true, analytics: true, whatsappNotifications: true },
       stripePriceId: null,
       stripeYearlyPriceId: null,
     },
@@ -33,7 +33,7 @@ async function main() {
       yearlyPrice: 499000, // R$4.990,00/ano (≈R$415/mês)
       propertyLimit: -1, // unlimited
       userLimit: -1, // unlimited
-      features: { customDomain: true, analytics: true, prioritySupport: true },
+      features: { customDomain: true, analytics: true, prioritySupport: true, whatsappNotifications: true },
       stripePriceId: null,
       stripeYearlyPriceId: null,
     },

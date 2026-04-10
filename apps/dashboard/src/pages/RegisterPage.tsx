@@ -16,6 +16,7 @@ const step1Schema = z.object({
   email: z.string().min(1, 'E-mail é obrigatório').email('E-mail inválido'),
   phone: z.string().optional(),
   agencyName: z.string().min(1, 'Nome da imobiliária é obrigatório'),
+  acceptTerms: z.literal(true, { message: 'Você deve aceitar os termos de uso' }),
 });
 
 const step2Schema = z.object({
@@ -222,6 +223,25 @@ export function RegisterPage() {
                     <input {...form1.register('agencyName')} placeholder="Minha Imobiliária" className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all ${form1.formState.errors.agencyName ? 'border-red-300' : 'border-gray-200'}`} />
                   </div>
                   {form1.formState.errors.agencyName && <p className="text-xs text-red-500 mt-1">{form1.formState.errors.agencyName.message}</p>}
+                </div>
+
+                <div className="space-y-1">
+                  <label className="flex items-start gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      {...form1.register('acceptTerms')}
+                      className="mt-1 w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/20 cursor-pointer"
+                    />
+                    <span className="text-xs text-gray-500 leading-relaxed">
+                      Li e aceito os{' '}
+                      <a href="/terms" target="_blank" className="text-primary hover:underline font-medium">Termos de Uso</a>
+                      {' '}e a{' '}
+                      <a href="/terms" target="_blank" className="text-primary hover:underline font-medium">Política de Privacidade</a>
+                    </span>
+                  </label>
+                  {form1.formState.errors.acceptTerms && (
+                    <p className="text-xs text-red-500 ml-6.5">{form1.formState.errors.acceptTerms.message}</p>
+                  )}
                 </div>
 
                 <motion.button type="submit" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20">

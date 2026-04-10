@@ -229,6 +229,12 @@ model ContactConfig {
   youtube          String?
   linkedin         String?
   tiktok           String?
+  leadNotifyPhones String[] @default([]) // phones to receive lead notifications
+
+  olxEnabled       Boolean   @default(false)
+  olxAccessToken   String?
+  olxRefreshToken  String?
+  olxTokenExpiry   DateTime? via WhatsApp
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
