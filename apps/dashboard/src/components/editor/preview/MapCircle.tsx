@@ -1,3 +1,5 @@
+import { useState, useEffect, useRef } from 'react';
+
 interface MapCircleProps {
   latitude: number | null;
   longitude: number | null;
@@ -6,6 +8,18 @@ interface MapCircleProps {
 }
 
 export function MapCircle({ latitude, longitude, radius, primaryColor }: MapCircleProps) {
+  const [debouncedRadius, setDebouncedRadius] = useState(radius);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Debounce radius changes — only update the map 800ms after slider stops
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setDebouncedRadius(radius);
+    }, 800);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [radius]);
+
   if (!latitude || !longitude) {
     return (
       <div className="w-full aspect-[16/9] bg-gray-100 rounded-xl flex items-center justify-center">
@@ -14,7 +28,7 @@ export function MapCircle({ latitude, longitude, radius, primaryColor }: MapCirc
     );
   }
 
-  const zoom = radius <= 200 ? 16 : radius <= 500 ? 15 : radius <= 1000 ? 14 : 13;
+  const zoom = debouncedRadius <= 200 ? 16 : debouncedRadius <= 500 ? 15 : debouncedRadius <= 1000 ? 14 : 13;
   const circleSize = Math.min(70, Math.max(25, radius / 12));
   const apiKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GOOGLE_MAPS_API_KEY) || '';
 
@@ -33,10 +47,10 @@ export function MapCircle({ latitude, longitude, radius, primaryColor }: MapCirc
         referrerPolicy="no-referrer-when-downgrade"
       />
 
-      {/* Privacy circle */}
+      {/* Privacy circle — uses live radius for instant visual feedback */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div
-          className="rounded-full border-[3px]"
+          className="rounded-full border-[3px] transition-all duration-200"
           style={{
             backgroundColor: `${primaryColor}20`,
             borderColor: `${primaryColor}80`,
