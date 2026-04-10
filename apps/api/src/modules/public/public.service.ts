@@ -144,6 +144,33 @@ export class PublicService {
     return property;
   }
 
+  async getGoogleReviews(placeId: string, minRating = 0) {
+    if (!placeId) return [];
+    const apiKey = this.config.get('GOOGLE_MAPS_API_KEY');
+    if (!apiKey) return [];
+
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(placeId)}&fields=reviews&language=pt-BR&key=${apiKey}`,
+      );
+      const data = await res.json();
+      const reviews = data.result?.reviews || [];
+
+      return reviews
+        .filter((r: any) => r.rating >= minRating)
+        .slice(0, 8)
+        .map((r: any) => ({
+          name: r.author_name,
+          text: r.text,
+          rating: r.rating,
+          avatarUrl: r.profile_photo_url || null,
+          time: r.relative_time_description,
+        }));
+    } catch {
+      return [];
+    }
+  }
+
   async resolveDomain(domain: string) {
     const tenant = await this.prisma.tenant.findUnique({ where: { customDomain: domain } });
     if (!tenant) throw new NotFoundException('Domínio não encontrado');

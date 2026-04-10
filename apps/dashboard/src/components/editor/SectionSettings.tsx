@@ -11,7 +11,8 @@ import {
   BadgeToggle,
   EditorImageUploader,
 } from './controls';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2, Star } from 'lucide-react';
+import { api } from '../../lib/api';
 
 function useSectionUpdater(sectionId: string) {
   const updateSection = useEditorStore((s) => s.updateSection);
@@ -225,11 +226,16 @@ function TestimonialsSettingsPanel({ section }: { section: Section<'testimonials
   const s = section.settings;
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [draft, setDraft] = useState({ name: '', text: '', rating: 5 });
+  const [fetchingGoogle, setFetchingGoogle] = useState(false);
+  const [googleReviews, setGoogleReviews] = useState<any[]>([]);
+  const [googleError, setGoogleError] = useState('');
 
+  const source = s.source || 'manual';
   const items = s.items || [];
 
   const addItem = () => {
     if (!draft.name.trim() || !draft.text.trim()) return;
+    if (items.length >= 8) return;
     const newItems = [...items, { ...draft, avatarUrl: null }];
     updateSection(section.id, { items: newItems });
     setDraft({ name: '', text: '', rating: 5 });
@@ -255,6 +261,37 @@ function TestimonialsSettingsPanel({ section }: { section: Section<'testimonials
     setEditingIndex(index);
   };
 
+  const fetchGoogleReviews = async () => {
+    if (!s.googlePlaceId?.trim()) {
+      setGoogleError('Insira o Place ID do Google');
+      return;
+    }
+    setFetchingGoogle(true);
+    setGoogleError('');
+    try {
+      const { data } = await api.get(`/public/google-reviews?placeId=${encodeURIComponent(s.googlePlaceId)}&minRating=${s.minRating || 0}`);
+      setGoogleReviews(data);
+      if (data.length === 0) {
+        setGoogleError('Nenhuma avaliação encontrada para este Place ID');
+      }
+    } catch {
+      setGoogleError('Erro ao buscar avaliações. Verifique o Place ID.');
+    } finally {
+      setFetchingGoogle(false);
+    }
+  };
+
+  const importGoogleReviews = (selected: any[]) => {
+    const imported = selected.slice(0, 8).map((r: any) => ({
+      name: r.name,
+      text: r.text,
+      rating: r.rating,
+      avatarUrl: r.avatarUrl || null,
+    }));
+    updateSection(section.id, { items: imported });
+    setGoogleReviews([]);
+  };
+
   return (
     <div className="space-y-4">
       <TextInput label="Título" value={s.title} onChange={(v) => update('title', v)} />
@@ -268,51 +305,171 @@ function TestimonialsSettingsPanel({ section }: { section: Section<'testimonials
         ]}
       />
 
-      {/* Existing items */}
-      <div className="space-y-2">
-        <p className="text-xs font-medium text-gray-500">Depoimentos ({items.length})</p>
-        {items.map((item: any, i: number) => (
-          <div key={i} className="bg-gray-50 rounded-lg p-3 space-y-1">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">{item.name}</span>
-                <span className="text-xs text-yellow-500">{'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}</span>
-              </div>
-              <div className="flex gap-1">
-                <button type="button" onClick={() => startEdit(i)} className="text-xs text-primary hover:underline">Editar</button>
-                <button type="button" onClick={() => removeItem(i)} className="text-xs text-red-500 hover:underline">Remover</button>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 line-clamp-2">"{item.text}"</p>
-          </div>
-        ))}
-      </div>
+      <ToggleGroup
+        label="Fonte dos depoimentos"
+        value={source}
+        onChange={(v) => update('source', v)}
+        options={[
+          { value: 'manual', label: 'Manual' },
+          { value: 'google', label: 'Google' },
+        ]}
+      />
 
-      {/* Add/Edit form */}
-      <div className="bg-primary-light/50 rounded-lg p-3 space-y-3 border border-primary/20">
-        <p className="text-xs font-medium text-primary-dark">{editingIndex !== null ? 'Editar depoimento' : 'Novo depoimento'}</p>
-        <TextInput label="Nome" value={draft.name} onChange={(v) => setDraft((d) => ({ ...d, name: v }))} placeholder="Nome do cliente" />
-        <TextareaField label="Depoimento" value={draft.text} onChange={(v) => setDraft((d) => ({ ...d, text: v }))} placeholder="O que o cliente disse..." rows={2} />
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-gray-600">Avaliação</label>
-          <StarRating value={draft.rating} onChange={(v) => setDraft((d) => ({ ...d, rating: v }))} />
-        </div>
-        <div className="flex gap-2">
-          {editingIndex !== null && (
-            <button type="button" onClick={() => { setEditingIndex(null); setDraft({ name: '', text: '', rating: 5 }); }} className="px-3 py-1.5 text-xs font-medium text-gray-500 bg-white border border-gray-200 rounded-lg">
-              Cancelar
-            </button>
-          )}
+      {source === 'google' ? (
+        <div className="space-y-3">
+          <TextInput
+            label="Google Place ID"
+            value={s.googlePlaceId || ''}
+            onChange={(v) => update('googlePlaceId', v)}
+            placeholder="Ex: ChIJ..."
+          />
+          <p className="text-[10px] text-gray-400 -mt-2">
+            Encontre em{' '}
+            <a href="https://developers.google.com/maps/documentation/places/web-service/place-id-finder" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+              Place ID Finder
+            </a>
+          </p>
+
+          <SelectField
+            label="Avaliação mínima"
+            value={String(s.minRating || 0)}
+            onChange={(v) => update('minRating', Number(v))}
+            options={[
+              { value: '0', label: 'Todas' },
+              { value: '3', label: '3+ estrelas' },
+              { value: '4', label: '4+ estrelas' },
+              { value: '5', label: 'Apenas 5 estrelas' },
+            ]}
+          />
+
           <button
             type="button"
-            onClick={editingIndex !== null ? () => updateItem(editingIndex) : addItem}
-            disabled={!draft.name.trim() || !draft.text.trim()}
-            className="px-3 py-1.5 text-xs font-medium text-white bg-primary rounded-lg disabled:opacity-40"
+            onClick={fetchGoogleReviews}
+            disabled={fetchingGoogle || !s.googlePlaceId?.trim()}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-white bg-primary rounded-lg disabled:opacity-40"
           >
-            {editingIndex !== null ? 'Salvar' : 'Adicionar'}
+            {fetchingGoogle ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Star className="w-3.5 h-3.5" />}
+            {fetchingGoogle ? 'Buscando...' : 'Buscar avaliações do Google'}
           </button>
+
+          {googleError && (
+            <p className="text-xs text-red-500">{googleError}</p>
+          )}
+
+          {/* Google reviews to select */}
+          {googleReviews.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium text-gray-500">{googleReviews.length} avaliações encontradas</p>
+                <button
+                  type="button"
+                  onClick={() => importGoogleReviews(googleReviews)}
+                  className="text-xs font-medium text-primary hover:underline"
+                >
+                  Importar todas
+                </button>
+              </div>
+              {googleReviews.map((r: any, i: number) => (
+                <div key={i} className="bg-gray-50 rounded-lg p-3 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {r.avatarUrl && <img src={r.avatarUrl} alt="" className="w-5 h-5 rounded-full" />}
+                      <span className="text-sm font-medium text-gray-700">{r.name}</span>
+                      <span className="text-xs text-yellow-500">{'★'.repeat(r.rating)}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (items.length < 8) {
+                          updateSection(section.id, { items: [...items, { name: r.name, text: r.text, rating: r.rating, avatarUrl: r.avatarUrl }] });
+                        }
+                      }}
+                      disabled={items.length >= 8}
+                      className="text-xs text-primary hover:underline disabled:text-gray-400"
+                    >
+                      Adicionar
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 line-clamp-2">{r.text}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Imported items */}
+          {items.length > 0 && (
+            <div className="space-y-2 pt-2 border-t border-gray-100">
+              <p className="text-xs font-medium text-gray-500">Selecionados ({items.length}/8)</p>
+              {items.map((item: any, i: number) => (
+                <div key={i} className="bg-gray-50 rounded-lg p-3 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-700">{item.name}</span>
+                      <span className="text-xs text-yellow-500">{'★'.repeat(item.rating)}</span>
+                    </div>
+                    <button type="button" onClick={() => removeItem(i)} className="text-xs text-red-500 hover:underline">Remover</button>
+                  </div>
+                  <p className="text-xs text-gray-500 line-clamp-2">{item.text}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Manual items */}
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-gray-500">Depoimentos ({items.length}/8)</p>
+            {items.map((item: any, i: number) => (
+              <div key={i} className="bg-gray-50 rounded-lg p-3 space-y-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-700">{item.name}</span>
+                    <span className="text-xs text-yellow-500">{'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}</span>
+                  </div>
+                  <div className="flex gap-1">
+                    <button type="button" onClick={() => startEdit(i)} className="text-xs text-primary hover:underline">Editar</button>
+                    <button type="button" onClick={() => removeItem(i)} className="text-xs text-red-500 hover:underline">Remover</button>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 line-clamp-2">"{item.text}"</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Add/Edit form */}
+          {items.length < 8 && (
+            <div className="bg-primary-light/50 rounded-lg p-3 space-y-3 border border-primary/20">
+              <p className="text-xs font-medium text-primary-dark">{editingIndex !== null ? 'Editar depoimento' : 'Novo depoimento'}</p>
+              <TextInput label="Nome" value={draft.name} onChange={(v) => setDraft((d) => ({ ...d, name: v }))} placeholder="Nome do cliente" />
+              <TextareaField label="Depoimento" value={draft.text} onChange={(v) => setDraft((d) => ({ ...d, text: v }))} placeholder="O que o cliente disse..." rows={2} />
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-600">Avaliação</label>
+                <StarRating value={draft.rating} onChange={(v) => setDraft((d) => ({ ...d, rating: v }))} />
+              </div>
+              <div className="flex gap-2">
+                {editingIndex !== null && (
+                  <button type="button" onClick={() => { setEditingIndex(null); setDraft({ name: '', text: '', rating: 5 }); }} className="px-3 py-1.5 text-xs font-medium text-gray-500 bg-white border border-gray-200 rounded-lg">
+                    Cancelar
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={editingIndex !== null ? () => updateItem(editingIndex) : addItem}
+                  disabled={!draft.name.trim() || !draft.text.trim()}
+                  className="px-3 py-1.5 text-xs font-medium text-white bg-primary rounded-lg disabled:opacity-40"
+                >
+                  {editingIndex !== null ? 'Salvar' : 'Adicionar'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {items.length >= 8 && (
+            <p className="text-xs text-gray-400">Limite de 8 depoimentos atingido.</p>
+          )}
+        </>
+      )}
     </div>
   );
 }

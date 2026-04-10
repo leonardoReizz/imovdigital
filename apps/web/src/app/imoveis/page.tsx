@@ -96,13 +96,13 @@ export default async function ImoveisPage({ searchParams }: Props) {
               sp.layout === 'list' ? (
                 <div className="flex flex-col gap-4">
                   {res.data.map((property) => (
-                    <PropertyCard key={property.id} property={property} primaryColor={primaryColor} layout="horizontal" />
+                    <PropertyCard key={property.id} property={property} primaryColor={primaryColor} layout="horizontal" carousel={sp.cardCarousel ?? true} />
                   ))}
                 </div>
               ) : (
                 <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${Math.min(sp.columns, 2)}, 1fr)` }}>
                   {res.data.map((property) => (
-                    <PropertyCard key={property.id} property={property} primaryColor={primaryColor} />
+                    <PropertyCard key={property.id} property={property} primaryColor={primaryColor} carousel={sp.cardCarousel ?? true} />
                   ))}
                 </div>
               )

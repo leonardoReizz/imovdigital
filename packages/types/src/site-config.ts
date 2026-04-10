@@ -66,6 +66,9 @@ export interface AgentsSettings {
 export interface TestimonialsSettings {
   title: string;
   layout: 'carousel' | 'grid';
+  source: 'manual' | 'google';
+  googlePlaceId: string;
+  minRating: number;
   items: {
     name: string;
     text: string;
@@ -193,6 +196,7 @@ export interface SearchPageConfig {
   // Layout
   layout: 'grid' | 'list';
   columns: 2 | 3 | 4;
+  cardCarousel: boolean;
 }
 
 export const DEFAULT_SEARCH_PAGE_CONFIG: SearchPageConfig = {
@@ -209,6 +213,7 @@ export const DEFAULT_SEARCH_PAGE_CONFIG: SearchPageConfig = {
   showPriceFilter: true,
   layout: 'grid',
   columns: 3,
+  cardCarousel: true,
 };
 
 // ─── Section ─────────────────────────────────────────────────

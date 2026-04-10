@@ -3,6 +3,7 @@ import type { Property } from '@imovdigital/types';
 import { formatPrice } from '@imovdigital/utils';
 import { resolveFileUrl } from '@/lib/api';
 import { MapPin, BedDouble, Bath, Car, Home } from 'lucide-react';
+import { PropertyImageCarousel } from './PropertyImageCarousel';
 
 interface Props {
   property: Property;
@@ -10,24 +11,31 @@ interface Props {
   layout?: 'vertical' | 'horizontal';
   showPrice?: boolean;
   showBadge?: boolean;
+  carousel?: boolean;
 }
 
-export function PropertyCard({ property, primaryColor, layout = 'vertical', showPrice = true, showBadge = true }: Props) {
+export function PropertyCard({ property, primaryColor, layout = 'vertical', showPrice = true, showBadge = true, carousel = true }: Props) {
   const hasImage = property.images && property.images.length > 0;
   const isRent = property.listingType === 'RENT';
   const mainPrice = isRent ? (property.rentPrice || property.price) : property.price;
+
+  const renderImage = () => {
+    if (!hasImage) {
+      return <div className="w-full h-full flex items-center justify-center"><Home className="w-10 h-10 text-gray-200" /></div>;
+    }
+    if (carousel && property.images.length > 1) {
+      return <PropertyImageCarousel images={property.images} />;
+    }
+    return <img src={resolveFileUrl(property.images[0].url)} alt={property.images[0].alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />;
+  };
 
   if (layout === 'horizontal') {
     return (
       <Link href={`/imoveis/${property.slug}`} className="group flex bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
         <div className="relative w-48 sm:w-64 shrink-0 bg-gray-100">
-          {hasImage ? (
-            <img src={resolveFileUrl(property.images[0].url)} alt={property.images[0].alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center"><Home className="w-10 h-10 text-gray-200" /></div>
-          )}
+          {renderImage()}
           {showBadge && property.featured && (
-            <span className="absolute top-3 left-3 text-white text-xs font-medium px-2 py-0.5 rounded-md" style={{ backgroundColor: primaryColor }}>Destaque</span>
+            <span className="absolute top-3 left-3 text-white text-xs font-medium px-2 py-0.5 rounded-md z-10" style={{ backgroundColor: primaryColor }}>Destaque</span>
           )}
         </div>
         <div className="p-4 sm:p-5 flex-1 flex flex-col justify-center gap-1.5">
@@ -52,12 +60,8 @@ export function PropertyCard({ property, primaryColor, layout = 'vertical', show
   return (
     <Link href={`/imoveis/${property.slug}`} className="group block bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg hover:border-gray-200 transition-all">
       <div className="relative aspect-[16/10] bg-gray-100 overflow-hidden">
-        {hasImage ? (
-          <img src={resolveFileUrl(property.images[0].url)} alt={property.images[0].alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center"><Home className="w-10 h-10 text-gray-200" /></div>
-        )}
-        <div className="absolute top-3 left-3 flex items-center gap-2">
+        {renderImage()}
+        <div className="absolute top-3 left-3 flex items-center gap-2 z-10">
           <span className="text-white text-xs font-medium px-2 py-0.5 rounded-md" style={{ backgroundColor: primaryColor }}>
             {isRent ? 'Aluguel' : property.listingType === 'BOTH' ? 'Venda/Aluguel' : 'Venda'}
           </span>

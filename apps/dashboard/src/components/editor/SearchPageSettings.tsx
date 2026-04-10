@@ -74,6 +74,11 @@ export function SearchPageSettings() {
               ]}
             />
           )}
+          <BadgeToggle
+            label="Carrossel de imagens no card"
+            value={sp.cardCarousel ?? true}
+            onChange={(v) => update('cardCarousel', v)}
+          />
         </div>
       </div>
 

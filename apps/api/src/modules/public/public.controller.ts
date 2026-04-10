@@ -8,6 +8,14 @@ import { PublicService } from './public.service';
 export class PublicController {
   constructor(private readonly publicService: PublicService) {}
 
+  @Get('google-reviews')
+  async googleReviews(
+    @Query('placeId') placeId: string,
+    @Query('minRating') minRating?: string,
+  ) {
+    return this.publicService.getGoogleReviews(placeId, parseInt(minRating || '0') || 0);
+  }
+
   @Get('resolve-domain')
   async resolveDomain(@Query('domain') domain: string) {
     return this.publicService.resolveDomain(domain);
