@@ -67,14 +67,14 @@ enum LeadSource {
 // ==========================================
 
 model Plan {
-  id                  String @id @default(uuid())
+  id                  String  @id @default(uuid())
   name                String
-  slug                String @unique
-  monthlyPrice        Int    // in cents (BRL)
-  yearlyPrice         Int?   // in cents (BRL) — annual total
+  slug                String  @unique
+  monthlyPrice        Int // in cents (BRL)
+  yearlyPrice         Int? // in cents (BRL) — annual total
   propertyLimit       Int
   userLimit           Int
-  features            Json   @default("{}")
+  features            Json    @default("{}")
   stripePriceId       String?
   stripeYearlyPriceId String?
 
@@ -94,7 +94,7 @@ model Tenant {
   secondaryColor       String             @default("#1e40af")
   fontFamily           String             @default("Inter")
   layoutStyle          LayoutStyle        @default(GRID)
-  siteTheme            Json?              // SiteTheme JSON
+  siteTheme            Json? // SiteTheme JSON
   planId               String
   subscriptionStatus   SubscriptionStatus @default(TRIAL)
   trialEndsAt          DateTime?
@@ -117,21 +117,21 @@ model Tenant {
 }
 
 model User {
-  id              String    @id @default(uuid())
-  tenantId        String
-  email           String
-  passwordHash    String
-  name            String
-  avatarUrl       String?
-  phone           String?
-  role            UserRole  @default(AGENT)
-  resetCode       String?
-  resetCodeExpiry DateTime?
+  id                  String    @id @default(uuid())
+  tenantId            String
+  email               String
+  passwordHash        String
+  name                String
+  avatarUrl           String?
+  phone               String?
+  role                UserRole  @default(AGENT)
+  resetCode           String?
+  resetCodeExpiry     DateTime?
   twoFactorCode       String?
   twoFactorCodeExpiry DateTime?
-  deletedAt       DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  deletedAt           DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
@@ -148,10 +148,10 @@ model Property {
   slug               String
   type               PropertyType
   listingType        ListingType
-  price              Int          // in cents
-  rentPrice          Int?         // in cents
-  condoFee           Int?         // in cents
-  iptuYearly         Int?         // in cents
+  price              Int // in cents
+  rentPrice          Int? // in cents
+  condoFee           Int? // in cents
+  iptuYearly         Int? // in cents
   area               Float
   usableArea         Float?
   bedrooms           Int          @default(0)
@@ -210,31 +210,26 @@ model SiteConfig {
 }
 
 model ContactConfig {
-  id               String  @id @default(uuid())
-  tenantId         String  @unique
+  id               String   @id @default(uuid())
+  tenantId         String   @unique
   whatsapp         String?
   whatsappMessage  String? // mensagem padrão ao abrir WhatsApp
   phone            String?
   email            String?
-  showForm         Boolean @default(true)
+  showForm         Boolean  @default(true)
   address          String?
   city             String?
-  state            String? @db.Char(2)
+  state            String?  @db.Char(2)
   zipCode          String?
   latitude         Float?
   longitude        Float?
-  businessHours    Json?   // { mon: "09:00-18:00", tue: "09:00-18:00", ... }
+  businessHours    Json? // { mon: "09:00-18:00", tue: "09:00-18:00", ... }
   instagram        String?
   facebook         String?
   youtube          String?
   linkedin         String?
   tiktok           String?
   leadNotifyPhones String[] @default([]) // phones to receive lead notifications
-
-  olxEnabled       Boolean   @default(false)
-  olxAccessToken   String?
-  olxRefreshToken  String?
-  olxTokenExpiry   DateTime? via WhatsApp
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
@@ -265,7 +260,7 @@ model CancellationFeedback {
   id        String   @id @default(uuid())
   tenantId  String
   userId    String
-  reason    String   // "too_expensive" | "not_using" | "switched" | "technical" | "other"
+  reason    String // "too_expensive" | "not_using" | "switched" | "technical" | "other"
   comment   String?  @db.Text
   planName  String
   createdAt DateTime @default(now())

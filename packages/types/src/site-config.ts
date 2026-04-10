@@ -316,6 +316,9 @@ export const DEFAULT_SECTION_SETTINGS: SectionSettingsMap = {
   testimonials: {
     title: 'O que dizem nossos clientes',
     layout: 'carousel',
+    source: 'manual',
+    googlePlaceId: '',
+    minRating: 0,
     items: [],
   },
   cta_banner: {

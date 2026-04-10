@@ -325,7 +325,7 @@ function TestimonialsSettingsPanel({ section }: { section: Section<'testimonials
           />
           <p className="text-[10px] text-gray-400 -mt-2">
             Encontre em{' '}
-            <a href="https://developers.google.com/maps/documentation/places/web-service/place-id-finder" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+            <a href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
               Place ID Finder
             </a>
           </p>
