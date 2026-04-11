@@ -8,7 +8,7 @@ async function main() {
       name: 'Básico',
       slug: 'basico',
       monthlyPrice: 14900, // R$149,00
-      yearlyPrice: 149000, // R$1.490,00/ano (≈R$124/mês)
+      yearlyPrice: null, // sem plano anual
       propertyLimit: 30,
       userLimit: 2,
       features: { customDomain: false, analytics: false },
