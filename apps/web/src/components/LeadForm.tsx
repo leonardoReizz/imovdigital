@@ -81,7 +81,7 @@ export function LeadForm({ tenantSlug, propertyId, propertyTitle, primaryColor, 
   }
 
   return (
-    <form onSubmit={handleSubmit} className={`space-y-${compact ? '2' : '3'}`}>
+    <form onSubmit={handleSubmit} className={compact ? 'space-y-2' : 'space-y-3'}>
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}

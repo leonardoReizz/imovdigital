@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { ShareButton } from '@/components/ShareButton';
 import { LeadForm } from '@/components/LeadForm';
+import { FloatingContactButton } from '@/components/FloatingContactButton';
 import { Footer } from '@/components/sections/Footer';
 import { formatListingDate } from '@/lib/dates';
 
@@ -281,6 +282,16 @@ export default async function PropertyPage({ params }: Props) {
           )}
         </div>
       </div>
+
+      {/* Floating contact button */}
+      {pd.contactPosition === 'floating' && pd.showContactForm && (
+        <FloatingContactButton
+          tenantSlug={tenantSlug}
+          propertyId={property.id}
+          propertyTitle={property.title}
+          primaryColor={primaryColor}
+        />
+      )}
 
       {/* Footer */}
       {siteConfig?.sections && (() => {
