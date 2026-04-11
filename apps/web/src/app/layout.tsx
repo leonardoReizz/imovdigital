@@ -40,8 +40,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   let primaryColor = '#2563eb';
   let fontSize = 16;
   let jsonLd: object | null = null;
-  let googleAnalyticsId: string | null = null;
-
   try {
     const slug = await resolveTenantSlug();
     const [tenant, siteConfig, seo] = await Promise.all([
@@ -52,7 +50,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     fontFamily = (siteConfig as any)?.fontFamily || tenant.fontFamily || 'Inter';
     primaryColor = (siteConfig as any)?.primaryColor || tenant.primaryColor || '#2563eb';
     fontSize = (siteConfig as any)?.fontSize || 16;
-    googleAnalyticsId = (siteConfig as any)?.googleAnalyticsId || null;
     if (seo?.jsonLd) jsonLd = seo.jsonLd;
   } catch {
     // use defaults
@@ -75,16 +72,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body style={{ fontFamily: `'${fontFamily}', sans-serif`, fontSize: `${fontSize}px`, ['--color-primary' as string]: primaryColor }}>
         {children}
-        {googleAnalyticsId && (
-          <>
-            <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`} />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${googleAnalyticsId}');`,
-              }}
-            />
-          </>
-        )}
       </body>
     </html>
   );

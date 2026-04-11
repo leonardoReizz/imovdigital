@@ -1,6 +1,6 @@
 import { useEditorStore } from '../../store/editorStore';
-import { ColorPicker, FontSelector, EditorImageUploader, RangeSlider, TextInput } from './controls';
-import { RotateCcw, BarChart3 } from 'lucide-react';
+import { ColorPicker, FontSelector, EditorImageUploader, RangeSlider } from './controls';
+import { RotateCcw } from 'lucide-react';
 
 export function GlobalSettings() {
   const config = useEditorStore((s) => s.config);
@@ -77,23 +77,6 @@ export function GlobalSettings() {
         step={1}
         suffix="px"
       />
-
-      {/* Integrations */}
-      <div className="pt-4 border-t border-gray-100">
-        <div className="flex items-center gap-2 mb-3">
-          <BarChart3 className="w-4 h-4 text-gray-400" />
-          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Integrações</h4>
-        </div>
-        <TextInput
-          label="Google Analytics (ID)"
-          value={(config as any).googleAnalyticsId || ''}
-          onChange={(v) => updateGlobal({ googleAnalyticsId: v || null } as any)}
-          placeholder="G-XXXXXXXXXX"
-        />
-        <p className="text-[10px] text-gray-400 mt-1">
-          Cole o Measurement ID do seu Google Analytics para rastrear visitas no seu site
-        </p>
-      </div>
 
       <button
         type="button"
