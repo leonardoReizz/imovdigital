@@ -7,6 +7,7 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   private readonly logger = new Logger(PrismaService.name);
+  private keepAliveTimer: ReturnType<typeof setInterval> | undefined;
 
   constructor() {
     super({
@@ -31,7 +32,7 @@ export class PrismaService
       try {
         await this.$connect();
         this.logger.log('Database connected');
-        return;
+        break;
       } catch (err) {
         retries--;
         this.logger.warn(`Database connection failed, ${retries} retries left...`);
@@ -39,9 +40,26 @@ export class PrismaService
         await new Promise((r) => setTimeout(r, 2000));
       }
     }
+
+    // Keep connection alive — ping every 4 minutes to prevent Neon from suspending
+    this.keepAliveTimer = setInterval(async () => {
+      try {
+        await this.$queryRaw`SELECT 1`;
+      } catch {
+        this.logger.warn('Keep-alive ping failed, reconnecting...');
+        try {
+          await this.$disconnect();
+          await this.$connect();
+          this.logger.log('Reconnected after keep-alive failure');
+        } catch (err) {
+          this.logger.error('Reconnection failed:', (err as Error).message);
+        }
+      }
+    }, 4 * 60 * 1000);
   }
 
   async onModuleDestroy() {
+    if (this.keepAliveTimer) clearInterval(this.keepAliveTimer);
     await this.$disconnect();
   }
 }

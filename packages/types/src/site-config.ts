@@ -250,6 +250,9 @@ export interface SiteConfig {
   // Search/listing page config
   searchPage: SearchPageConfig;
 
+  // Integrations
+  googleAnalyticsId: string | null;
+
   updatedAt: string;
 }
 
