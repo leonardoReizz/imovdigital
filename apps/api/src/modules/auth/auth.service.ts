@@ -89,10 +89,12 @@ export class AuthService {
       result.user.email,
       result.tenant.id,
       result.user.role,
+      true, // New registration — no 2FA required
     );
 
     return {
       ...tokens,
+      requiresTwoFactor: false,
       user: {
         id: result.user.id,
         name: result.user.name,
