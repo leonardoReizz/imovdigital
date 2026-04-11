@@ -20,6 +20,7 @@ import { useSubscription } from '../contexts/SubscriptionContext';
 import { UpgradeWall } from '../components/UpgradeWall';
 import { PhoneInput } from '../components/PhoneInput';
 import { Save } from 'lucide-react';
+import { Link } from 'react-router';
 
 interface Lead {
   id: string;
@@ -410,9 +411,16 @@ function LeadDetail({ lead, onClose, onDelete }: { lead: Lead; onClose: () => vo
 interface PipelineAgent {
   name: string;
   phone: string;
+  role: string;
   active: boolean;
   leadCount: number;
 }
+
+const ROLE_BADGES: Record<string, { label: string; className: string }> = {
+  OWNER: { label: 'Dono', className: 'bg-purple-100 text-purple-700' },
+  ADMIN: { label: 'Admin', className: 'bg-blue-100 text-blue-700' },
+  AGENT: { label: 'Corretor', className: 'bg-green-100 text-green-700' },
+};
 
 function LeadsSettings({ isTrial }: { isTrial: boolean }) {
   const [loading, setLoading] = useState(true);
@@ -429,8 +437,7 @@ function LeadsSettings({ isTrial }: { isTrial: boolean }) {
   const [pipelineEnabled, setPipelineEnabled] = useState(false);
   const [masterPhone, setMasterPhone] = useState('');
   const [agents, setAgents] = useState<PipelineAgent[]>([]);
-  const [newAgentName, setNewAgentName] = useState('');
-  const [newAgentPhone, setNewAgentPhone] = useState('');
+  const [teamMembers, setTeamMembers] = useState<{ id: string; name: string; phone: string; role: string }[]>([]);
 
   // Initial state for dirty check
   const [initialState, setInitialState] = useState('');
@@ -439,14 +446,45 @@ function LeadsSettings({ isTrial }: { isTrial: boolean }) {
     Promise.all([
       api.get('/contact'),
       api.get('/subscription'),
-    ]).then(([contactRes, subRes]) => {
+      api.get('/users'),
+    ]).then(([contactRes, subRes, usersRes]) => {
       const d = contactRes.data || {};
       setPhones(d.leadNotifyPhones || []);
       setInitialPhones(d.leadNotifyPhones || []);
       setPipelineEnabled(d.leadPipelineEnabled || false);
       setMasterPhone(d.leadMasterPhone || '');
-      setAgents(d.leadPipelineAgents || []);
       setPlanFeatures(subRes.data?.currentPlan?.features || {});
+
+      // Build agents from saved pipeline or from team members
+      const savedAgents: PipelineAgent[] = d.leadPipelineAgents || [];
+      const members = (usersRes.data || []).filter((m: any) => m.phone && !m.deletedAt);
+      setTeamMembers(members);
+
+      // Build agents from team members, using saved data where available
+      const normalize = (p: string) => p.replace(/\D/g, '');
+
+      if (savedAgents.length === 0 && members.length > 0) {
+        const initialAgents = members.map((m: any) => ({
+          name: m.name,
+          phone: m.phone,
+          role: m.role,
+          active: m.role === 'AGENT',
+          leadCount: 0,
+        }));
+        setAgents(initialAgents);
+      } else {
+        const merged = members.map((m: any) => {
+          const existing = savedAgents.find((a: PipelineAgent) =>
+            a.name === m.name && normalize(a.phone) === normalize(m.phone)
+          );
+          if (existing) {
+            return { name: m.name, phone: m.phone, role: m.role, active: existing.active, leadCount: existing.leadCount || 0 };
+          }
+          return { name: m.name, phone: m.phone, role: m.role, active: m.role === 'AGENT', leadCount: 0 };
+        });
+        setAgents(merged);
+      }
+
       setInitialState(JSON.stringify({
         phones: d.leadNotifyPhones || [],
         pipelineEnabled: d.leadPipelineEnabled || false,
@@ -466,17 +504,6 @@ function LeadsSettings({ isTrial }: { isTrial: boolean }) {
     agents,
   });
   const isDirty = currentState !== initialState;
-
-  const addAgent = () => {
-    if (!newAgentName.trim() || !newAgentPhone.trim()) return;
-    setAgents([...agents, { name: newAgentName.trim(), phone: newAgentPhone, active: true, leadCount: 0 }]);
-    setNewAgentName('');
-    setNewAgentPhone('');
-  };
-
-  const removeAgent = (index: number) => {
-    setAgents(agents.filter((_, i) => i !== index));
-  };
 
   const toggleAgent = (index: number) => {
     setAgents(agents.map((a, i) => i === index ? { ...a, active: !a.active } : a));
@@ -586,57 +613,44 @@ function LeadsSettings({ isTrial }: { isTrial: boolean }) {
                   )}
 
                   {agents.map((agent, i) => (
-                    <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${agent.active ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100 opacity-60'}`}>
-                      <button
-                        type="button"
-                        onClick={() => toggleAgent(i)}
-                        className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${agent.active ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}
-                      >
-                        {agent.active && <Check className="w-3 h-3 text-white" />}
-                      </button>
+                    <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${agent.active ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100'}`}>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{agent.name}</p>
-                        <p className="text-xs text-gray-500">{agent.phone}</p>
+                        <div className="flex items-center gap-1.5">
+                          <p className={`text-sm font-medium truncate ${agent.active ? 'text-gray-900' : 'text-gray-400'}`}>{agent.name}</p>
+                          {agent.role && ROLE_BADGES[agent.role] && (
+                            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 ${ROLE_BADGES[agent.role].className}`}>
+                              {ROLE_BADGES[agent.role].label}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-400">{agent.phone}</p>
                       </div>
-                      <div className="text-right shrink-0">
-                        <p className="text-xs font-semibold text-gray-900">{agent.leadCount}</p>
+                      <div className="text-right shrink-0 mr-1">
+                        <p className={`text-xs font-semibold ${agent.active ? 'text-gray-900' : 'text-gray-400'}`}>{agent.leadCount}</p>
                         <p className="text-[10px] text-gray-400">leads</p>
                       </div>
                       <button
                         type="button"
-                        onClick={() => removeAgent(i)}
-                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0"
+                        onClick={() => toggleAgent(i)}
+                        className={`relative w-9 h-5 rounded-full transition-colors shrink-0 ${agent.active ? 'bg-green-500' : 'bg-gray-300'}`}
                       >
-                        <X className="w-3.5 h-3.5" />
+                        <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${agent.active ? 'translate-x-4' : ''}`} />
                       </button>
                     </div>
                   ))}
 
-                  {/* Add agent form */}
-                  <div className="bg-gray-50 rounded-xl p-3 space-y-2">
-                    <p className="text-xs font-medium text-gray-500">Adicionar corretor</p>
-                    <div className="flex gap-2">
-                      <input
-                        value={newAgentName}
-                        onChange={(e) => setNewAgentName(e.target.value)}
-                        placeholder="Nome"
-                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary"
-                      />
-                      <PhoneInput
-                        value={newAgentPhone}
-                        onChange={setNewAgentPhone}
-                        placeholder="(11) 99999-9999"
-                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary"
-                      />
-                      <button
-                        type="button"
-                        onClick={addAgent}
-                        disabled={!newAgentName.trim() || !newAgentPhone.trim()}
-                        className="px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg disabled:opacity-40 shrink-0"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    </div>
+                  {/* Add agent via team page */}
+                  <div className="bg-gray-50 rounded-xl p-4 text-center">
+                    <p className="text-xs text-gray-500 mb-2">
+                      Os corretores são sincronizados da sua equipe. Para adicionar um novo corretor, cadastre na página de equipe.
+                    </p>
+                    <Link
+                      to="/dashboard/team"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Gerenciar equipe
+                    </Link>
                   </div>
                 </div>
               </>

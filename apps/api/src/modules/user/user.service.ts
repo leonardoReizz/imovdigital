@@ -44,6 +44,17 @@ export class UserService {
       throw new BadRequestException('Já existe um membro com este e-mail');
     }
 
+    if (data.phone) {
+      const phoneNormalized = data.phone.replace(/\D/g, '');
+      const allUsers = await this.prisma.user.findMany({
+        where: { tenantId, phone: { not: null }, deletedAt: null },
+        select: { phone: true },
+      });
+      if (allUsers.some((u) => u.phone?.replace(/\D/g, '') === phoneNormalized)) {
+        throw new BadRequestException('Já existe um membro com este telefone');
+      }
+    }
+
     const passwordHash = await bcrypt.hash(data.password, 12);
 
     return this.prisma.user.create({
@@ -71,11 +82,34 @@ export class UserService {
     const user = await this.prisma.user.findFirst({ where: { id, tenantId } });
     if (!user) throw new BadRequestException('Membro não encontrado');
 
+    // Owner can only update name and phone
+    if (user.role === 'OWNER') {
+      if (data.role && data.role !== 'OWNER') {
+        throw new BadRequestException('Não é possível alterar o cargo do proprietário');
+      }
+      if (data.password) {
+        throw new BadRequestException('Altere a senha do proprietário nas configurações da conta');
+      }
+    }
+
+    if (data.phone) {
+      const phoneNormalized = data.phone.replace(/\D/g, '');
+      const allUsers = await this.prisma.user.findMany({
+        where: { tenantId, phone: { not: null }, deletedAt: null, id: { not: id } },
+        select: { phone: true },
+      });
+      if (allUsers.some((u) => u.phone?.replace(/\D/g, '') === phoneNormalized)) {
+        throw new BadRequestException('Já existe um membro com este telefone');
+      }
+    }
+
     const updateData: any = {};
     if (data.name !== undefined) updateData.name = data.name;
     if (data.phone !== undefined) updateData.phone = data.phone || null;
-    if (data.role !== undefined) updateData.role = data.role;
-    if (data.password) updateData.passwordHash = await bcrypt.hash(data.password, 12);
+    if (user.role !== 'OWNER') {
+      if (data.role !== undefined) updateData.role = data.role;
+      if (data.password) updateData.passwordHash = await bcrypt.hash(data.password, 12);
+    }
 
     return this.prisma.user.update({
       where: { id },
@@ -99,8 +133,8 @@ export class UserService {
     });
     const user = await this.prisma.user.findFirst({ where: { id, tenantId } });
     if (!user) throw new BadRequestException('Membro não encontrado');
-    if (user.role === 'OWNER' && owners <= 1) {
-      throw new BadRequestException('Não é possível remover o último proprietário');
+    if (user.role === 'OWNER') {
+      throw new BadRequestException('Não é possível remover o proprietário da organização');
     }
 
     return this.prisma.user.delete({ where: { id } });

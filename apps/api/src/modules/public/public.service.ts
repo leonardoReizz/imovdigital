@@ -206,6 +206,7 @@ export class PublicService {
     const features = (tenant.plan.features as any) || {};
     const cc = tenant.contactConfig;
 
+    console.log('[LEAD] features:', features.whatsappNotifications, 'pipeline:', cc?.leadPipelineEnabled, 'master:', cc?.leadMasterPhone, 'phones:', cc?.leadNotifyPhones?.length);
     if (features.whatsappNotifications && cc) {
       if (cc.leadPipelineEnabled) {
         // Pipeline mode: notify master + next agent in round-robin
@@ -229,8 +230,12 @@ export class PublicService {
     tenantSlug: string,
     customDomain: string | null,
   ) {
+    const normalize = (p: string) => p.replace(/\D/g, '');
     const agents: { name: string; phone: string; active: boolean; leadCount: number }[] = cc.leadPipelineAgents || [];
     const activeAgents = agents.filter((a) => a.active && a.phone);
+
+    console.log('[PIPELINE] agents:', agents.map((a) => `${a.name}(${a.active ? 'ON' : 'OFF'}:${a.leadCount})`));
+    console.log('[PIPELINE] activeAgents:', activeAgents.length, 'currentIndex:', cc.leadPipelineCurrentIndex);
 
     // Find the next agent in round-robin
     let assignedAgent: typeof agents[0] | null = null;
@@ -238,9 +243,13 @@ export class PublicService {
       const index = cc.leadPipelineCurrentIndex % activeAgents.length;
       assignedAgent = activeAgents[index];
 
-      // Update the agent's lead count and the round-robin index
+      console.log('[PIPELINE] assigned:', assignedAgent.name, assignedAgent.phone);
+
+      // Update the agent's lead count using name match (phone may differ in format)
       const updatedAgents = agents.map((a) =>
-        a.phone === assignedAgent!.phone ? { ...a, leadCount: (a.leadCount || 0) + 1 } : a
+        a.name === assignedAgent!.name && normalize(a.phone) === normalize(assignedAgent!.phone)
+          ? { ...a, leadCount: (a.leadCount || 0) + 1 }
+          : a
       );
       await this.prisma.contactConfig.update({
         where: { id: cc.id },
@@ -255,6 +264,8 @@ export class PublicService {
     const phonesToNotify: string[] = [];
     if (cc.leadMasterPhone) phonesToNotify.push(cc.leadMasterPhone);
     if (assignedAgent) phonesToNotify.push(assignedAgent.phone);
+
+    console.log('[PIPELINE] notifying:', phonesToNotify);
 
     if (phonesToNotify.length > 0) {
       await this.sendLeadNotifications(phonesToNotify, lead, tenantSlug, customDomain, assignedAgent?.name || null);

@@ -52,6 +52,7 @@ function MemberModal({
   onSaved: () => void;
 }) {
   const isEditing = Boolean(member);
+  const isOwner = member?.role === 'OWNER';
   const [name, setName] = useState(member?.name || '');
   const [email, setEmail] = useState(member?.email || '');
   const [phone, setPhone] = useState(member?.phone || '');
@@ -148,54 +149,64 @@ function MemberModal({
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-700">Cargo</label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {(['ADMIN', 'AGENT'] as const).map((r) => {
-                const cfg = ROLE_CONFIG[r];
-                return (
-                  <button
-                    key={r}
-                    type="button"
-                    onClick={() => setRole(r)}
-                    className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors ${
-                      role === r
-                        ? `${cfg.bg} ${cfg.color} border-current`
-                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
-                    }`}
-                  >
-                    <cfg.icon className="w-4 h-4" />
-                    {cfg.label}
-                  </button>
-                );
-              })}
+          {isOwner ? (
+            <div className="bg-gray-50 rounded-xl p-3">
+              <p className="text-xs text-gray-500">
+                O proprietário da organização só pode alterar nome e telefone. Para alterar senha, use as <a href="/dashboard/settings" className="text-primary hover:underline">configurações da conta</a>.
+              </p>
             </div>
-            <p className="text-xs text-gray-400 mt-1">
-              {role === 'ADMIN' ? 'Acesso total ao painel, incluindo configurações e equipe' : 'Pode gerenciar imóveis e visualizar leads'}
-            </p>
-          </div>
+          ) : (
+            <>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">Cargo</label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {(['ADMIN', 'AGENT'] as const).map((r) => {
+                    const cfg = ROLE_CONFIG[r];
+                    return (
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => setRole(r)}
+                        className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors ${
+                          role === r
+                            ? `${cfg.bg} ${cfg.color} border-current`
+                            : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                        }`}
+                      >
+                        <cfg.icon className="w-4 h-4" />
+                        {cfg.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  {role === 'ADMIN' ? 'Acesso total ao painel, incluindo configurações e equipe' : 'Pode gerenciar imóveis e visualizar leads'}
+                </p>
+              </div>
 
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-700">
-              {isEditing ? 'Nova senha (deixe em branco para manter)' : 'Senha'}
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={isEditing ? 'Manter senha atual' : 'Mínimo 6 caracteres'}
-                className="w-full px-4 py-2.5 pr-10 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">
+                  {isEditing ? 'Nova senha (deixe em branco para manter)' : 'Senha'}
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={isEditing ? 'Manter senha atual' : 'Mínimo 6 caracteres'}
+                    className="w-full px-4 py-2.5 pr-10 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-3 pt-2">
