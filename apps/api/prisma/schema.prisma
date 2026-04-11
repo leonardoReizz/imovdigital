@@ -229,7 +229,11 @@ model ContactConfig {
   youtube          String?
   linkedin         String?
   tiktok           String?
-  leadNotifyPhones String[] @default([]) // phones to receive lead notifications
+  leadNotifyPhones        String[] @default([])
+  leadPipelineEnabled     Boolean  @default(false)
+  leadMasterPhone         String?
+  leadPipelineAgents      Json?
+  leadPipelineCurrentIndex Int     @default(0)
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 

@@ -221,6 +221,28 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new UnauthorizedException('Usuário não encontrado');
 
+    // Check limit: look at best ACTIVE plan across all user's tenants
+    const currentTenants = await this.prisma.user.findMany({
+      where: { email: user.email, deletedAt: null },
+      include: { tenant: { include: { plan: true } } },
+    });
+
+    let maxFiliais = 1;
+    for (const u of currentTenants) {
+      if (u.tenant.subscriptionStatus !== 'ACTIVE') continue;
+      const features = (u.tenant.plan.features as any) || {};
+      if (features.prioritySupport) { maxFiliais = Math.max(maxFiliais, 10); }
+      if (features.whatsappNotifications) maxFiliais = Math.max(maxFiliais, 2);
+    }
+
+    if (currentTenants.length >= maxFiliais) {
+      throw new BadRequestException(
+        maxFiliais === 1
+          ? 'Seu plano permite apenas 1 imobiliária. Faça upgrade para criar filiais.'
+          : `Seu plano permite até ${maxFiliais} filiais. Faça upgrade para o plano Multiunidade.`
+      );
+    }
+
     const finalSlug = await this.generateUniqueSlug(agencyName);
 
     const trialPlan = await this.prisma.plan.findFirst({ orderBy: { monthlyPrice: 'asc' } });

@@ -380,16 +380,28 @@ export function SubscriptionPage() {
                   <Check className="w-4 h-4 text-primary shrink-0" />
                   Leads ilimitados
                 </li>
-                {plan.features?.prioritySupport && (
+                {plan.features?.whatsappNotifications && (
                   <li className="flex items-center gap-2 text-sm text-gray-700">
                     <Check className="w-4 h-4 text-primary shrink-0" />
-                    Suporte prioritário
+                    Notificação de leads via WhatsApp
                   </li>
                 )}
-                {plan.slug === 'multiunidade' && (
+                {plan.features?.prioritySupport && (
+                  <>
+                    <li className="flex items-center gap-2 text-sm text-gray-700">
+                      <Check className="w-4 h-4 text-primary shrink-0" />
+                      Até 10 filiais
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-gray-700">
+                      <Check className="w-4 h-4 text-primary shrink-0" />
+                      Suporte prioritário
+                    </li>
+                  </>
+                )}
+                {!plan.features?.prioritySupport && plan.features?.whatsappNotifications && (
                   <li className="flex items-center gap-2 text-sm text-gray-700">
                     <Check className="w-4 h-4 text-primary shrink-0" />
-                    Multi-filial
+                    Até 2 filiais
                   </li>
                 )}
               </ul>

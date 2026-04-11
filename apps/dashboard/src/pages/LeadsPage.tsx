@@ -19,9 +19,6 @@ import { api } from '../lib/api';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { UpgradeWall } from '../components/UpgradeWall';
 import { PhoneInput } from '../components/PhoneInput';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Save } from 'lucide-react';
 
 interface Lead {
@@ -410,63 +407,100 @@ function LeadDetail({ lead, onClose, onDelete }: { lead: Lead; onClose: () => vo
 
 // ─── Lead Settings (WhatsApp notifications) ─────────────────
 
-const phoneSchema = z.object({
-  phones: z.array(
-    z.object({
-      value: z.string().refine(
-        (v) => !v.trim() || v.replace(/\D/g, '').length >= 10,
-        'Número inválido',
-      ),
-    }),
-  ),
-});
-
-type PhoneForm = z.infer<typeof phoneSchema>;
+interface PipelineAgent {
+  name: string;
+  phone: string;
+  active: boolean;
+  leadCount: number;
+}
 
 function LeadsSettings({ isTrial }: { isTrial: boolean }) {
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState('');
   const [serverError, setServerError] = useState('');
   const [planFeatures, setPlanFeatures] = useState<any>({});
+
+  // Simple mode
+  const [phones, setPhones] = useState<string[]>([]);
   const [initialPhones, setInitialPhones] = useState<string[]>([]);
 
-  const form = useForm<PhoneForm>({
-    resolver: zodResolver(phoneSchema),
-    defaultValues: { phones: [] },
-  });
+  // Pipeline mode
+  const [pipelineEnabled, setPipelineEnabled] = useState(false);
+  const [masterPhone, setMasterPhone] = useState('');
+  const [agents, setAgents] = useState<PipelineAgent[]>([]);
+  const [newAgentName, setNewAgentName] = useState('');
+  const [newAgentPhone, setNewAgentPhone] = useState('');
 
-  const { fields, append, remove } = useFieldArray({ control: form.control, name: 'phones' });
+  // Initial state for dirty check
+  const [initialState, setInitialState] = useState('');
 
   useEffect(() => {
     Promise.all([
       api.get('/contact'),
       api.get('/subscription'),
     ]).then(([contactRes, subRes]) => {
-      const saved: string[] = contactRes.data?.leadNotifyPhones || [];
-      setInitialPhones(saved);
-      form.reset({ phones: saved.map((v) => ({ value: v })) });
+      const d = contactRes.data || {};
+      setPhones(d.leadNotifyPhones || []);
+      setInitialPhones(d.leadNotifyPhones || []);
+      setPipelineEnabled(d.leadPipelineEnabled || false);
+      setMasterPhone(d.leadMasterPhone || '');
+      setAgents(d.leadPipelineAgents || []);
       setPlanFeatures(subRes.data?.currentPlan?.features || {});
+      setInitialState(JSON.stringify({
+        phones: d.leadNotifyPhones || [],
+        pipelineEnabled: d.leadPipelineEnabled || false,
+        masterPhone: d.leadMasterPhone || '',
+        agents: d.leadPipelineAgents || [],
+      }));
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   const hasFeature = !!planFeatures.whatsappNotifications && !isTrial;
   const maxPhones = planFeatures.prioritySupport ? 5 : 2;
 
-  // Check if form is dirty by comparing current values to initial
-  const currentPhones = form.watch('phones').map((p) => p.value).filter((v) => v.trim());
-  const isDirty = JSON.stringify(currentPhones) !== JSON.stringify(initialPhones);
+  const currentState = JSON.stringify({
+    phones: phones.filter((p) => p.trim()),
+    pipelineEnabled,
+    masterPhone,
+    agents,
+  });
+  const isDirty = currentState !== initialState;
 
-  const onSubmit = async (data: PhoneForm) => {
+  const addAgent = () => {
+    if (!newAgentName.trim() || !newAgentPhone.trim()) return;
+    setAgents([...agents, { name: newAgentName.trim(), phone: newAgentPhone, active: true, leadCount: 0 }]);
+    setNewAgentName('');
+    setNewAgentPhone('');
+  };
+
+  const removeAgent = (index: number) => {
+    setAgents(agents.filter((_, i) => i !== index));
+  };
+
+  const toggleAgent = (index: number) => {
+    setAgents(agents.map((a, i) => i === index ? { ...a, active: !a.active } : a));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
     setServerError('');
     setSuccess('');
-    const cleaned = data.phones.map((p) => p.value).filter((v) => v.trim());
     try {
-      await api.patch('/contact', { leadNotifyPhones: cleaned });
-      setInitialPhones(cleaned);
+      await api.patch('/contact', {
+        leadNotifyPhones: phones.filter((p) => p.trim()),
+        leadPipelineEnabled: pipelineEnabled,
+        leadMasterPhone: masterPhone.trim() || null,
+        leadPipelineAgents: agents,
+      });
+      setInitialPhones(phones.filter((p) => p.trim()));
+      setInitialState(currentState);
       setSuccess('Configurações salvas!');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err: any) {
       setServerError(err?.response?.data?.message || 'Erro ao salvar');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -485,10 +519,11 @@ function LeadsSettings({ isTrial }: { isTrial: boolean }) {
         <p className="text-sm text-gray-500 mt-1">Configure como você recebe notificações de novos leads</p>
       </div>
 
+      {/* WhatsApp Notifications */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl border border-gray-200 p-6"
+        className="bg-white rounded-xl border border-gray-200 p-6 mb-6"
       >
         <div className="flex items-center gap-2 mb-1">
           <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
@@ -510,51 +545,148 @@ function LeadsSettings({ isTrial }: { isTrial: boolean }) {
             <p className="text-xs text-gray-400">Faça upgrade para receber notificações em tempo real</p>
           </div>
         ) : (
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <p className="text-xs text-gray-400">
-              Adicione até <strong>{maxPhones}</strong> números para receber notificações quando um lead preencher o formulário.
-            </p>
-
-            {fields.map((field, i) => (
-              <div key={field.id}>
-                <div className="flex items-center gap-2">
-                  <PhoneInput
-                    value={form.watch(`phones.${i}.value`)}
-                    onChange={(v) => form.setValue(`phones.${i}.value`, v, { shouldDirty: true })}
-                    placeholder="(11) 99999-9999"
-                    className={`flex-1 px-4 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary ${
-                      form.formState.errors.phones?.[i]?.value ? 'border-red-300' : 'border-gray-200'
-                    }`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => remove(i)}
-                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-                {form.formState.errors.phones?.[i]?.value && (
-                  <p className="text-xs text-red-500 mt-1">{form.formState.errors.phones[i].value.message}</p>
-                )}
+          <div className="space-y-5">
+            {/* Pipeline toggle */}
+            <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4">
+              <div>
+                <p className="text-sm font-medium text-gray-900">Esteira de leads</p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Distribui leads automaticamente entre corretores em rodízio
+                </p>
               </div>
-            ))}
-
-            {fields.length < maxPhones && (
               <button
                 type="button"
-                onClick={() => append({ value: '' })}
-                className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+                onClick={() => setPipelineEnabled(!pipelineEnabled)}
+                className={`relative w-11 h-6 rounded-full transition-colors ${pipelineEnabled ? 'bg-green-500' : 'bg-gray-300'}`}
               >
-                <Plus className="w-4 h-4" />
-                Adicionar número
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${pipelineEnabled ? 'translate-x-5' : ''}`} />
               </button>
+            </div>
+
+            {pipelineEnabled ? (
+              <>
+                {/* Master phone */}
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-gray-700">Número master (recebe todos os leads)</label>
+                  <PhoneInput
+                    value={masterPhone}
+                    onChange={setMasterPhone}
+                    placeholder="(11) 99999-9999"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  />
+                  <p className="text-[11px] text-gray-400">Este número recebe todos os leads + informação de qual corretor foi designado</p>
+                </div>
+
+                {/* Agents list */}
+                <div className="space-y-3">
+                  <p className="text-sm font-medium text-gray-700">Corretores na esteira</p>
+
+                  {agents.length === 0 && (
+                    <p className="text-xs text-gray-400 bg-gray-50 rounded-lg p-3 text-center">Nenhum corretor adicionado</p>
+                  )}
+
+                  {agents.map((agent, i) => (
+                    <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${agent.active ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100 opacity-60'}`}>
+                      <button
+                        type="button"
+                        onClick={() => toggleAgent(i)}
+                        className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${agent.active ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}
+                      >
+                        {agent.active && <Check className="w-3 h-3 text-white" />}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{agent.name}</p>
+                        <p className="text-xs text-gray-500">{agent.phone}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-xs font-semibold text-gray-900">{agent.leadCount}</p>
+                        <p className="text-[10px] text-gray-400">leads</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeAgent(i)}
+                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Add agent form */}
+                  <div className="bg-gray-50 rounded-xl p-3 space-y-2">
+                    <p className="text-xs font-medium text-gray-500">Adicionar corretor</p>
+                    <div className="flex gap-2">
+                      <input
+                        value={newAgentName}
+                        onChange={(e) => setNewAgentName(e.target.value)}
+                        placeholder="Nome"
+                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary"
+                      />
+                      <PhoneInput
+                        value={newAgentPhone}
+                        onChange={setNewAgentPhone}
+                        placeholder="(11) 99999-9999"
+                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary"
+                      />
+                      <button
+                        type="button"
+                        onClick={addAgent}
+                        disabled={!newAgentName.trim() || !newAgentPhone.trim()}
+                        className="px-3 py-2 bg-primary text-white text-sm font-medium rounded-lg disabled:opacity-40 shrink-0"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Simple mode — phone list */}
+                <p className="text-xs text-gray-400">
+                  Adicione até <strong>{maxPhones}</strong> números para receber notificações quando um lead preencher o formulário.
+                </p>
+
+                {phones.map((phone, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <PhoneInput
+                      value={phone}
+                      onChange={(v) => {
+                        const updated = [...phones];
+                        updated[i] = v;
+                        setPhones(updated);
+                      }}
+                      placeholder="(11) 99999-9999"
+                      className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setPhones(phones.filter((_, j) => j !== i))}
+                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+
+                {phones.length < maxPhones && (
+                  <button
+                    type="button"
+                    onClick={() => setPhones([...phones, ''])}
+                    className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Adicionar número
+                  </button>
+                )}
+
+                {phones.length >= maxPhones && (
+                  <p className="text-xs text-gray-400">Limite de {maxPhones} números atingido para o seu plano.</p>
+                )}
+              </>
             )}
 
-            {fields.length >= maxPhones && (
-              <p className="text-xs text-gray-400">Limite de {maxPhones} números atingido para o seu plano.</p>
-            )}
-
+            {/* Feedback */}
             {success && (
               <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm px-3 py-2 rounded-lg">
                 <Check className="w-4 h-4" />{success}
@@ -567,14 +699,15 @@ function LeadsSettings({ isTrial }: { isTrial: boolean }) {
             )}
 
             <button
-              type="submit"
-              disabled={form.formState.isSubmitting || !isDirty}
+              type="button"
+              onClick={handleSave}
+              disabled={saving || !isDirty}
               className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {form.formState.isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               Salvar
             </button>
-          </form>
+          </div>
         )}
       </motion.div>
     </div>

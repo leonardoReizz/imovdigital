@@ -204,17 +204,61 @@ export class PublicService {
 
     // Send WhatsApp notification via Z-API (only for plans with whatsappNotifications)
     const features = (tenant.plan.features as any) || {};
-    const phones = tenant.contactConfig?.leadNotifyPhones || [];
-    console.log('[LEAD] features:', features, 'phones:', phones);
-    if (features.whatsappNotifications && phones.length > 0) {
-      this.sendLeadNotifications(phones, lead, slug, tenant.customDomain).catch((err) => {
-        console.error('Z-API notification failed:', err.message);
-      });
-    } else {
-      console.log('[LEAD] Skipping notification:', { whatsappNotifications: features.whatsappNotifications, phonesCount: phones.length });
+    const cc = tenant.contactConfig;
+
+    if (features.whatsappNotifications && cc) {
+      if (cc.leadPipelineEnabled) {
+        // Pipeline mode: notify master + next agent in round-robin
+        this.handlePipelineLead(cc, lead, slug, tenant.customDomain).catch((err) => {
+          console.error('Pipeline notification failed:', err.message);
+        });
+      } else if (cc.leadNotifyPhones.length > 0) {
+        // Simple mode: notify all configured phones
+        this.sendLeadNotifications(cc.leadNotifyPhones, lead, slug, tenant.customDomain, null).catch((err) => {
+          console.error('Z-API notification failed:', err.message);
+        });
+      }
     }
 
     return lead;
+  }
+
+  private async handlePipelineLead(
+    cc: { id: string; leadMasterPhone: string | null; leadPipelineAgents: any; leadPipelineCurrentIndex: number },
+    lead: any,
+    tenantSlug: string,
+    customDomain: string | null,
+  ) {
+    const agents: { name: string; phone: string; active: boolean; leadCount: number }[] = cc.leadPipelineAgents || [];
+    const activeAgents = agents.filter((a) => a.active && a.phone);
+
+    // Find the next agent in round-robin
+    let assignedAgent: typeof agents[0] | null = null;
+    if (activeAgents.length > 0) {
+      const index = cc.leadPipelineCurrentIndex % activeAgents.length;
+      assignedAgent = activeAgents[index];
+
+      // Update the agent's lead count and the round-robin index
+      const updatedAgents = agents.map((a) =>
+        a.phone === assignedAgent!.phone ? { ...a, leadCount: (a.leadCount || 0) + 1 } : a
+      );
+      await this.prisma.contactConfig.update({
+        where: { id: cc.id },
+        data: {
+          leadPipelineAgents: updatedAgents,
+          leadPipelineCurrentIndex: index + 1,
+        },
+      });
+    }
+
+    // Build phones to notify
+    const phonesToNotify: string[] = [];
+    if (cc.leadMasterPhone) phonesToNotify.push(cc.leadMasterPhone);
+    if (assignedAgent) phonesToNotify.push(assignedAgent.phone);
+
+    if (phonesToNotify.length > 0) {
+      await this.sendLeadNotifications(phonesToNotify, lead, tenantSlug, customDomain, assignedAgent?.name || null);
+    }
   }
 
   private async sendLeadNotifications(
@@ -222,10 +266,10 @@ export class PublicService {
     lead: any,
     tenantSlug: string,
     customDomain: string | null,
+    assignedAgentName: string | null,
   ) {
     const instanceId = this.config.get('ZAPI_INSTANCE_ID');
     const token = this.config.get('ZAPI_TOKEN');
-    console.log('[ZAPI] instanceId:', instanceId ? 'set' : 'MISSING', 'token:', token ? 'set' : 'MISSING');
     if (!instanceId || !token) return;
 
     const baseUrl = customDomain
@@ -247,6 +291,7 @@ export class PublicService {
       lead.phone ? `*Telefone:* ${lead.phone}` : null,
       lead.email ? `*E-mail:* ${lead.email}` : null,
       lead.message ? `*Mensagem:* ${lead.message}` : null,
+      assignedAgentName ? `\n📋 *Designado para:* ${assignedAgentName}` : null,
       '',
       propertyLine,
       replyLink ? `\n👉 Responder: ${replyLink}` : null,
