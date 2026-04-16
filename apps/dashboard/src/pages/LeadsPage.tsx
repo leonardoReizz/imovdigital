@@ -431,13 +431,13 @@ function LeadsSettings({ isTrial }: { isTrial: boolean }) {
 
   // Simple mode
   const [phones, setPhones] = useState<string[]>([]);
-  const [initialPhones, setInitialPhones] = useState<string[]>([]);
+  const [_initialPhones, setInitialPhones] = useState<string[]>([]);
 
   // Pipeline mode
   const [pipelineEnabled, setPipelineEnabled] = useState(false);
   const [masterPhone, setMasterPhone] = useState('');
   const [agents, setAgents] = useState<PipelineAgent[]>([]);
-  const [teamMembers, setTeamMembers] = useState<{ id: string; name: string; phone: string; role: string }[]>([]);
+  const [_teamMembers, setTeamMembers] = useState<{ id: string; name: string; phone: string; role: string }[]>([]);
 
   // Initial state for dirty check
   const [initialState, setInitialState] = useState('');
