@@ -1,0 +1,805 @@
+{
+  "totalFiles": 160,
+  "files": [
+    {
+      "path": "apps/dashboard/vite.config.ts",
+      "name": "vite.config.ts",
+      "module": "apps/dashboard"
+    },
+    {
+      "path": "apps/web/next.config.ts",
+      "name": "next.config.ts",
+      "module": "apps/web"
+    },
+    {
+      "path": "apps/api/prisma/seed.ts",
+      "name": "seed.ts",
+      "module": "apps/api/prisma"
+    },
+    {
+      "path": "apps/api/prisma/setup-stripe.ts",
+      "name": "setup-stripe.ts",
+      "module": "apps/api/prisma"
+    },
+    {
+      "path": "apps/api/src/app.module.ts",
+      "name": "app.module.ts",
+      "module": "apps/api"
+    },
+    {
+      "path": "apps/api/src/main.ts",
+      "name": "main.ts",
+      "module": "apps/api"
+    },
+    {
+      "path": "apps/dashboard/src/App.tsx",
+      "name": "App.tsx",
+      "module": "apps/dashboard"
+    },
+    {
+      "path": "apps/dashboard/src/main.tsx",
+      "name": "main.tsx",
+      "module": "apps/dashboard"
+    },
+    {
+      "path": "packages/types/src/auth.ts",
+      "name": "auth.ts",
+      "module": "packages/types"
+    },
+    {
+      "path": "packages/types/src/contact.ts",
+      "name": "contact.ts",
+      "module": "packages/types"
+    },
+    {
+      "path": "packages/types/src/enums.ts",
+      "name": "enums.ts",
+      "module": "packages/types"
+    },
+    {
+      "path": "packages/types/src/index.ts",
+      "name": "index.ts",
+      "module": "packages/types"
+    },
+    {
+      "path": "packages/types/src/lead.ts",
+      "name": "lead.ts",
+      "module": "packages/types"
+    },
+    {
+      "path": "packages/types/src/plan.ts",
+      "name": "plan.ts",
+      "module": "packages/types"
+    },
+    {
+      "path": "packages/types/src/property.ts",
+      "name": "property.ts",
+      "module": "packages/types"
+    },
+    {
+      "path": "packages/types/src/site-config.ts",
+      "name": "site-config.ts",
+      "module": "packages/types"
+    },
+    {
+      "path": "packages/types/src/tenant.ts",
+      "name": "tenant.ts",
+      "module": "packages/types"
+    },
+    {
+      "path": "packages/types/src/theme-presets.ts",
+      "name": "theme-presets.ts",
+      "module": "packages/types"
+    },
+    {
+      "path": "packages/types/src/theme.ts",
+      "name": "theme.ts",
+      "module": "packages/types"
+    },
+    {
+      "path": "packages/types/src/user.ts",
+      "name": "user.ts",
+      "module": "packages/types"
+    },
+    {
+      "path": "packages/utils/src/index.ts",
+      "name": "index.ts",
+      "module": "packages/utils"
+    },
+    {
+      "path": "apps/api/src/prisma/prisma.module.ts",
+      "name": "prisma.module.ts",
+      "module": "apps/api/prisma"
+    },
+    {
+      "path": "apps/api/src/prisma/prisma.service.ts",
+      "name": "prisma.service.ts",
+      "module": "apps/api/prisma"
+    },
+    {
+      "path": "apps/dashboard/src/components/CancellationModal.tsx",
+      "name": "CancellationModal.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/GoogleAddressInput.tsx",
+      "name": "GoogleAddressInput.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/ImageUploader.tsx",
+      "name": "ImageUploader.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/Img.tsx",
+      "name": "Img.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/PhoneInput.tsx",
+      "name": "PhoneInput.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/SupportWidget.tsx",
+      "name": "SupportWidget.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/UpgradeWall.tsx",
+      "name": "UpgradeWall.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/contexts/SubscriptionContext.tsx",
+      "name": "SubscriptionContext.tsx",
+      "module": "apps/dashboard/contexts"
+    },
+    {
+      "path": "apps/dashboard/src/hooks/useAutoSave.ts",
+      "name": "useAutoSave.ts",
+      "module": "apps/dashboard/hooks"
+    },
+    {
+      "path": "apps/dashboard/src/hooks/useR2Upload.ts",
+      "name": "useR2Upload.ts",
+      "module": "apps/dashboard/hooks"
+    },
+    {
+      "path": "apps/dashboard/src/layouts/DashboardLayout.tsx",
+      "name": "DashboardLayout.tsx",
+      "module": "apps/dashboard/layouts"
+    },
+    {
+      "path": "apps/dashboard/src/lib/api.ts",
+      "name": "api.ts",
+      "module": "apps/dashboard"
+    },
+    {
+      "path": "apps/dashboard/src/pages/BrandingPage.tsx",
+      "name": "BrandingPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/ContactPage.tsx",
+      "name": "ContactPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/DomainPage.tsx",
+      "name": "DomainPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/ForgotPasswordPage.tsx",
+      "name": "ForgotPasswordPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/LeadsPage.tsx",
+      "name": "LeadsPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/LoginPage.tsx",
+      "name": "LoginPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/NoOrganizationPage.tsx",
+      "name": "NoOrganizationPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/OrganizationPage.tsx",
+      "name": "OrganizationPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/OverviewPage.tsx",
+      "name": "OverviewPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/PropertiesPage.tsx",
+      "name": "PropertiesPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/PropertyFormPage.tsx",
+      "name": "PropertyFormPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/RegisterPage.tsx",
+      "name": "RegisterPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/SettingsPage.tsx",
+      "name": "SettingsPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/SubscriptionPage.tsx",
+      "name": "SubscriptionPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/TeamPage.tsx",
+      "name": "TeamPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/TermsPage.tsx",
+      "name": "TermsPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/pages/TwoFactorPage.tsx",
+      "name": "TwoFactorPage.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/dashboard/src/store/editorStore.ts",
+      "name": "editorStore.ts",
+      "module": "apps/dashboard/store"
+    },
+    {
+      "path": "apps/web/src/app/layout.tsx",
+      "name": "layout.tsx",
+      "module": "apps/web/app"
+    },
+    {
+      "path": "apps/web/src/app/page.tsx",
+      "name": "page.tsx",
+      "module": "apps/web/app"
+    },
+    {
+      "path": "apps/web/src/app/robots.ts",
+      "name": "robots.ts",
+      "module": "apps/web/app"
+    },
+    {
+      "path": "apps/web/src/app/sitemap.ts",
+      "name": "sitemap.ts",
+      "module": "apps/web/app"
+    },
+    {
+      "path": "apps/web/src/components/CustomSelect.tsx",
+      "name": "CustomSelect.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/FloatingContactButton.tsx",
+      "name": "FloatingContactButton.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/ImageGallery.tsx",
+      "name": "ImageGallery.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/LeadForm.tsx",
+      "name": "LeadForm.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/MobileFilterDrawer.tsx",
+      "name": "MobileFilterDrawer.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/PhoneInput.tsx",
+      "name": "PhoneInput.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/PropertyCard.tsx",
+      "name": "PropertyCard.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/PropertyFilters.tsx",
+      "name": "PropertyFilters.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/PropertyImageCarousel.tsx",
+      "name": "PropertyImageCarousel.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/SectionRenderer.tsx",
+      "name": "SectionRenderer.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/ShareButton.tsx",
+      "name": "ShareButton.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/SidebarFilters.tsx",
+      "name": "SidebarFilters.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/SiteHeader.tsx",
+      "name": "SiteHeader.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/SortSelect.tsx",
+      "name": "SortSelect.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/lib/api.ts",
+      "name": "api.ts",
+      "module": "apps/web"
+    },
+    {
+      "path": "apps/web/src/lib/client-api.ts",
+      "name": "client-api.ts",
+      "module": "apps/web"
+    },
+    {
+      "path": "apps/web/src/lib/dates.ts",
+      "name": "dates.ts",
+      "module": "apps/web"
+    },
+    {
+      "path": "apps/web/src/lib/tenant.ts",
+      "name": "tenant.ts",
+      "module": "apps/web"
+    },
+    {
+      "path": "apps/api/src/common/decorators/current-user.decorator.ts",
+      "name": "current-user.decorator.ts",
+      "module": "apps/api/common"
+    },
+    {
+      "path": "apps/api/src/common/filters/http-exception.filter.ts",
+      "name": "http-exception.filter.ts",
+      "module": "apps/api/common"
+    },
+    {
+      "path": "apps/api/src/common/guards/jwt-auth.guard.ts",
+      "name": "jwt-auth.guard.ts",
+      "module": "apps/api/common"
+    },
+    {
+      "path": "apps/api/src/common/middleware/tenant-context.middleware.ts",
+      "name": "tenant-context.middleware.ts",
+      "module": "apps/api/common"
+    },
+    {
+      "path": "apps/api/src/modules/admin/admin.controller.ts",
+      "name": "admin.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/admin/admin.module.ts",
+      "name": "admin.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/admin/admin.service.ts",
+      "name": "admin.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/auth/auth.controller.ts",
+      "name": "auth.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/auth/auth.module.ts",
+      "name": "auth.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/auth/auth.service.ts",
+      "name": "auth.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/auth/jwt.strategy.ts",
+      "name": "jwt.strategy.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/contact/contact.controller.ts",
+      "name": "contact.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/contact/contact.module.ts",
+      "name": "contact.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/contact/contact.service.ts",
+      "name": "contact.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/lead/lead.controller.ts",
+      "name": "lead.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/lead/lead.module.ts",
+      "name": "lead.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/lead/lead.service.ts",
+      "name": "lead.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/plan/plan.controller.ts",
+      "name": "plan.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/plan/plan.module.ts",
+      "name": "plan.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/plan/plan.service.ts",
+      "name": "plan.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/property/property.controller.ts",
+      "name": "property.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/property/property.module.ts",
+      "name": "property.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/property/property.service.ts",
+      "name": "property.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/public/public.controller.ts",
+      "name": "public.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/public/public.module.ts",
+      "name": "public.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/public/public.service.ts",
+      "name": "public.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/site-config/site-config.controller.ts",
+      "name": "site-config.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/site-config/site-config.dto.ts",
+      "name": "site-config.dto.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/site-config/site-config.module.ts",
+      "name": "site-config.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/site-config/site-config.service.ts",
+      "name": "site-config.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/subscription/subscription.controller.ts",
+      "name": "subscription.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/subscription/subscription.module.ts",
+      "name": "subscription.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/subscription/subscription.service.ts",
+      "name": "subscription.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/tenant/tenant.controller.ts",
+      "name": "tenant.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/tenant/tenant.module.ts",
+      "name": "tenant.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/tenant/tenant.service.ts",
+      "name": "tenant.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/upload/upload.controller.ts",
+      "name": "upload.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/upload/upload.module.ts",
+      "name": "upload.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/upload/upload.service.ts",
+      "name": "upload.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/user/user.controller.ts",
+      "name": "user.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/user/user.module.ts",
+      "name": "user.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/user/user.service.ts",
+      "name": "user.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/GlobalSettings.tsx",
+      "name": "GlobalSettings.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/PropertyDetailSettings.tsx",
+      "name": "PropertyDetailSettings.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/SearchPageSettings.tsx",
+      "name": "SearchPageSettings.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/SectionSettings.tsx",
+      "name": "SectionSettings.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/SectionsList.tsx",
+      "name": "SectionsList.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/SitePreview.tsx",
+      "name": "SitePreview.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/pages/editor/SiteEditor.tsx",
+      "name": "SiteEditor.tsx",
+      "module": "apps/dashboard/pages"
+    },
+    {
+      "path": "apps/web/src/app/imoveis/page.tsx",
+      "name": "page.tsx",
+      "module": "apps/web/app"
+    },
+    {
+      "path": "apps/web/src/components/sections/About.tsx",
+      "name": "About.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/sections/Agents.tsx",
+      "name": "Agents.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/sections/CTABanner.tsx",
+      "name": "CTABanner.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/sections/Contact.tsx",
+      "name": "Contact.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/sections/FeaturedListings.tsx",
+      "name": "FeaturedListings.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/sections/Footer.tsx",
+      "name": "Footer.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/sections/Hero.tsx",
+      "name": "Hero.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/sections/SearchBar.tsx",
+      "name": "SearchBar.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/web/src/components/sections/Testimonials.tsx",
+      "name": "Testimonials.tsx",
+      "module": "apps/web/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/controls/BadgeToggle.tsx",
+      "name": "BadgeToggle.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/controls/ColorPicker.tsx",
+      "name": "ColorPicker.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/controls/EditorImageUploader.tsx",
+      "name": "EditorImageUploader.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/controls/FontSelector.tsx",
+      "name": "FontSelector.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/controls/RangeSlider.tsx",
+      "name": "RangeSlider.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/controls/SelectField.tsx",
+      "name": "SelectField.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/controls/TextInput.tsx",
+      "name": "TextInput.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/controls/TextareaField.tsx",
+      "name": "TextareaField.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/controls/ToggleGroup.tsx",
+      "name": "ToggleGroup.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/controls/index.ts",
+      "name": "index.ts",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/AboutPreview.tsx",
+      "name": "AboutPreview.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/AgentsPreview.tsx",
+      "name": "AgentsPreview.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/CTABannerPreview.tsx",
+      "name": "CTABannerPreview.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/ContactPreview.tsx",
+      "name": "ContactPreview.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/FeaturedListingsPreview.tsx",
+      "name": "FeaturedListingsPreview.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/FooterPreview.tsx",
+      "name": "FooterPreview.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/HeroPreview.tsx",
+      "name": "HeroPreview.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/ImageLightbox.tsx",
+      "name": "ImageLightbox.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/MapCircle.tsx",
+      "name": "MapCircle.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/PreviewHeader.tsx",
+      "name": "PreviewHeader.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/PropertyDetailPreview.tsx",
+      "name": "PropertyDetailPreview.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/PropertyPrice.tsx",
+      "name": "PropertyPrice.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/SearchBarPreview.tsx",
+      "name": "SearchBarPreview.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/SearchResultsPreview.tsx",
+      "name": "SearchResultsPreview.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/dashboard/src/components/editor/preview/TestimonialsPreview.tsx",
+      "name": "TestimonialsPreview.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
+      "path": "apps/web/src/app/imoveis/[slug]/page.tsx",
+      "name": "page.tsx",
+      "module": "apps/web/app"
+    }
+  ]
+}

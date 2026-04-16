@@ -1,9 +1,10 @@
 import { Controller, Get, Patch, Delete, Param, Query, UseGuards } from '@nestjs/common';
 import { LeadService } from './lead.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { SubscriptionGuard } from '../../common/guards/subscription.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, SubscriptionGuard)
 @Controller('leads')
 export class LeadController {
   constructor(private readonly leadService: LeadService) {}

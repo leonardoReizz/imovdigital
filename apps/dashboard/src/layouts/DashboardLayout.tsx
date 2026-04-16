@@ -67,7 +67,14 @@ function parseJwt(token: string) {
 export function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { limits, isTrial, trialDaysLeft, trialExpired } = useSubscription();
+  const { limits, isTrial, trialDaysLeft, trialExpired, isBlocked } = useSubscription();
+
+  // Block: redirect to subscription page if trial expired or canceled
+  useEffect(() => {
+    if (isBlocked && location.pathname !== '/dashboard/subscription') {
+      navigate('/dashboard/subscription', { replace: true });
+    }
+  }, [isBlocked, location.pathname, navigate]);
 
   // Check 2FA: if token has tfv=false, verify with API if 2FA is still required
   useEffect(() => {

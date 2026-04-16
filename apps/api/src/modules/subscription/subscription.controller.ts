@@ -12,7 +12,9 @@ import { Request } from 'express';
 import { SubscriptionService } from './subscription.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { SkipSubscriptionCheck } from '../../common/decorators/skip-subscription-check.decorator';
 
+@SkipSubscriptionCheck()
 @Controller('subscription')
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}

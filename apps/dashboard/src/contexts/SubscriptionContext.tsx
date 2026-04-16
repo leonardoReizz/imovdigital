@@ -78,7 +78,8 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
 
   const isTrial = state.status === 'TRIAL';
   const isActive = state.status === 'ACTIVE';
-  const isBlocked = isTrial && state.trialExpired;
+  const isCanceled = state.status === 'CANCELED';
+  const isBlocked = (isTrial && state.trialExpired) || isCanceled;
 
   const value: SubscriptionContextValue = {
     ...state,

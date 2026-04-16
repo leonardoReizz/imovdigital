@@ -12,12 +12,13 @@ import type { Response } from 'express';
 import { SkipThrottle } from '@nestjs/throttler';
 import { UploadService } from './upload.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { SubscriptionGuard } from '../../common/guards/subscription.guard';
 
 @Controller()
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, SubscriptionGuard)
   @Post('upload/presigned')
   async getPresignedUrl(
     @Body() body: { filename: string; contentType: string; folder?: string },
@@ -29,7 +30,7 @@ export class UploadController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, SubscriptionGuard)
   @Delete('upload/file')
   async deleteFile(@Body() body: { url: string }) {
     await this.uploadService.deleteFile(body.url);

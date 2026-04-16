@@ -12,9 +12,10 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { PropertyService } from './property.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { SubscriptionGuard } from '../../common/guards/subscription.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, SubscriptionGuard)
 @Controller('properties')
 export class PropertyController {
   constructor(

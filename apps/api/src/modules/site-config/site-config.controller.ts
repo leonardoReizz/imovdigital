@@ -8,10 +8,11 @@ import {
 } from '@nestjs/common';
 import { SiteConfigService } from './site-config.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { SubscriptionGuard } from '../../common/guards/subscription.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UpdateSiteConfigDto } from './site-config.dto';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, SubscriptionGuard)
 @Controller('site-config')
 export class SiteConfigController {
   constructor(private readonly siteConfigService: SiteConfigService) {}
