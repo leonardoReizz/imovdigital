@@ -235,7 +235,7 @@ export class SubscriptionService {
           const value = priceCents ? priceCents / 100 : undefined;
 
           await this.tiktok.sendEvent(
-            'Subscribe',
+            'ApplicationApproval',
             {
               email: owner?.email,
               phone: owner?.phone,

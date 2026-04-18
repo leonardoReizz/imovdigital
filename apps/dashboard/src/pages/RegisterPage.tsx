@@ -8,7 +8,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { api } from '../lib/api';
-import { tiktokTrack } from '../lib/tiktok';
 import { formatPhone } from '../components/PhoneInput';
 import logoImg from '../assets/logo.png';
 
@@ -66,7 +65,6 @@ export function RegisterPage() {
       });
       localStorage.setItem('accessToken', res.accessToken);
       localStorage.setItem('refreshToken', res.refreshToken);
-      tiktokTrack('CompleteRegistration');
       navigate('/dashboard');
     } catch (err: any) {
       const messages: string[] = err?.response?.data?.message;
