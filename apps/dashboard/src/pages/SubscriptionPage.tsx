@@ -17,6 +17,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { api } from '../lib/api';
+import { tiktokTrack } from '../lib/tiktok';
 import { formatPrice } from '@imovdigital/utils';
 import { CancellationModal } from '../components/CancellationModal';
 
@@ -99,6 +100,15 @@ export function SubscriptionPage() {
   const handleCheckout = async (planId: string) => {
     setCheckingOut(planId);
     try {
+      const plan = info?.plans.find((p) => p.id === planId);
+      const priceCents = billing === 'yearly' ? plan?.yearlyPrice : plan?.monthlyPrice;
+      tiktokTrack('AddPaymentInfo', {
+        value: priceCents ? priceCents / 100 : undefined,
+        currency: 'BRL',
+        contents: plan
+          ? [{ content_id: plan.id, content_type: 'product', content_name: plan.name }]
+          : undefined,
+      });
       const { data } = await api.post('/subscription/checkout', { planId, billing });
       if (data.url) window.location.href = data.url;
     } catch {

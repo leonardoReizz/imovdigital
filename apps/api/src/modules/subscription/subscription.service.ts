@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma/prisma.service';
+import { TikTokEventsService } from './tiktok-events.service';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class SubscriptionService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
+    private readonly tiktok: TikTokEventsService,
   ) {}
 
   private getStripe() {
@@ -223,6 +225,31 @@ export class SubscriptionService {
               billingInterval: billing,
             },
           });
+
+          const plan = await this.prisma.plan.findUnique({ where: { id: planId } });
+          const owner = await this.prisma.user.findFirst({
+            where: { tenantId, role: { in: ['OWNER', 'ADMIN'] } },
+            orderBy: { createdAt: 'asc' },
+          });
+          const priceCents = billing === 'yearly' ? plan?.yearlyPrice : plan?.monthlyPrice;
+          const value = priceCents ? priceCents / 100 : undefined;
+
+          await this.tiktok.sendEvent(
+            'Subscribe',
+            {
+              email: owner?.email,
+              phone: owner?.phone,
+              externalId: tenantId,
+            },
+            {
+              value,
+              currency: 'BRL',
+              contents: plan
+                ? [{ content_id: plan.id, content_type: 'product', content_name: plan.name }]
+                : undefined,
+            },
+            session.id,
+          );
         }
         break;
       }
