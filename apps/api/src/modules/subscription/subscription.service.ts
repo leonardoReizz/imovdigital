@@ -38,6 +38,12 @@ export class SubscriptionService {
       : 0;
     const trialExpired = tenant.subscriptionStatus === 'TRIAL' && trialEndsAt && trialEndsAt < now;
 
+    const changeStatus = await this.getPlanChangeStatus({
+      stripeSubscriptionId: tenant.stripeSubscriptionId,
+      subscriptionStatus: tenant.subscriptionStatus,
+      planChangedAt: (tenant as unknown as { planChangedAt: Date | null }).planChangedAt ?? null,
+    });
+
     return {
       tenant: {
         id: tenant.id,
@@ -48,6 +54,8 @@ export class SubscriptionService {
         trialExpired,
         hasPaymentMethod: !!tenant.stripeCustomerId,
         hasSubscription: !!tenant.stripeSubscriptionId,
+        canChangePlan: changeStatus.canChange,
+        nextChangeAvailableAt: changeStatus.nextAvailableAt,
       },
       currentPlan: tenant.plan,
       currentBilling: tenant.billingInterval as 'monthly' | 'yearly',
@@ -66,6 +74,28 @@ export class SubscriptionService {
     };
   }
 
+  private async getPlanChangeStatus(tenant: { stripeSubscriptionId: string | null; subscriptionStatus: string; planChangedAt: Date | null }) {
+    if (tenant.subscriptionStatus !== 'ACTIVE' || !tenant.stripeSubscriptionId) {
+      return { canChange: true, nextAvailableAt: null as Date | null };
+    }
+    if (!tenant.planChangedAt) {
+      return { canChange: true, nextAvailableAt: null };
+    }
+    const stripe = this.getStripe();
+    if (!stripe) return { canChange: true, nextAvailableAt: null };
+    try {
+      const sub = await stripe.subscriptions.retrieve(tenant.stripeSubscriptionId);
+      const periodEndUnix = sub.items.data[0]?.current_period_end;
+      if (!periodEndUnix) return { canChange: true, nextAvailableAt: null };
+      const periodEnd = new Date(periodEndUnix * 1000);
+      const cutoff = new Date(periodEnd.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const canChange = Date.now() >= cutoff.getTime();
+      return { canChange, nextAvailableAt: canChange ? null : cutoff };
+    } catch {
+      return { canChange: true, nextAvailableAt: null };
+    }
+  }
+
   async createCheckoutSession(tenantId: string, planId: string, billing: 'monthly' | 'yearly' = 'monthly') {
     const stripe = this.getStripe();
     if (!stripe) throw new BadRequestException('Stripe não configurado');
@@ -79,6 +109,46 @@ export class SubscriptionService {
     const priceId = billing === 'yearly' && plan.stripeYearlyPriceId
       ? plan.stripeYearlyPriceId
       : plan.stripePriceId;
+
+    // Plan change: tenant already has an active subscription — update in place with proration
+    if (tenant.stripeSubscriptionId && tenant.subscriptionStatus === 'ACTIVE') {
+      try {
+        const existing = await stripe.subscriptions.retrieve(tenant.stripeSubscriptionId);
+        const currentItem = existing.items.data[0];
+
+        if (currentItem?.price?.id === priceId) {
+          throw new BadRequestException('Você já está neste plano');
+        }
+
+        const changeStatus = await this.getPlanChangeStatus({
+          stripeSubscriptionId: tenant.stripeSubscriptionId,
+          subscriptionStatus: tenant.subscriptionStatus,
+          planChangedAt: (tenant as unknown as { planChangedAt: Date | null }).planChangedAt ?? null,
+        });
+        if (!changeStatus.canChange) {
+          const availableAt = changeStatus.nextAvailableAt?.toISOString() ?? '';
+          throw new BadRequestException(
+            `Você já trocou de plano neste período. Próxima troca disponível em ${availableAt}.`,
+          );
+        }
+
+        const updated = await stripe.subscriptions.update(tenant.stripeSubscriptionId, {
+          items: [{ id: currentItem.id, price: priceId }],
+          proration_behavior: 'always_invoice',
+          metadata: { tenantId, planId, billing },
+        });
+
+        await this.prisma.tenant.update({
+          where: { id: tenantId },
+          data: { planId, billingInterval: billing, planChangedAt: new Date() } as never,
+        });
+
+        return { updated: true, subscriptionId: updated.id };
+      } catch (err: any) {
+        if (err instanceof BadRequestException) throw err;
+        // Stripe sub missing/canceled — fall through to checkout
+      }
+    }
 
     // Get or create Stripe customer
     let customerId = tenant.stripeCustomerId;
@@ -233,23 +303,23 @@ export class SubscriptionService {
           });
           const priceCents = billing === 'yearly' ? plan?.yearlyPrice : plan?.monthlyPrice;
           const value = priceCents ? priceCents / 100 : undefined;
+          const userData = {
+            email: owner?.email,
+            phone: owner?.phone,
+            externalId: tenantId,
+          };
+          const properties = {
+            value,
+            currency: 'BRL',
+            contents: plan
+              ? [{ content_id: plan.id, content_type: 'product', content_name: plan.name }]
+              : undefined,
+          };
 
-          await this.tiktok.sendEvent(
-            'ApplicationApproval',
-            {
-              email: owner?.email,
-              phone: owner?.phone,
-              externalId: tenantId,
-            },
-            {
-              value,
-              currency: 'BRL',
-              contents: plan
-                ? [{ content_id: plan.id, content_type: 'product', content_name: plan.name }]
-                : undefined,
-            },
-            session.id,
-          );
+          await Promise.all([
+            this.tiktok.sendEvent('Purchase', userData, properties, session.id),
+            this.tiktok.sendEvent('Subscribe', userData, properties, session.id),
+          ]);
         }
         break;
       }

@@ -43,7 +43,9 @@ export class TikTokEventsService {
     if (user.ip) userData.ip = user.ip;
     if (user.userAgent) userData.user_agent = user.userAgent;
 
-    const body = {
+    const testEventCode = this.config.get<string>('TIKTOK_TEST_EVENT_CODE');
+
+    const body: Record<string, unknown> = {
       event_source: 'web',
       event_source_id: pixelId,
       data: [
@@ -56,6 +58,7 @@ export class TikTokEventsService {
         },
       ],
     };
+    if (testEventCode) body.test_event_code = testEventCode;
 
     try {
       const res = await fetch(TIKTOK_EVENTS_API_URL, {
@@ -68,9 +71,9 @@ export class TikTokEventsService {
       });
       const json: any = await res.json().catch(() => ({}));
       if (json.code !== 0) {
-        this.logger.error(`TikTok CAPI error: ${JSON.stringify(json)}`);
+        this.logger.error(`TikTok CAPI error: ${JSON.stringify(json)} | body=${JSON.stringify(body)}`);
       } else {
-        this.logger.log(`TikTok event '${eventName}' sent (event_id=${body.data[0].event_id})`);
+        this.logger.log(`TikTok event '${eventName}' sent (event_id=${(body.data as any[])[0].event_id}, test=${!!testEventCode})`);
       }
     } catch (err: any) {
       this.logger.error(`TikTok CAPI request failed: ${err?.message}`);

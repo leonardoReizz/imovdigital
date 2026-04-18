@@ -44,6 +44,8 @@ interface SubInfo {
     trialExpired: boolean;
     stripeCustomerId: string | null;
     stripeSubscriptionId: string | null;
+    canChangePlan: boolean;
+    nextChangeAvailableAt: string | null;
   };
   currentPlan: Plan;
   currentBilling: 'monthly' | 'yearly';
@@ -86,6 +88,7 @@ export function SubscriptionPage() {
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [planChanged, setPlanChanged] = useState(false);
 
   const success = searchParams.get('success') === 'true';
   const canceled = searchParams.get('canceled') === 'true';
@@ -108,9 +111,18 @@ export function SubscriptionPage() {
     setCheckingOut(planId);
     try {
       const { data } = await api.post('/subscription/checkout', { planId, billing });
-      if (data.url) window.location.href = data.url;
-    } catch {
-      alert('Erro ao iniciar checkout. Verifique se o Stripe está configurado.');
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      if (data.updated) {
+        setPlanChanged(true);
+        const { data: fresh } = await api.get('/subscription');
+        setInfo(fresh);
+      }
+    } catch (err: any) {
+      const message = err?.response?.data?.message;
+      alert(Array.isArray(message) ? message[0] : message || 'Erro ao iniciar checkout.');
     } finally {
       setCheckingOut(null);
     }
@@ -150,6 +162,12 @@ export function SubscriptionPage() {
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 text-sm px-4 py-3 rounded-xl mb-6">
           <AlertCircle className="w-4 h-4" />
           Checkout cancelado. Você pode tentar novamente quando quiser.
+        </motion.div>
+      )}
+      {planChanged && (
+        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-700 text-sm px-4 py-3 rounded-xl mb-6">
+          <Check className="w-4 h-4" />
+          Plano alterado. A diferença (proporcional ao tempo restante) foi cobrada ou creditada automaticamente.
         </motion.div>
       )}
 
@@ -422,6 +440,10 @@ export function SubscriptionPage() {
               ) : billing === 'yearly' && !hasYearly ? (
                 <div className="px-5 py-3 text-sm font-medium bg-gray-50 text-gray-400 rounded-xl text-center">
                   Em breve
+                </div>
+              ) : isActive && !tenant.canChangePlan ? (
+                <div className="px-5 py-3 text-xs font-medium bg-gray-50 text-gray-500 rounded-xl text-center leading-relaxed">
+                  Troca bloqueada.<br />Disponível em {tenant.nextChangeAvailableAt ? new Date(tenant.nextChangeAvailableAt).toLocaleDateString('pt-BR') : '—'}
                 </div>
               ) : (
                 <button
