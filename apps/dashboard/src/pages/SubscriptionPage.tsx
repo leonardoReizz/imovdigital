@@ -20,6 +20,7 @@ import { api } from '../lib/api';
 import { tiktokTrack } from '../lib/tiktok';
 import { formatPrice } from '@imovdigital/utils';
 import { CancellationModal } from '../components/CancellationModal';
+import { PlanChangeConfirmModal } from '../components/PlanChangeConfirmModal';
 
 interface Plan {
   id: string;
@@ -89,6 +90,7 @@ export function SubscriptionPage() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [planChanged, setPlanChanged] = useState(false);
+  const [pendingChangePlanId, setPendingChangePlanId] = useState<string | null>(null);
 
   const success = searchParams.get('success') === 'true';
   const canceled = searchParams.get('canceled') === 'true';
@@ -447,7 +449,7 @@ export function SubscriptionPage() {
                 </div>
               ) : (
                 <button
-                  onClick={() => handleCheckout(plan.id)}
+                  onClick={() => (isActive ? setPendingChangePlanId(plan.id) : handleCheckout(plan.id))}
                   disabled={checkingOut !== null}
                   className={`w-full px-5 py-3 text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 ${
                     isPopular
@@ -523,6 +525,27 @@ export function SubscriptionPage() {
             onCanceled={() => { setShowCancelModal(false); window.location.reload(); }}
           />
         )}
+      </AnimatePresence>
+
+      {/* Plan Change Confirmation Modal */}
+      <AnimatePresence>
+        {pendingChangePlanId && (() => {
+          const target = plans.find((p) => p.id === pendingChangePlanId);
+          if (!target) return null;
+          return (
+            <PlanChangeConfirmModal
+              currentPlan={currentPlan}
+              targetPlan={target}
+              billing={billing}
+              submitting={checkingOut === pendingChangePlanId}
+              onClose={() => setPendingChangePlanId(null)}
+              onConfirm={async () => {
+                await handleCheckout(pendingChangePlanId);
+                setPendingChangePlanId(null);
+              }}
+            />
+          );
+        })()}
       </AnimatePresence>
 
       {/* FAQ */}
