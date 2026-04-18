@@ -245,14 +245,16 @@ export function SubscriptionPage() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-gray-600">Imóveis</span>
-              <span className="text-sm font-semibold text-gray-900">{usage.properties}/{limits.properties}</span>
+              <span className="text-sm font-semibold text-gray-900">
+                {usage.properties}/{limits.properties <= 0 ? '∞' : limits.properties}
+              </span>
             </div>
             <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all"
                 style={{
-                  width: `${Math.min(100, (usage.properties / limits.properties) * 100)}%`,
-                  backgroundColor: usage.properties >= limits.properties ? '#ef4444' : 'var(--color-primary)',
+                  width: limits.properties <= 0 ? '0%' : `${Math.min(100, (usage.properties / limits.properties) * 100)}%`,
+                  backgroundColor: limits.properties > 0 && usage.properties >= limits.properties ? '#ef4444' : 'var(--color-primary)',
                 }}
               />
             </div>
@@ -260,14 +262,16 @@ export function SubscriptionPage() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-gray-600">Membros da equipe</span>
-              <span className="text-sm font-semibold text-gray-900">{usage.users}/{limits.users}</span>
+              <span className="text-sm font-semibold text-gray-900">
+                {usage.users}/{limits.users <= 0 ? '∞' : limits.users}
+              </span>
             </div>
             <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all"
                 style={{
-                  width: `${Math.min(100, (usage.users / limits.users) * 100)}%`,
-                  backgroundColor: usage.users >= limits.users ? '#ef4444' : 'var(--color-primary)',
+                  width: limits.users <= 0 ? '0%' : `${Math.min(100, (usage.users / limits.users) * 100)}%`,
+                  backgroundColor: limits.users > 0 && usage.users >= limits.users ? '#ef4444' : 'var(--color-primary)',
                 }}
               />
             </div>
