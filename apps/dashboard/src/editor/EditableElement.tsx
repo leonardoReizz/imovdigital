@@ -14,6 +14,7 @@ interface Props {
   layout: SectionLayout;
   parentCols?: number;
   parentGap?: number;
+  parentDirection?: 'row' | 'column';
 }
 
 export function EditableElement(props: Props) {
@@ -50,7 +51,7 @@ function FreeElement({ element, rendered, sectionId }: Props) {
 
 /* ─── Stack / grid layout ────────────────────────────────────── */
 
-function FlowElement({ element, rendered, sectionId, layout, parentCols, parentGap }: Props) {
+function FlowElement({ element, rendered, sectionId, layout, parentCols, parentGap, parentDirection }: Props) {
   const payload: DragPayload = { kind: 'element', elementId: element.id, sectionId, isFree: false };
   const dropPayload: DropPayload = { kind: 'element-slot', sectionId, elementId: element.id };
   const [editing, setEditing] = useState(false);
@@ -124,6 +125,7 @@ function FlowElement({ element, rendered, sectionId, layout, parentCols, parentG
       parentLayout={layout}
       parentCols={parentCols}
       parentGap={parentGap}
+      parentDirection={parentDirection}
       editing={editing}
       setEditing={setEditing}
       showIndicator={showIndicator}
@@ -150,6 +152,7 @@ interface ShellProps {
   parentLayout?: import('@imovdigital/types').SectionLayout;
   parentCols?: number;
   parentGap?: number;
+  parentDirection?: 'row' | 'column';
   editing: boolean;
   setEditing: (v: boolean) => void;
   showIndicator?: boolean;
@@ -214,6 +217,15 @@ function EditableShell({
     !isFree && element.gridSpan && element.gridSpan > 1
       ? `span ${element.gridSpan}`
       : undefined;
+  // In stack layouts, children size to content (or explicit width) so that
+  // flex alignment (justify/align) can actually position them. The flex
+  // parent's `alignItems: stretch` (default) still stretches auto-width
+  // items across the cross axis, so column-stacks with stretch behave like
+  // width: 100%. In grid we keep width: 100% so the child fills its cell.
+  const isStack = parentLayout === 'stack';
+  const flowWidth: CSSProperties['width'] = isStack
+    ? (width ?? 'auto')
+    : '100%';
   const positionStyle: CSSProperties = isFree
     ? {
         position: 'absolute',
@@ -225,7 +237,7 @@ function EditableShell({
       }
     : {
         position: 'relative',
-        width: '100%',
+        width: flowWidth,
         // Flow elements may carry an explicit height (resized via n/s
         // handles in grid). When omitted or 'auto', intrinsic sizing wins.
         ...(typeof height === 'number' ? { height } : {}),

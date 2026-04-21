@@ -309,6 +309,7 @@ export function Canvas() {
       layout={ctx.layout}
       parentCols={ctx.parentCols}
       parentGap={ctx.parentGap}
+      parentDirection={ctx.parentDirection}
     />
   );
 

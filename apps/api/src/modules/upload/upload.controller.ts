@@ -4,19 +4,28 @@ import {
   Delete,
   Get,
   Body,
+  Headers,
   Param,
+  Query,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { SkipThrottle } from '@nestjs/throttler';
+import { ConfigService } from '@nestjs/config';
 import { UploadService } from './upload.service';
+import { UploadGcService } from './upload-gc.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { SubscriptionGuard } from '../../common/guards/subscription.guard';
 
 @Controller()
 export class UploadController {
-  constructor(private readonly uploadService: UploadService) {}
+  constructor(
+    private readonly uploadService: UploadService,
+    private readonly uploadGc: UploadGcService,
+    private readonly config: ConfigService,
+  ) {}
 
   @UseGuards(JwtAuthGuard, SubscriptionGuard)
   @Post('upload/presigned')
@@ -35,6 +44,24 @@ export class UploadController {
   async deleteFile(@Body() body: { url: string }) {
     await this.uploadService.deleteFile(body.url);
     return { deleted: true };
+  }
+
+  // Admin-only manual trigger for the R2 orphan sweep. Defaults to dry-run
+  // so the caller can inspect counts before deleting for real.
+  @SkipThrottle()
+  @Post('upload/gc')
+  async runGc(
+    @Headers('authorization') auth: string,
+    @Query('dryRun') dryRunQ?: string,
+    @Query('minAgeHours') minAgeHoursQ?: string,
+  ) {
+    const adminKey = this.config.get('ADMIN_API_KEY');
+    if (!adminKey || auth !== `Bearer ${adminKey}`) {
+      throw new UnauthorizedException('Invalid admin key');
+    }
+    const dryRun = dryRunQ !== 'false';
+    const minAgeHours = minAgeHoursQ ? Math.max(0, Number(minAgeHoursQ)) : 24;
+    return this.uploadGc.garbageCollect({ dryRun, minAgeHours });
   }
 
   // Proxy R2 files — no auth required (public images)

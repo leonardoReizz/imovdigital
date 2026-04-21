@@ -148,7 +148,7 @@ export function ColorField({ label, value, onChange, hint }: ColorFieldProps) {
 interface ToggleGroupProps<T extends string> extends BaseProps {
   value: T;
   onChange: (value: T) => void;
-  options: { value: T; label: string }[];
+  options: { value: T; label: ReactNode; title?: string }[];
 }
 
 export function ToggleGroup<T extends string>({ label, value, onChange, options, hint }: ToggleGroupProps<T>) {
@@ -160,7 +160,8 @@ export function ToggleGroup<T extends string>({ label, value, onChange, options,
             key={o.value}
             type="button"
             onClick={() => onChange(o.value)}
-            className={`flex-1 px-2 py-1 rounded text-xs font-medium ${
+            title={o.title}
+            className={`flex-1 px-2 py-1 rounded text-xs font-medium flex items-center justify-center ${
               value === o.value ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
             }`}
           >

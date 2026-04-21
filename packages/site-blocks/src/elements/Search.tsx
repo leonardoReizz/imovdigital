@@ -38,9 +38,12 @@ const BEDROOMS_OPTIONS = [
   { value: '2', label: '2+' },
   { value: '3', label: '3+' },
   { value: '4', label: '4+' },
+  { value: '5', label: '5+' },
 ];
 
 const PARKING_OPTIONS = BEDROOMS_OPTIONS;
+
+const CHIP_VALUES = ['1', '2', '3', '4', '5'];
 
 export function SearchBlock({ element }: { element: SearchElement }) {
   const { theme, cities, neighborhoods, searchBasePath = '/imoveis' } = useBlocks();
@@ -118,6 +121,8 @@ export function SearchBlock({ element }: { element: SearchElement }) {
               cities={cities ?? []}
               neighborhoods={neighborhoods ?? []}
               borderRadius={theme.borderRadius}
+              primaryColor={theme.primaryColor}
+              isSidebar
             />
           </div>
         ))}
@@ -178,6 +183,7 @@ export function SearchBlock({ element }: { element: SearchElement }) {
             cities={cities ?? []}
             neighborhoods={neighborhoods ?? []}
             borderRadius={theme.borderRadius}
+            primaryColor={theme.primaryColor}
           />
         </div>
       ))}
@@ -221,6 +227,8 @@ function FieldInput({
   cities,
   neighborhoods,
   borderRadius,
+  primaryColor,
+  isSidebar = false,
 }: {
   field: FieldKey;
   value: string;
@@ -228,6 +236,8 @@ function FieldInput({
   cities: string[];
   neighborhoods: string[];
   borderRadius: number;
+  primaryColor: string;
+  isSidebar?: boolean;
 }) {
   const baseStyle: React.CSSProperties = {
     width: '100%',
@@ -240,6 +250,19 @@ function FieldInput({
     fontSize: 14,
     color: '#0f172a',
   };
+
+  if (isSidebar && (field === 'bedrooms' || field === 'parking')) {
+    return (
+      <ChipGroup
+        values={CHIP_VALUES}
+        value={value}
+        onChange={onChange}
+        suffix="+"
+        borderRadius={borderRadius}
+        primaryColor={primaryColor}
+      />
+    );
+  }
 
   if (field === 'type') {
     return (
@@ -308,4 +331,51 @@ function FieldInput({
     );
   }
   return null;
+}
+
+function ChipGroup({
+  values,
+  value,
+  onChange,
+  suffix = '',
+  borderRadius,
+  primaryColor,
+}: {
+  values: string[];
+  value: string;
+  onChange: (value: string) => void;
+  suffix?: string;
+  borderRadius: number;
+  primaryColor: string;
+}) {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+      {values.map((v) => {
+        const active = value === v;
+        return (
+          <button
+            key={v}
+            type="button"
+            onClick={() => onChange(active ? '' : v)}
+            style={{
+              minWidth: 40,
+              height: 32,
+              paddingLeft: 10,
+              paddingRight: 10,
+              borderRadius,
+              border: `1px solid ${active ? primaryColor : '#e2e8f0'}`,
+              background: active ? `${primaryColor}1A` : '#fff',
+              color: active ? primaryColor : '#475569',
+              fontSize: 12,
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'border-color 120ms, background 120ms',
+            }}
+          >
+            {v}{suffix}
+          </button>
+        );
+      })}
+    </div>
+  );
 }

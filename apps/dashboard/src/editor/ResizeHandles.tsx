@@ -28,11 +28,14 @@ const FREE_HANDLES: Handle[] = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
 /** Grid controls the width via gridSpan (horizontal handles) while
  *  vertical handles adjust element.size.h for any element type. */
 const GRID_HANDLES: Handle[] = ['e', 'w', 'n', 's'];
+/** Stack supports both axes — `n/s` resize height, `e/w` resize width
+ *  (px, stored on element.size.w). */
+const STACK_HANDLES: Handle[] = ['n', 's', 'e', 'w'];
 const MIN_SIZE = 24;
 
 interface DragState {
   handle: Handle;
-  mode: 'free' | 'grid-span' | 'grid-height';
+  mode: 'free' | 'grid-span' | 'grid-height' | 'stack-width';
   startX: number;
   startY: number;
   startW: number;
@@ -80,27 +83,32 @@ export function ResizeHandles({ element, targetRef, isFree, parentLayout, parent
     let parentLeft = 0;
     let gap = 0;
 
-    if (!isFree && parentLayout === 'grid') {
+    if (!isFree) {
       const isVerticalHandle = handle === 'n' || handle === 's';
-      if (isVerticalHandle) {
-        // Height-only resize for any element in grid. Width stays under
-        // grid control; only element.size.h is adjusted via setElementBox.
-        mode = 'grid-height';
-      } else {
-        mode = 'grid-span';
-        const parent = targetRef.current?.parentElement as HTMLElement | null;
-        const parentRect = parent?.getBoundingClientRect();
-        const parentW = parentRect ? parentRect.width / zoom : 0;
-        parentLeft = parentRect ? parentRect.left : 0;
-        // Read the true column count + gap from the section's gridConfig
-        // (passed via props) — computed style can return unexpanded
-        // `minmax(…)` tokens that break naive parsing.
-        parentCols = propParentCols ?? 3;
-        gap = propParentGap ?? 0;
-        cellWidth = (parentW - gap * (parentCols - 1)) / parentCols;
+      if (parentLayout === 'stack') {
+        // Vertical handles → height; horizontal handles → explicit px width.
+        mode = isVerticalHandle ? 'grid-height' : 'stack-width';
+      } else if (parentLayout === 'grid') {
+        if (isVerticalHandle) {
+          // Height-only resize for any element in grid. Width stays under
+          // grid control; only element.size.h is adjusted via setElementBox.
+          mode = 'grid-height';
+        } else {
+          mode = 'grid-span';
+          const parent = targetRef.current?.parentElement as HTMLElement | null;
+          const parentRect = parent?.getBoundingClientRect();
+          const parentW = parentRect ? parentRect.width / zoom : 0;
+          parentLeft = parentRect ? parentRect.left : 0;
+          // Read the true column count + gap from the section's gridConfig
+          // (passed via props) — computed style can return unexpanded
+          // `minmax(…)` tokens that break naive parsing.
+          parentCols = propParentCols ?? 3;
+          gap = propParentGap ?? 0;
+          cellWidth = (parentW - gap * (parentCols - 1)) / parentCols;
 
-        // Anchor the edge that stays still while the opposite edge is dragged.
-        anchorX = handle.includes('e') ? rect.left : rect.right;
+          // Anchor the edge that stays still while the opposite edge is dragged.
+          anchorX = handle.includes('e') ? rect.left : rect.right;
+        }
       }
     }
 
@@ -168,6 +176,17 @@ export function ResizeHandles({ element, targetRef, isFree, parentLayout, parent
         return;
       }
 
+      if (drag.mode === 'stack-width') {
+        // Stack: adjust explicit pixel width on element.size.w so individual
+        // items can be wider/narrower than siblings. Preserve existing h.
+        let w = drag.startW;
+        if (drag.handle === 'e') w = drag.startW + dx;
+        else if (drag.handle === 'w') w = drag.startW - dx;
+        if (w < MIN_SIZE) w = MIN_SIZE;
+        setElementSize(element.id, Math.round(w), element.size?.h ?? 'auto');
+        return;
+      }
+
       // Free resize (original logic)
       let w = drag.startW;
       let h = drag.startH;
@@ -227,10 +246,15 @@ export function ResizeHandles({ element, targetRef, isFree, parentLayout, parent
     window.addEventListener('pointerup', up);
   };
 
-  // Stack (flow without columns) hides handles — parent controls width.
-  if (!isFree && parentLayout !== 'grid') return null;
+  const handles = isFree
+    ? FREE_HANDLES
+    : parentLayout === 'grid'
+      ? GRID_HANDLES
+      : parentLayout === 'stack'
+        ? STACK_HANDLES
+        : null;
 
-  const handles = isFree ? FREE_HANDLES : GRID_HANDLES;
+  if (!handles) return null;
 
   return (
     <>
@@ -253,6 +277,4 @@ export function ResizeHandles({ element, targetRef, isFree, parentLayout, parent
       ))}
     </>
   );
-  // Silence unused import if not used above.
-  void setElementSize;
 }

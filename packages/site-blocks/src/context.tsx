@@ -10,6 +10,8 @@ export interface WrapElementContext {
   parentCols?: number;
   /** Gap in px between tracks. */
   parentGap?: number;
+  /** For stack layouts, whether children flow as a row (inline) or column. */
+  parentDirection?: 'row' | 'column';
 }
 
 // Injected by the host (dashboard/editor or apps/web).

@@ -1,6 +1,15 @@
-import type { Element, Section, SectionLayout, TextElement, ImageElement, ButtonElement, ListingsElement, SearchElement, SpacerElement, DividerElement, PropertyBinding, PropertyGalleryElement, PropertyMapElement, PropertyContactFormElement, PropertyTagsElement, PropertyPricesElement, PropertySpecsElement } from '@imovdigital/types';
+import type { ContainerElement, Element, Section, SectionLayout, TextElement, ImageElement, ButtonElement, ListingsElement, SearchElement, SpacerElement, DividerElement, PropertyBinding, PropertyGalleryElement, PropertyMapElement, PropertyContactFormElement, PropertyTagsElement, PropertyPricesElement, PropertySpecsElement } from '@imovdigital/types';
 import { PROPERTY_BINDING_LABELS } from '@imovdigital/types';
-import { PanelRightClose, RotateCcw } from 'lucide-react';
+import {
+  PanelRightClose, RotateCcw,
+  AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd,
+  AlignHorizontalSpaceBetween, AlignHorizontalSpaceAround,
+  AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd,
+  AlignVerticalSpaceBetween, AlignVerticalSpaceAround,
+  AlignStartVertical, AlignCenterVertical, AlignEndVertical, StretchHorizontal,
+  AlignStartHorizontal, AlignCenterHorizontal, AlignEndHorizontal, StretchVertical,
+  ArrowDown, ArrowRight,
+} from 'lucide-react';
 import { selectSelectedElement, selectSelectedSection, useEditorStore } from '../store';
 import {
   ColorField,
@@ -367,6 +376,143 @@ function ElementSpecificFields({ element }: { element: Element }) {
               { value: 'fill', label: 'Esticar' },
             ]}
           />
+        </>
+      );
+    case 'container':
+      return (
+        <>
+          <ToggleGroup<SectionLayout>
+            label="Layout interno"
+            value={element.layout}
+            onChange={(layout) => update(element.id, (e) => {
+              const c = e as ContainerElement;
+              c.layout = layout;
+              if (layout === 'grid' && !c.gridConfig) {
+                c.gridConfig = { cols: 2, gap: 16 };
+              }
+              if (layout === 'stack' && !c.gridConfig) {
+                c.gridConfig = { cols: 1, gap: 16, direction: 'column' };
+              }
+            })}
+            options={[
+              { value: 'stack', label: 'Pilha' },
+              { value: 'grid', label: 'Grade' },
+              { value: 'free', label: 'Livre' },
+            ]}
+          />
+          {element.layout === 'stack' && (() => {
+            const dir = element.gridConfig?.direction ?? 'column';
+            const isRow = dir === 'row';
+            const justifyIcons = isRow
+              ? {
+                  start: <AlignHorizontalJustifyStart className="w-4 h-4" />,
+                  center: <AlignHorizontalJustifyCenter className="w-4 h-4" />,
+                  end: <AlignHorizontalJustifyEnd className="w-4 h-4" />,
+                  between: <AlignHorizontalSpaceBetween className="w-4 h-4" />,
+                  around: <AlignHorizontalSpaceAround className="w-4 h-4" />,
+                }
+              : {
+                  start: <AlignVerticalJustifyStart className="w-4 h-4" />,
+                  center: <AlignVerticalJustifyCenter className="w-4 h-4" />,
+                  end: <AlignVerticalJustifyEnd className="w-4 h-4" />,
+                  between: <AlignVerticalSpaceBetween className="w-4 h-4" />,
+                  around: <AlignVerticalSpaceAround className="w-4 h-4" />,
+                };
+            const alignIcons = isRow
+              ? {
+                  stretch: <StretchVertical className="w-4 h-4" />,
+                  start: <AlignStartHorizontal className="w-4 h-4" />,
+                  center: <AlignCenterHorizontal className="w-4 h-4" />,
+                  end: <AlignEndHorizontal className="w-4 h-4" />,
+                }
+              : {
+                  stretch: <StretchHorizontal className="w-4 h-4" />,
+                  start: <AlignStartVertical className="w-4 h-4" />,
+                  center: <AlignCenterVertical className="w-4 h-4" />,
+                  end: <AlignEndVertical className="w-4 h-4" />,
+                };
+            return (
+              <>
+                <ToggleGroup<'row' | 'column'>
+                  label="Direção"
+                  value={dir}
+                  onChange={(direction) => update(element.id, (e) => {
+                    const c = e as ContainerElement;
+                    c.gridConfig = { ...(c.gridConfig ?? { cols: 1, gap: 16 }), direction };
+                  })}
+                  options={[
+                    { value: 'column', label: <ArrowDown className="w-4 h-4" />, title: 'Vertical' },
+                    { value: 'row', label: <ArrowRight className="w-4 h-4" />, title: 'Horizontal' },
+                  ]}
+                />
+                <ToggleGroup<'start' | 'center' | 'end' | 'between' | 'around'>
+                  label={isRow ? 'Distribuição horizontal' : 'Distribuição vertical'}
+                  value={element.gridConfig?.justifyContent ?? 'start'}
+                  onChange={(justifyContent) => update(element.id, (e) => {
+                    const c = e as ContainerElement;
+                    c.gridConfig = { ...(c.gridConfig ?? { cols: 1, gap: 16 }), justifyContent };
+                  })}
+                  options={[
+                    { value: 'start', label: justifyIcons.start, title: isRow ? 'Esquerda' : 'Topo' },
+                    { value: 'center', label: justifyIcons.center, title: 'Centralizado' },
+                    { value: 'end', label: justifyIcons.end, title: isRow ? 'Direita' : 'Fundo' },
+                    { value: 'between', label: justifyIcons.between, title: 'Espaço entre' },
+                    { value: 'around', label: justifyIcons.around, title: 'Espaço ao redor' },
+                  ]}
+                />
+                <ToggleGroup<'start' | 'center' | 'end' | 'stretch'>
+                  label={isRow ? 'Alinhamento vertical' : 'Alinhamento horizontal'}
+                  value={element.gridConfig?.alignItems ?? 'stretch'}
+                  onChange={(alignItems) => update(element.id, (e) => {
+                    const c = e as ContainerElement;
+                    c.gridConfig = { ...(c.gridConfig ?? { cols: 1, gap: 16 }), alignItems };
+                  })}
+                  options={[
+                    { value: 'stretch', label: alignIcons.stretch, title: 'Esticar' },
+                    { value: 'start', label: alignIcons.start, title: 'Início' },
+                    { value: 'center', label: alignIcons.center, title: 'Centro' },
+                    { value: 'end', label: alignIcons.end, title: 'Fim' },
+                  ]}
+                />
+                <NumberField
+                  label="Espaçamento"
+                  value={element.gridConfig?.gap ?? 16}
+                  onChange={(gap) => update(element.id, (e) => {
+                    const c = e as ContainerElement;
+                    c.gridConfig = { ...(c.gridConfig ?? { cols: 1, gap: 16 }), gap };
+                  })}
+                  min={0}
+                  max={96}
+                  suffix="px"
+                />
+              </>
+            );
+          })()}
+          {element.layout === 'grid' && (
+            <>
+              <NumberField
+                label="Colunas"
+                value={element.gridConfig?.cols ?? 2}
+                onChange={(cols) => update(element.id, (e) => {
+                  const c = e as ContainerElement;
+                  c.gridConfig = { ...(c.gridConfig ?? { cols: 2, gap: 16 }), cols };
+                })}
+                min={1}
+                max={12}
+              />
+              <NumberField
+                label="Espaçamento"
+                value={element.gridConfig?.gap ?? 16}
+                onChange={(gap) => update(element.id, (e) => {
+                  const c = e as ContainerElement;
+                  c.gridConfig = { ...(c.gridConfig ?? { cols: 2, gap: 16 }), gap };
+                })}
+                min={0}
+                max={96}
+                suffix="px"
+              />
+            </>
+          )}
         </>
       );
     case 'button':

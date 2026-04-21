@@ -71,6 +71,7 @@ export function SectionBody({ layout, gridConfig, elements, sectionId, style }: 
             layout,
             parentCols: layout === 'grid' ? (gridConfig?.cols ?? 3) : undefined,
             parentGap: gridConfig?.gap,
+            parentDirection: layout === 'stack' ? (gridConfig?.direction ?? 'column') : undefined,
           });
         }
         return renderForLayout(layout, element, inner);

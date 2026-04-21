@@ -5,6 +5,8 @@ import {
   PutObjectCommand,
   GetObjectCommand,
   DeleteObjectCommand,
+  DeleteObjectsCommand,
+  ListObjectsV2Command,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
@@ -113,7 +115,7 @@ export class UploadService {
   /**
    * Extract the R2 key from a URL like /api/files/gallery/xxx.jpg or https://cdn.../gallery/xxx.jpg
    */
-  private extractKey(url: string): string | null {
+  extractKey(url: string): string | null {
     // /api/files/gallery/xxx.jpg → gallery/xxx.jpg
     const apiMatch = url.match(/\/api\/files\/(.+)$/);
     if (apiMatch) return apiMatch[1];
@@ -148,5 +150,59 @@ export class UploadService {
 
   async deleteFiles(urls: string[]): Promise<void> {
     await Promise.all(urls.map((url) => this.deleteFile(url)));
+  }
+
+  /** List every object in the bucket. Returns key + lastModified. */
+  async listAllObjects(): Promise<{ key: string; lastModified: Date }[]> {
+    const s3 = this.getS3();
+    const bucket = this.getBucket();
+    if (!s3 || !bucket) return [];
+
+    const results: { key: string; lastModified: Date }[] = [];
+    let ContinuationToken: string | undefined;
+    do {
+      const res = await s3.send(
+        new ListObjectsV2Command({ Bucket: bucket, ContinuationToken }),
+      );
+      for (const obj of res.Contents ?? []) {
+        if (obj.Key && obj.LastModified) {
+          results.push({ key: obj.Key, lastModified: obj.LastModified });
+        }
+      }
+      ContinuationToken = res.IsTruncated ? res.NextContinuationToken : undefined;
+    } while (ContinuationToken);
+    return results;
+  }
+
+  /** Delete a batch of keys with one S3 call (max 1000 per call). */
+  async deleteKeys(keys: string[]): Promise<number> {
+    const s3 = this.getS3();
+    const bucket = this.getBucket();
+    if (!s3 || !bucket || keys.length === 0) return 0;
+
+    let deleted = 0;
+    for (let i = 0; i < keys.length; i += 1000) {
+      const chunk = keys.slice(i, i + 1000);
+      try {
+        const res = await s3.send(
+          new DeleteObjectsCommand({
+            Bucket: bucket,
+            Delete: { Objects: chunk.map((Key) => ({ Key })), Quiet: true },
+          }),
+        );
+        deleted += chunk.length - (res.Errors?.length ?? 0);
+      } catch {
+        // Fall back to individual deletes for this chunk
+        for (const key of chunk) {
+          try {
+            await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
+            deleted += 1;
+          } catch {
+            /* ignore */
+          }
+        }
+      }
+    }
+    return deleted;
   }
 }
