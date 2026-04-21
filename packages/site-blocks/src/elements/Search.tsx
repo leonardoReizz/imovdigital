@@ -12,6 +12,7 @@ const FIELD_LABELS: Record<string, string> = {
   neighborhood: 'Bairro',
   priceRange: 'Preço',
   bedrooms: 'Quartos',
+  bathrooms: 'Banheiros',
   parking: 'Vagas',
   areaRange: 'Área',
 };
@@ -42,6 +43,7 @@ const BEDROOMS_OPTIONS = [
 ];
 
 const PARKING_OPTIONS = BEDROOMS_OPTIONS;
+const BATHROOMS_OPTIONS = BEDROOMS_OPTIONS;
 
 const CHIP_VALUES = ['1', '2', '3', '4', '5'];
 
@@ -251,7 +253,7 @@ function FieldInput({
     color: '#0f172a',
   };
 
-  if (isSidebar && (field === 'bedrooms' || field === 'parking')) {
+  if (isSidebar && (field === 'bedrooms' || field === 'bathrooms' || field === 'parking')) {
     return (
       <ChipGroup
         values={CHIP_VALUES}
@@ -298,6 +300,13 @@ function FieldInput({
     return (
       <select value={value} onChange={(e) => onChange(e.target.value)} style={baseStyle}>
         {BEDROOMS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+    );
+  }
+  if (field === 'bathrooms') {
+    return (
+      <select value={value} onChange={(e) => onChange(e.target.value)} style={baseStyle}>
+        {BATHROOMS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     );
   }

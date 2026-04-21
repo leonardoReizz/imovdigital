@@ -55,7 +55,11 @@ export function ListingsBlock({ element }: { element: ListingsElement }) {
           key={property.id}
           style={element.display === 'carousel' ? { minWidth: 280, scrollSnapAlign: 'start' } : undefined}
         >
-          <PropertyCard property={property} template={element.cardTemplate} />
+          <PropertyCard
+            property={property}
+            template={element.cardTemplate}
+            orientation={element.display === 'list' ? 'horizontal' : 'vertical'}
+          />
         </div>
       ))}
     </div>

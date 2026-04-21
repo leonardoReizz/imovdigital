@@ -72,7 +72,7 @@ export function buildDefaultElement(
       return {
         id,
         type: 'search',
-        fields: ['type', 'city', 'priceRange', 'bedrooms'],
+        fields: ['type', 'city', 'priceRange', 'bedrooms', 'bathrooms'],
         layout: 'row',
         submitMode: 'redirect',
         submitLabel: 'Buscar',

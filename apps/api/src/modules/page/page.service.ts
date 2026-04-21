@@ -134,35 +134,10 @@ export class PageService {
         continue;
       }
 
-      // Non-destructive navbar prepend + footer append: existing pages
-      // that don't have navbar/footer yet get the default ones added,
-      // without losing anything the user customized in between.
-      let mutated = [...sections];
-      let changed = false;
-
-      if (!isNavbarSection(mutated[0])) {
-        const templateNav = (data.sections ?? []).find(isNavbarSection);
-        if (templateNav) {
-          mutated = [cloneWithFreshIds(templateNav), ...mutated];
-          changed = true;
-        }
-      }
-
-      if (!isFooterSection(mutated[mutated.length - 1])) {
-        const templateFooter = (data.sections ?? []).find(isFooterSection);
-        if (templateFooter) {
-          mutated = [...mutated, cloneWithFreshIds(templateFooter)];
-          changed = true;
-        }
-      }
-
-      if (changed) {
-        const newData = { ...current, sections: mutated };
-        await this.prisma.page.update({
-          where: { id: row.id },
-          data: { data: newData as unknown as object },
-        });
-      }
+      // Deliberately do NOT backfill missing navbar/footer here. Once a
+      // reserved page exists, its section list is the user's — if they
+      // removed the navbar, it stays removed. Initial seeding (the empty
+      // branch above) still applies the full template including chrome.
     }
   }
 
@@ -291,26 +266,24 @@ export class PageService {
     for (const row of rows) {
       const data = (row.data as { sections?: unknown[] }) ?? {};
       const sections = Array.isArray(data.sections) ? [...data.sections] : [];
+      let changed = false;
 
-      if (chrome.navbar) {
-        const cloned = cloneWithFreshIds(chrome.navbar);
-        if (sections.length > 0 && isNavbarSection(sections[0])) {
-          sections[0] = cloned;
-        } else {
-          sections.unshift(cloned);
-        }
+      // Only REPLACE existing chrome — if the target page doesn't have a
+      // navbar/footer, the user removed it on purpose, so leave it alone.
+      if (chrome.navbar && sections.length > 0 && isNavbarSection(sections[0])) {
+        sections[0] = cloneWithFreshIds(chrome.navbar);
+        changed = true;
       }
 
       if (chrome.footer) {
-        const cloned = cloneWithFreshIds(chrome.footer);
         const lastIdx = sections.length - 1;
         if (lastIdx >= 0 && isFooterSection(sections[lastIdx])) {
-          sections[lastIdx] = cloned;
-        } else {
-          sections.push(cloned);
+          sections[lastIdx] = cloneWithFreshIds(chrome.footer);
+          changed = true;
         }
       }
 
+      if (!changed) continue;
       const newData = { ...data, sections };
       await this.prisma.page.update({
         where: { id: row.id },

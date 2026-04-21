@@ -439,7 +439,7 @@ function buildSearchSections(_theme: ThemeTokens): Section[] {
       {
         id: id(),
         type: 'search',
-        fields: ['operation', 'type', 'city', 'neighborhood', 'priceRange', 'bedrooms', 'parking', 'areaRange'],
+        fields: ['operation', 'type', 'city', 'neighborhood', 'priceRange', 'bedrooms', 'bathrooms', 'parking', 'areaRange'],
         layout: 'sidebar',
         submitMode: 'redirect',
         submitLabel: 'Aplicar filtros',

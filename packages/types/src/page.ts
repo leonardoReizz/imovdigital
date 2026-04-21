@@ -206,6 +206,7 @@ export interface SearchElement extends ElementBase<'search'> {
     | 'neighborhood'
     | 'priceRange'
     | 'bedrooms'
+    | 'bathrooms'
     | 'parking'
     | 'areaRange'
   >;

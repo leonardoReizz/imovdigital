@@ -280,22 +280,23 @@ interface ToggleProps extends BaseProps {
 
 export function Toggle({ label, checked, onChange, hint }: ToggleProps) {
   return (
-    <div className="flex items-center justify-between py-1">
-      <div>
+    <div className="flex items-center justify-between gap-2 py-1">
+      <div className="min-w-0">
         <span className="text-sm text-slate-700">{label}</span>
         {hint && <p className="text-[11px] text-slate-400">{hint}</p>}
       </div>
       <button
         type="button"
+        role="switch"
+        aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`relative w-8 h-4 rounded-full transition-colors ${
+        className={`relative shrink-0 w-9 h-5 rounded-full transition-colors ${
           checked ? 'bg-blue-500' : 'bg-slate-300'
         }`}
       >
         <span
-          className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-transform ${
-            checked ? 'translate-x-[18px]' : 'translate-x-0.5'
-          }`}
+          className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform"
+          style={{ transform: checked ? 'translateX(16px)' : 'translateX(0)' }}
         />
       </button>
     </div>

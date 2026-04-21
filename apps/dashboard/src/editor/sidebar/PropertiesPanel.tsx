@@ -599,20 +599,62 @@ function ElementSpecificFields({ element }: { element: Element }) {
           />
         </>
       );
-    case 'search':
+    case 'search': {
+      const SEARCH_FIELDS: { value: SearchElement['fields'][number]; label: string }[] = [
+        { value: 'operation', label: 'Operação (Venda/Aluguel)' },
+        { value: 'type', label: 'Tipo de imóvel' },
+        { value: 'city', label: 'Cidade' },
+        { value: 'neighborhood', label: 'Bairro' },
+        { value: 'priceRange', label: 'Preço' },
+        { value: 'bedrooms', label: 'Quartos' },
+        { value: 'bathrooms', label: 'Banheiros' },
+        { value: 'parking', label: 'Vagas' },
+        { value: 'areaRange', label: 'Área' },
+      ];
+      const activeFields = new Set(element.fields);
       return (
-        <SelectField
-          label="Layout"
-          value={element.layout}
-          onChange={(layout) => update(element.id, (e) => { (e as SearchElement).layout = layout; })}
-          options={[
-            { value: 'row', label: 'Horizontal' },
-            { value: 'stacked', label: 'Empilhado' },
-            { value: 'compact', label: 'Compacto' },
-            { value: 'sidebar', label: 'Lateral (filtros)' },
-          ]}
-        />
+        <>
+          <SelectField
+            label="Layout"
+            value={element.layout}
+            onChange={(layout) => update(element.id, (e) => { (e as SearchElement).layout = layout; })}
+            options={[
+              { value: 'row', label: 'Horizontal' },
+              { value: 'stacked', label: 'Empilhado' },
+              { value: 'compact', label: 'Compacto' },
+              { value: 'sidebar', label: 'Lateral (filtros)' },
+            ]}
+          />
+          <div className="pt-1">
+            <p className="text-[11px] font-medium text-slate-600 uppercase tracking-wide mb-2">
+              Campos
+            </p>
+            <div className="space-y-1.5">
+              {SEARCH_FIELDS.map((f) => (
+                <Toggle
+                  key={f.value}
+                  label={f.label}
+                  checked={activeFields.has(f.value)}
+                  onChange={(on) => update(element.id, (e) => {
+                    const s = e as SearchElement;
+                    if (on) {
+                      if (!s.fields.includes(f.value)) {
+                        const order = SEARCH_FIELDS.map((x) => x.value);
+                        s.fields = [...s.fields, f.value].sort(
+                          (a, b) => order.indexOf(a) - order.indexOf(b),
+                        );
+                      }
+                    } else {
+                      s.fields = s.fields.filter((x) => x !== f.value);
+                    }
+                  })}
+                />
+              ))}
+            </div>
+          </div>
+        </>
       );
+    }
     case 'spacer':
       return (
         <NumberField

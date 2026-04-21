@@ -24,7 +24,11 @@ export function ButtonBlock({ element }: { element: ButtonElement }) {
   })();
 
   const style: React.CSSProperties = {
-    display: 'inline-flex',
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    minHeight: 40,
+    boxSizing: 'border-box',
     alignItems: 'center',
     justifyContent: 'center',
     paddingLeft: 20,

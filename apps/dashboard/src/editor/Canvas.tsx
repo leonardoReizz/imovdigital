@@ -83,6 +83,10 @@ export function Canvas() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const desktopDrop = useDesktopImageDrop({ rootRef: frameRef });
 
+  // Tracks which page.id we've already auto-centered so we don't fight the
+  // user's scroll after the first paint.
+  const centeredForPage = useRef<string | null>(null);
+
   // Frame (pre-scale) dimensions and scroll viewport dimensions. Combined
   // to build a canvas surface that's always bigger than the scaled page
   // plus 500px of "air" on every side so the user can pan freely.
@@ -116,6 +120,20 @@ export function Canvas() {
   const canvasH = Math.max(viewportSize.h, scaledH) + AIR * 2;
   const pageLeft = (canvasW - scaledW) / 2;
   const pageTop = (canvasH - scaledH) / 2;
+
+  // Scroll the page so its top edge sits near the top of the viewport and
+  // it's horizontally centered. Runs once per page.id — after that, user's
+  // scroll isn't touched.
+  useLayoutEffect(() => {
+    if (!page || !scrollRef.current) return;
+    if (centeredForPage.current === page.id) return;
+    if (viewportSize.w === 0 || frameSize.w === 0) return;
+
+    const TOP_MARGIN = 32;
+    scrollRef.current.scrollLeft = pageLeft + scaledW / 2 - viewportSize.w / 2;
+    scrollRef.current.scrollTop = Math.max(0, pageTop - TOP_MARGIN);
+    centeredForPage.current = page.id;
+  }, [page, pageLeft, pageTop, scaledW, viewportSize.w, frameSize.w]);
 
   // Pan mode: Space + drag moves the viewport (like Figma).
   const spaceDownRef = useRef(false);

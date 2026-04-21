@@ -191,7 +191,44 @@ function EditableShell({
   const handleClick = (e: MouseEvent) => {
     e.stopPropagation();
     if (editing) return;
-    select({ kind: 'element', id: element.id });
+
+    // Figma-style drill-down: advance one level past the deepest ancestor
+    // shared by the current selection and the clicked element.
+    //   - nothing selected → outermost of the clicked chain
+    //   - sibling selected (same parent) → the clicked element directly
+    //   - parent selected → drill one level into the clicked subtree
+    //   - unrelated selection → outermost of the clicked chain
+    const chain: string[] = [];
+    for (let node: HTMLElement | null = e.currentTarget as HTMLElement; node; node = node.parentElement) {
+      const id = node.getAttribute('data-element-id');
+      if (id) chain.unshift(id);
+    }
+    if (chain.length === 0) chain.push(element.id);
+
+    const sel = useEditorStore.getState().selection;
+    const selId = sel?.kind === 'element' ? sel.id : null;
+
+    const selChain: string[] = [];
+    if (selId) {
+      const selNode = document.querySelector<HTMLElement>(`[data-element-id="${CSS.escape(selId)}"]`);
+      for (let node: HTMLElement | null = selNode; node; node = node.parentElement) {
+        const id = node.getAttribute('data-element-id');
+        if (id) selChain.unshift(id);
+      }
+    }
+
+    let commonLen = 0;
+    while (
+      commonLen < chain.length &&
+      commonLen < selChain.length &&
+      chain[commonLen] === selChain[commonLen]
+    ) {
+      commonLen++;
+    }
+
+    const targetId = chain[Math.min(commonLen, chain.length - 1)];
+    if (targetId === selId) return;
+    select({ kind: 'element', id: targetId });
   };
   const handleDoubleClick = (e: MouseEvent) => {
     if (element.type === 'text') { e.stopPropagation(); setEditing(true); }

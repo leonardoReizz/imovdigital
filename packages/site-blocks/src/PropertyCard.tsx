@@ -8,9 +8,13 @@ export type PropertyCardTemplate = 'compact' | 'standard' | 'highlight';
 interface Props {
   property: Property;
   template: PropertyCardTemplate;
+  orientation?: 'vertical' | 'horizontal';
 }
 
-export function PropertyCard({ property, template }: Props) {
+export function PropertyCard({ property, template, orientation = 'vertical' }: Props) {
+  if (orientation === 'horizontal') {
+    return <RowCard property={property} />;
+  }
   switch (template) {
     case 'compact':
       return <CompactCard property={property} />;
@@ -228,6 +232,93 @@ function HighlightCard({ property }: { property: Property }) {
           {locationLabel(property)}
         </p>
         <p style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>{priceLabel(property)}</p>
+      </div>
+    </CardShell>
+  );
+}
+
+/* ─── Row (list display) ─────────────────────────────────────── */
+
+function RowCard({ property }: { property: Property }) {
+  const { theme } = useBlocks();
+  const cover = coverImage(property);
+
+  return (
+    <CardShell
+      property={property}
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        background: '#fff',
+        borderRadius: theme.borderRadius,
+        overflow: 'hidden',
+        textDecoration: 'none',
+        color: 'inherit',
+        border: '1px solid #e2e8f0',
+        minHeight: 180,
+      }}
+    >
+      <div
+        style={{
+          width: 260,
+          flexShrink: 0,
+          background: '#f1f5f9',
+          position: 'relative',
+        }}
+      >
+        {cover && (
+          <img
+            src={cover}
+            alt={property.title}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        )}
+        {property.featured && (
+          <span
+            style={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              background: theme.primaryColor,
+              color: '#fff',
+              padding: '2px 8px',
+              borderRadius: 4,
+              fontSize: 11,
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: 0.4,
+            }}
+          >
+            Destaque
+          </span>
+        )}
+      </div>
+      <div
+        style={{
+          flex: 1,
+          padding: 20,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          gap: 8,
+          minWidth: 0,
+        }}
+      >
+        <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0, color: '#0f172a' }}>
+          {property.title}
+        </h3>
+        <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>
+          {locationLabel(property)}
+        </p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, fontSize: 12, color: '#475569' }}>
+          <span>{property.area}m²</span>
+          {property.bedrooms > 0 && <span>{property.bedrooms} quartos</span>}
+          {property.bathrooms > 0 && <span>{property.bathrooms} banheiros</span>}
+          {property.parkingSpots > 0 && <span>{property.parkingSpots} vagas</span>}
+        </div>
+        <p style={{ fontSize: 20, fontWeight: 700, color: theme.primaryColor, margin: '4px 0 0' }}>
+          {priceLabel(property)}
+        </p>
       </div>
     </CardShell>
   );
