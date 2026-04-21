@@ -17,7 +17,9 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { TwoFactorPage } from './pages/TwoFactorPage';
 import { NoOrganizationPage } from './pages/NoOrganizationPage';
 import { TermsPage } from './pages/TermsPage';
-import { SiteEditor } from './pages/editor/SiteEditor';
+import { SiteEditor } from './editor/SiteEditor';
+import { PageList } from './editor/PageList';
+import { PreviewPage } from './editor/PreviewPage';
 
 export function App() {
   return (
@@ -28,9 +30,11 @@ export function App() {
       <Route path="/two-factor" element={<TwoFactorPage />} />
       <Route path="/no-organization" element={<NoOrganizationPage />} />
       <Route path="/terms" element={<TermsPage />} />
-      <Route path="/dashboard/editor" element={<SiteEditor />} />
+      <Route path="/dashboard/pages/:id/editor" element={<SiteEditor />} />
+      <Route path="/dashboard/pages/:id/preview" element={<PreviewPage />} />
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route index element={<OverviewPage />} />
+        <Route path="pages" element={<PageList />} />
         <Route path="properties" element={<PropertiesPage />} />
         <Route path="properties/new" element={<PropertyFormPage />} />
         <Route path="properties/:id/edit" element={<PropertyFormPage />} />

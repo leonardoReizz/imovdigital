@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { CLIENT_API_URL } from '@/lib/client-api';
 import { CustomSelect } from './CustomSelect';
-import type { SearchPageConfig } from '@imovdigital/types';
+import type { SearchPageConfig } from '@/lib/legacy-config';
 import { PROPERTY_TYPE_LABELS } from '@imovdigital/types';
 
 interface Props {
@@ -142,7 +142,7 @@ export function MobileFilterDrawer({ primaryColor, tenantSlug, sp, total }: Prop
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-gray-500">Banheiros</label>
                   <div className="flex flex-wrap gap-1.5">
-                    {['1', '2', '3', '4'].map((v) => (
+                    {['1', '2', '3', '4', '5'].map((v) => (
                       <button key={v} type="button" onClick={() => toggleChip('bathrooms', v)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${local.bathrooms === v ? 'border-[--color-primary] bg-[--color-primary]/10 text-[--color-primary]' : 'border-gray-200 text-gray-600'}`}
                       >{v}+</button>
@@ -155,7 +155,7 @@ export function MobileFilterDrawer({ primaryColor, tenantSlug, sp, total }: Prop
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-gray-500">Vagas</label>
                   <div className="flex flex-wrap gap-1.5">
-                    {['1', '2', '3', '4'].map((v) => (
+                    {['1', '2', '3', '4', '5'].map((v) => (
                       <button key={v} type="button" onClick={() => toggleChip('parkingSpots', v)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${local.parkingSpots === v ? 'border-[--color-primary] bg-[--color-primary]/10 text-[--color-primary]' : 'border-gray-200 text-gray-600'}`}
                       >{v}+</button>

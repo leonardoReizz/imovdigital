@@ -1,5 +1,5 @@
 {
-  "totalFiles": 160,
+  "totalFiles": 176,
   "files": [
     {
       "path": "apps/dashboard/vite.config.ts",
@@ -42,6 +42,41 @@
       "module": "apps/dashboard"
     },
     {
+      "path": "packages/site-blocks/src/ElementRenderer.tsx",
+      "name": "ElementRenderer.tsx",
+      "module": "packages/site-blocks"
+    },
+    {
+      "path": "packages/site-blocks/src/PropertyCard.tsx",
+      "name": "PropertyCard.tsx",
+      "module": "packages/site-blocks"
+    },
+    {
+      "path": "packages/site-blocks/src/SectionBody.tsx",
+      "name": "SectionBody.tsx",
+      "module": "packages/site-blocks"
+    },
+    {
+      "path": "packages/site-blocks/src/SectionRenderer.tsx",
+      "name": "SectionRenderer.tsx",
+      "module": "packages/site-blocks"
+    },
+    {
+      "path": "packages/site-blocks/src/context.tsx",
+      "name": "context.tsx",
+      "module": "packages/site-blocks"
+    },
+    {
+      "path": "packages/site-blocks/src/index.ts",
+      "name": "index.ts",
+      "module": "packages/site-blocks"
+    },
+    {
+      "path": "packages/site-blocks/src/mocks.ts",
+      "name": "mocks.ts",
+      "module": "packages/site-blocks"
+    },
+    {
       "path": "packages/types/src/auth.ts",
       "name": "auth.ts",
       "module": "packages/types"
@@ -67,6 +102,11 @@
       "module": "packages/types"
     },
     {
+      "path": "packages/types/src/page.ts",
+      "name": "page.ts",
+      "module": "packages/types"
+    },
+    {
       "path": "packages/types/src/plan.ts",
       "name": "plan.ts",
       "module": "packages/types"
@@ -77,8 +117,8 @@
       "module": "packages/types"
     },
     {
-      "path": "packages/types/src/site-config.ts",
-      "name": "site-config.ts",
+      "path": "packages/types/src/templates.ts",
+      "name": "templates.ts",
       "module": "packages/types"
     },
     {
@@ -117,6 +157,11 @@
       "module": "apps/api/prisma"
     },
     {
+      "path": "apps/dashboard/src/contexts/SubscriptionContext.tsx",
+      "name": "SubscriptionContext.tsx",
+      "module": "apps/dashboard/contexts"
+    },
+    {
       "path": "apps/dashboard/src/components/CancellationModal.tsx",
       "name": "CancellationModal.tsx",
       "module": "apps/dashboard/components"
@@ -142,6 +187,11 @@
       "module": "apps/dashboard/components"
     },
     {
+      "path": "apps/dashboard/src/components/PlanChangeConfirmModal.tsx",
+      "name": "PlanChangeConfirmModal.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
       "path": "apps/dashboard/src/components/SupportWidget.tsx",
       "name": "SupportWidget.tsx",
       "module": "apps/dashboard/components"
@@ -152,14 +202,84 @@
       "module": "apps/dashboard/components"
     },
     {
-      "path": "apps/dashboard/src/contexts/SubscriptionContext.tsx",
-      "name": "SubscriptionContext.tsx",
-      "module": "apps/dashboard/contexts"
+      "path": "apps/dashboard/src/editor/Canvas.tsx",
+      "name": "Canvas.tsx",
+      "module": "apps/dashboard/editor"
     },
     {
-      "path": "apps/dashboard/src/hooks/useAutoSave.ts",
-      "name": "useAutoSave.ts",
-      "module": "apps/dashboard/hooks"
+      "path": "apps/dashboard/src/editor/EditableElement.tsx",
+      "name": "EditableElement.tsx",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/PageList.tsx",
+      "name": "PageList.tsx",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/PageSwitcher.tsx",
+      "name": "PageSwitcher.tsx",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/PreviewPage.tsx",
+      "name": "PreviewPage.tsx",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/ResizeHandles.tsx",
+      "name": "ResizeHandles.tsx",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/SectionResizeHandle.tsx",
+      "name": "SectionResizeHandle.tsx",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/ShortcutsModal.tsx",
+      "name": "ShortcutsModal.tsx",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/SiteEditor.tsx",
+      "name": "SiteEditor.tsx",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/SnapGuides.tsx",
+      "name": "SnapGuides.tsx",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/ThemePanel.tsx",
+      "name": "ThemePanel.tsx",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/Toolbar.tsx",
+      "name": "Toolbar.tsx",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/api.ts",
+      "name": "api.ts",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/defaults.ts",
+      "name": "defaults.ts",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/store.ts",
+      "name": "store.ts",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/types.ts",
+      "name": "types.ts",
+      "module": "apps/dashboard/editor"
     },
     {
       "path": "apps/dashboard/src/hooks/useR2Upload.ts",
@@ -174,6 +294,11 @@
     {
       "path": "apps/dashboard/src/lib/api.ts",
       "name": "api.ts",
+      "module": "apps/dashboard"
+    },
+    {
+      "path": "apps/dashboard/src/lib/tiktok.ts",
+      "name": "tiktok.ts",
       "module": "apps/dashboard"
     },
     {
@@ -262,11 +387,6 @@
       "module": "apps/dashboard/pages"
     },
     {
-      "path": "apps/dashboard/src/store/editorStore.ts",
-      "name": "editorStore.ts",
-      "module": "apps/dashboard/store"
-    },
-    {
       "path": "apps/web/src/app/layout.tsx",
       "name": "layout.tsx",
       "module": "apps/web/app"
@@ -312,6 +432,11 @@
       "module": "apps/web/components"
     },
     {
+      "path": "apps/web/src/components/PageChrome.tsx",
+      "name": "PageChrome.tsx",
+      "module": "apps/web/components"
+    },
+    {
       "path": "apps/web/src/components/PhoneInput.tsx",
       "name": "PhoneInput.tsx",
       "module": "apps/web/components"
@@ -329,11 +454,6 @@
     {
       "path": "apps/web/src/components/PropertyImageCarousel.tsx",
       "name": "PropertyImageCarousel.tsx",
-      "module": "apps/web/components"
-    },
-    {
-      "path": "apps/web/src/components/SectionRenderer.tsx",
-      "name": "SectionRenderer.tsx",
       "module": "apps/web/components"
     },
     {
@@ -372,9 +492,109 @@
       "module": "apps/web"
     },
     {
+      "path": "apps/web/src/lib/legacy-config.ts",
+      "name": "legacy-config.ts",
+      "module": "apps/web"
+    },
+    {
       "path": "apps/web/src/lib/tenant.ts",
       "name": "tenant.ts",
       "module": "apps/web"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/Button.tsx",
+      "name": "Button.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/Container.tsx",
+      "name": "Container.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/Divider.tsx",
+      "name": "Divider.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/Form.tsx",
+      "name": "Form.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/Image.tsx",
+      "name": "Image.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/Listings.tsx",
+      "name": "Listings.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/Map.tsx",
+      "name": "Map.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/PropertyContactForm.tsx",
+      "name": "PropertyContactForm.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/PropertyGallery.tsx",
+      "name": "PropertyGallery.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/PropertyMap.tsx",
+      "name": "PropertyMap.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/PropertyPrices.tsx",
+      "name": "PropertyPrices.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/PropertySpecs.tsx",
+      "name": "PropertySpecs.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/PropertyTags.tsx",
+      "name": "PropertyTags.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/Search.tsx",
+      "name": "Search.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/Spacer.tsx",
+      "name": "Spacer.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/Text.tsx",
+      "name": "Text.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/elements/Video.tsx",
+      "name": "Video.tsx",
+      "module": "packages/site-blocks/elements"
+    },
+    {
+      "path": "packages/site-blocks/src/utils/style.ts",
+      "name": "style.ts",
+      "module": "packages/site-blocks/utils"
+    },
+    {
+      "path": "apps/api/src/common/filters/http-exception.filter.ts",
+      "name": "http-exception.filter.ts",
+      "module": "apps/api/common"
     },
     {
       "path": "apps/api/src/common/decorators/current-user.decorator.ts",
@@ -382,8 +602,13 @@
       "module": "apps/api/common"
     },
     {
-      "path": "apps/api/src/common/filters/http-exception.filter.ts",
-      "name": "http-exception.filter.ts",
+      "path": "apps/api/src/common/decorators/skip-subscription-check.decorator.ts",
+      "name": "skip-subscription-check.decorator.ts",
+      "module": "apps/api/common"
+    },
+    {
+      "path": "apps/api/src/common/middleware/tenant-context.middleware.ts",
+      "name": "tenant-context.middleware.ts",
       "module": "apps/api/common"
     },
     {
@@ -392,8 +617,8 @@
       "module": "apps/api/common"
     },
     {
-      "path": "apps/api/src/common/middleware/tenant-context.middleware.ts",
-      "name": "tenant-context.middleware.ts",
+      "path": "apps/api/src/common/guards/subscription.guard.ts",
+      "name": "subscription.guard.ts",
       "module": "apps/api/common"
     },
     {
@@ -447,18 +672,23 @@
       "module": "apps/api/modules"
     },
     {
-      "path": "apps/api/src/modules/lead/lead.controller.ts",
-      "name": "lead.controller.ts",
+      "path": "apps/api/src/modules/page/page.controller.ts",
+      "name": "page.controller.ts",
       "module": "apps/api/modules"
     },
     {
-      "path": "apps/api/src/modules/lead/lead.module.ts",
-      "name": "lead.module.ts",
+      "path": "apps/api/src/modules/page/page.dto.ts",
+      "name": "page.dto.ts",
       "module": "apps/api/modules"
     },
     {
-      "path": "apps/api/src/modules/lead/lead.service.ts",
-      "name": "lead.service.ts",
+      "path": "apps/api/src/modules/page/page.module.ts",
+      "name": "page.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/page/page.service.ts",
+      "name": "page.service.ts",
       "module": "apps/api/modules"
     },
     {
@@ -492,6 +722,21 @@
       "module": "apps/api/modules"
     },
     {
+      "path": "apps/api/src/modules/lead/lead.controller.ts",
+      "name": "lead.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/lead/lead.module.ts",
+      "name": "lead.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/lead/lead.service.ts",
+      "name": "lead.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
       "path": "apps/api/src/modules/public/public.controller.ts",
       "name": "public.controller.ts",
       "module": "apps/api/modules"
@@ -504,41 +749,6 @@
     {
       "path": "apps/api/src/modules/public/public.service.ts",
       "name": "public.service.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/site-config/site-config.controller.ts",
-      "name": "site-config.controller.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/site-config/site-config.dto.ts",
-      "name": "site-config.dto.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/site-config/site-config.module.ts",
-      "name": "site-config.module.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/site-config/site-config.service.ts",
-      "name": "site-config.service.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/subscription/subscription.controller.ts",
-      "name": "subscription.controller.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/subscription/subscription.module.ts",
-      "name": "subscription.module.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/subscription/subscription.service.ts",
-      "name": "subscription.service.ts",
       "module": "apps/api/modules"
     },
     {
@@ -572,6 +782,26 @@
       "module": "apps/api/modules"
     },
     {
+      "path": "apps/api/src/modules/subscription/subscription.controller.ts",
+      "name": "subscription.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/subscription/subscription.module.ts",
+      "name": "subscription.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/subscription/subscription.service.ts",
+      "name": "subscription.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/subscription/tiktok-events.service.ts",
+      "name": "tiktok-events.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
       "path": "apps/api/src/modules/user/user.controller.ts",
       "name": "user.controller.ts",
       "module": "apps/api/modules"
@@ -587,39 +817,44 @@
       "module": "apps/api/modules"
     },
     {
-      "path": "apps/dashboard/src/components/editor/GlobalSettings.tsx",
-      "name": "GlobalSettings.tsx",
-      "module": "apps/dashboard/components"
+      "path": "apps/dashboard/src/editor/dnd/EditorDndProvider.tsx",
+      "name": "EditorDndProvider.tsx",
+      "module": "apps/dashboard/editor"
     },
     {
-      "path": "apps/dashboard/src/components/editor/PropertyDetailSettings.tsx",
-      "name": "PropertyDetailSettings.tsx",
-      "module": "apps/dashboard/components"
+      "path": "apps/dashboard/src/editor/dnd/draggables.tsx",
+      "name": "draggables.tsx",
+      "module": "apps/dashboard/editor"
     },
     {
-      "path": "apps/dashboard/src/components/editor/SearchPageSettings.tsx",
-      "name": "SearchPageSettings.tsx",
-      "module": "apps/dashboard/components"
+      "path": "apps/dashboard/src/editor/dnd/droppables.tsx",
+      "name": "droppables.tsx",
+      "module": "apps/dashboard/editor"
     },
     {
-      "path": "apps/dashboard/src/components/editor/SectionSettings.tsx",
-      "name": "SectionSettings.tsx",
-      "module": "apps/dashboard/components"
+      "path": "apps/dashboard/src/editor/dnd/snap.ts",
+      "name": "snap.ts",
+      "module": "apps/dashboard/editor"
     },
     {
-      "path": "apps/dashboard/src/components/editor/SectionsList.tsx",
-      "name": "SectionsList.tsx",
-      "module": "apps/dashboard/components"
+      "path": "apps/dashboard/src/editor/dnd/snapModifier.ts",
+      "name": "snapModifier.ts",
+      "module": "apps/dashboard/editor"
     },
     {
-      "path": "apps/dashboard/src/components/editor/SitePreview.tsx",
-      "name": "SitePreview.tsx",
-      "module": "apps/dashboard/components"
+      "path": "apps/dashboard/src/editor/dnd/types.ts",
+      "name": "types.ts",
+      "module": "apps/dashboard/editor"
     },
     {
-      "path": "apps/dashboard/src/pages/editor/SiteEditor.tsx",
-      "name": "SiteEditor.tsx",
-      "module": "apps/dashboard/pages"
+      "path": "apps/dashboard/src/editor/dnd/useDesktopImageDrop.ts",
+      "name": "useDesktopImageDrop.ts",
+      "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/dashboard/src/editor/dnd/zoomModifier.ts",
+      "name": "zoomModifier.ts",
+      "module": "apps/dashboard/editor"
     },
     {
       "path": "apps/web/src/app/imoveis/page.tsx",
@@ -627,174 +862,19 @@
       "module": "apps/web/app"
     },
     {
-      "path": "apps/web/src/components/sections/About.tsx",
-      "name": "About.tsx",
-      "module": "apps/web/components"
+      "path": "apps/dashboard/src/editor/sidebar/ElementLibrary.tsx",
+      "name": "ElementLibrary.tsx",
+      "module": "apps/dashboard/editor"
     },
     {
-      "path": "apps/web/src/components/sections/Agents.tsx",
-      "name": "Agents.tsx",
-      "module": "apps/web/components"
+      "path": "apps/dashboard/src/editor/sidebar/PropertiesPanel.tsx",
+      "name": "PropertiesPanel.tsx",
+      "module": "apps/dashboard/editor"
     },
     {
-      "path": "apps/web/src/components/sections/CTABanner.tsx",
-      "name": "CTABanner.tsx",
-      "module": "apps/web/components"
-    },
-    {
-      "path": "apps/web/src/components/sections/Contact.tsx",
-      "name": "Contact.tsx",
-      "module": "apps/web/components"
-    },
-    {
-      "path": "apps/web/src/components/sections/FeaturedListings.tsx",
-      "name": "FeaturedListings.tsx",
-      "module": "apps/web/components"
-    },
-    {
-      "path": "apps/web/src/components/sections/Footer.tsx",
-      "name": "Footer.tsx",
-      "module": "apps/web/components"
-    },
-    {
-      "path": "apps/web/src/components/sections/Hero.tsx",
-      "name": "Hero.tsx",
-      "module": "apps/web/components"
-    },
-    {
-      "path": "apps/web/src/components/sections/SearchBar.tsx",
-      "name": "SearchBar.tsx",
-      "module": "apps/web/components"
-    },
-    {
-      "path": "apps/web/src/components/sections/Testimonials.tsx",
-      "name": "Testimonials.tsx",
-      "module": "apps/web/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/controls/BadgeToggle.tsx",
-      "name": "BadgeToggle.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/controls/ColorPicker.tsx",
-      "name": "ColorPicker.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/controls/EditorImageUploader.tsx",
-      "name": "EditorImageUploader.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/controls/FontSelector.tsx",
-      "name": "FontSelector.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/controls/RangeSlider.tsx",
-      "name": "RangeSlider.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/controls/SelectField.tsx",
-      "name": "SelectField.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/controls/TextInput.tsx",
-      "name": "TextInput.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/controls/TextareaField.tsx",
-      "name": "TextareaField.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/controls/ToggleGroup.tsx",
-      "name": "ToggleGroup.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/controls/index.ts",
-      "name": "index.ts",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/AboutPreview.tsx",
-      "name": "AboutPreview.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/AgentsPreview.tsx",
-      "name": "AgentsPreview.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/CTABannerPreview.tsx",
-      "name": "CTABannerPreview.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/ContactPreview.tsx",
-      "name": "ContactPreview.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/FeaturedListingsPreview.tsx",
-      "name": "FeaturedListingsPreview.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/FooterPreview.tsx",
-      "name": "FooterPreview.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/HeroPreview.tsx",
-      "name": "HeroPreview.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/ImageLightbox.tsx",
-      "name": "ImageLightbox.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/MapCircle.tsx",
-      "name": "MapCircle.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/PreviewHeader.tsx",
-      "name": "PreviewHeader.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/PropertyDetailPreview.tsx",
-      "name": "PropertyDetailPreview.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/PropertyPrice.tsx",
-      "name": "PropertyPrice.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/SearchBarPreview.tsx",
-      "name": "SearchBarPreview.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/SearchResultsPreview.tsx",
-      "name": "SearchResultsPreview.tsx",
-      "module": "apps/dashboard/components"
-    },
-    {
-      "path": "apps/dashboard/src/components/editor/preview/TestimonialsPreview.tsx",
-      "name": "TestimonialsPreview.tsx",
-      "module": "apps/dashboard/components"
+      "path": "apps/dashboard/src/editor/sidebar/controls.tsx",
+      "name": "controls.tsx",
+      "module": "apps/dashboard/editor"
     },
     {
       "path": "apps/web/src/app/imoveis/[slug]/page.tsx",

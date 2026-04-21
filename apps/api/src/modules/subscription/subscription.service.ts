@@ -253,14 +253,16 @@ export class SubscriptionService {
     });
     if (!tenant) throw new BadRequestException('Tenant não encontrado');
 
-    const siteConfig = await this.prisma.siteConfig.findUnique({ where: { tenantId } });
+    const publishedPages = await this.prisma.page.count({
+      where: { tenantId, status: 'published' },
+    });
 
     return {
       planName: tenant.plan.name,
       properties: tenant._count.properties,
       users: tenant._count.users,
       leads: tenant._count.leads,
-      hasSitePublished: !!siteConfig?.published,
+      hasSitePublished: publishedPages > 0,
       hasCustomDomain: !!tenant.customDomain,
     };
   }

@@ -5,13 +5,20 @@ import { apiFetch } from '@/lib/api';
 import { SiteHeader } from '@/components/SiteHeader';
 import { PropertyCard } from '@/components/PropertyCard';
 import { PropertyFilters } from '@/components/PropertyFilters';
-import type { Property, SearchPageConfig } from '@imovdigital/types';
-import { DEFAULT_SEARCH_PAGE_CONFIG } from '@imovdigital/types';
+import type { Property, Section, ThemeTokens } from '@imovdigital/types';
+import { DEFAULT_THEME } from '@imovdigital/types';
+import type { SearchPageConfig } from '@/lib/legacy-config';
+import { DEFAULT_SEARCH_PAGE_CONFIG } from '@/lib/legacy-config';
 import { SidebarFilters } from '@/components/SidebarFilters';
 import { MobileFilterDrawer } from '@/components/MobileFilterDrawer';
 import { SortSelect } from '@/components/SortSelect';
-import { Footer } from '@/components/sections/Footer';
+import { PageChrome } from '@/components/PageChrome';
 import { Home } from 'lucide-react';
+
+interface PublicPage {
+  sections?: Section[];
+  theme?: ThemeTokens;
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const slug = await resolveTenantSlug();
@@ -30,8 +37,7 @@ export default async function ImoveisPage({ searchParams }: Props) {
   const params = await searchParams;
   const slug = await resolveTenantSlug();
 
-  const siteConfig = await apiFetch(`/public/${slug}/site-config`).catch(() => null) as any;
-  const sp: SearchPageConfig = siteConfig?.searchPage || DEFAULT_SEARCH_PAGE_CONFIG;
+  const sp: SearchPageConfig = DEFAULT_SEARCH_PAGE_CONFIG;
 
   const qs = new URLSearchParams();
   if (params.q) qs.set('q', params.q);
@@ -48,19 +54,59 @@ export default async function ImoveisPage({ searchParams }: Props) {
   if (params.page) qs.set('page', params.page);
   qs.set('limit', String(sp.itemsPerPage));
 
-  const [tenant, res] = await Promise.all([
+  const [tenant, res, searchPage, filters] = await Promise.all([
     apiFetch(`/public/${slug}`),
     apiFetch<{ data: Property[]; total: number; page: number; totalPages: number }>(
       `/public/${slug}/properties?${qs.toString()}`
     ),
+    apiFetch<PublicPage | null>(`/public/${slug}/pages/search`).catch(() => null),
+    apiFetch<{ cities: string[]; neighborhoods: string[] }>(`/public/${slug}/filters`).catch(
+      () => ({ cities: [], neighborhoods: [] }),
+    ),
   ]);
 
-  const logoUrl = siteConfig?.logoUrl ?? tenant.logoUrl;
-  const primaryColor = siteConfig?.primaryColor || tenant.primaryColor;
+  const logoUrl = tenant.logoUrl;
+  const primaryColor = tenant.primaryColor;
+
+  const rawSections = searchPage?.sections ?? [];
+  const theme: ThemeTokens = {
+    ...DEFAULT_THEME,
+    ...(searchPage?.theme ?? {}),
+    ...(tenant?.primaryColor ? { primaryColor: tenant.primaryColor } : {}),
+    ...(tenant?.secondaryColor ? { secondaryColor: tenant.secondaryColor } : {}),
+    ...(tenant?.fontFamily ? { fontFamily: tenant.fontFamily } : {}),
+    ...(tenant?.borderRadius !== undefined ? { borderRadius: tenant.borderRadius } : {}),
+  };
+  // SiteHeader below is a hardcoded sticky chrome with logo/mobile drawer,
+  // so we skip the template's navbar section here to avoid duplication.
+  // (The navbar still shows in the editor for WYSIWYG consistency and is
+  //  rendered on the home page which doesn't have SiteHeader.)
+  const sections = rawSections.filter(
+    (s) => (s as { type?: string }).type !== 'navbar',
+  );
+  // The public page renders its own results grid (with filters, pagination,
+  // live data) so the template's `listings` section is skipped — it only
+  // exists to give the editor a WYSIWYG preview of the sidebar + grid.
+  // Anything authored before the listings becomes header chrome; anything
+  // after becomes footer chrome.
+  const listingsIdx = sections.findIndex(
+    (s) => (s as { type?: string }).type === 'listings',
+  );
+  const headerSections = listingsIdx === -1 ? [] : sections.slice(0, listingsIdx);
+  const footerSections = listingsIdx === -1 ? sections : sections.slice(listingsIdx + 1);
 
   return (
     <>
-      <SiteHeader logoUrl={logoUrl} logoSize={(siteConfig as any)?.logoSize} siteName={tenant.name} primaryColor={primaryColor} />
+      <SiteHeader logoUrl={logoUrl} siteName={tenant.name} primaryColor={primaryColor} />
+
+      <PageChrome
+        sections={headerSections}
+        theme={theme}
+        tenantSlug={slug}
+        properties={res.data}
+        cities={filters.cities}
+        neighborhoods={filters.neighborhoods}
+      />
 
       {sp.filterPosition === 'top' && (
         <Suspense>
@@ -148,11 +194,15 @@ export default async function ImoveisPage({ searchParams }: Props) {
         </div>
       </div>
 
-      {/* Footer */}
-      {siteConfig?.sections && (() => {
-        const footerSection = (siteConfig as any).sections.find((s: any) => s.type === 'footer' && s.visible);
-        return footerSection ? <Footer settings={footerSection.settings} contactData={{ ...(tenant as any).contact }} /> : null;
-      })()}
+
+      <PageChrome
+        sections={footerSections}
+        theme={theme}
+        tenantSlug={slug}
+        properties={res.data}
+        cities={filters.cities}
+        neighborhoods={filters.neighborhoods}
+      />
     </>
   );
 }

@@ -90,9 +90,11 @@ model Tenant {
   customDomain         String?            @unique
   logoUrl              String?
   bannerUrl            String?
+  faviconUrl           String?
   primaryColor         String             @default("#2563eb")
   secondaryColor       String             @default("#1e40af")
   fontFamily           String             @default("Inter")
+  borderRadius         Int                @default(8)
   layoutStyle          LayoutStyle        @default(GRID)
   siteTheme            Json? // SiteTheme JSON
   planId               String
@@ -111,7 +113,7 @@ model Tenant {
   properties    Property[]
   contactConfig ContactConfig?
   leads         Lead[]
-  siteConfig    SiteConfig?
+  pages         Page[]
 
   @@index([slug])
   @@map("tenants")
@@ -196,18 +198,22 @@ model Property {
   @@map("properties")
 }
 
-model SiteConfig {
+model Page {
   id          String    @id @default(uuid())
-  tenantId    String    @unique
-  data        Json
-  published   Boolean   @default(false)
+  tenantId    String
+  slug        String
+  title       String
+  data        Json // PageData (sections + theme + seo)
+  status      String    @default("draft") // "draft" | "published"
   publishedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
-  @@map("site_configs")
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@map("pages")
 }
 
 model ContactConfig {

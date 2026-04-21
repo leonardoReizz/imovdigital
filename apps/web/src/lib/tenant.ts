@@ -1,6 +1,5 @@
 import { headers } from 'next/headers';
 import { apiFetch } from './api';
-import type { SiteConfig } from '@imovdigital/types';
 
 const BASE_DOMAIN = process.env.BASE_DOMAIN || 'imovdigital.com.br';
 
@@ -64,6 +63,3 @@ export async function getTenant(): Promise<TenantData> {
   return apiFetch<TenantData>(`/public/${slug}`);
 }
 
-export async function getSiteConfig(slug: string): Promise<SiteConfig> {
-  return apiFetch<SiteConfig>(`/public/${slug}/site-config`);
-}

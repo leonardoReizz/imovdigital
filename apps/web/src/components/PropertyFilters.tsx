@@ -5,8 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { CLIENT_API_URL } from '@/lib/client-api';
 import { CustomSelect } from './CustomSelect';
-import type { SearchPageConfig } from '@imovdigital/types';
-import { DEFAULT_SEARCH_PAGE_CONFIG, PROPERTY_TYPE_LABELS } from '@imovdigital/types';
+import type { SearchPageConfig } from '@/lib/legacy-config';
+import { DEFAULT_SEARCH_PAGE_CONFIG } from '@/lib/legacy-config';
+import { PROPERTY_TYPE_LABELS } from '@imovdigital/types';
 
 const TYPE_OPTIONS = [
   { value: '', label: 'Todos os tipos' },

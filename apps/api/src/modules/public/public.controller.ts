@@ -44,9 +44,17 @@ export class PublicController {
     return this.publicService.findProperty(slug, propertySlug);
   }
 
-  @Get(':slug/site-config')
-  async siteConfig(@Param('slug') slug: string) {
-    return this.publicService.getSiteConfig(slug);
+  @Get(':slug/pages')
+  async listPages(@Param('slug') slug: string) {
+    return this.publicService.listPages(slug);
+  }
+
+  @Get(':slug/pages/:pageSlug')
+  async getPage(
+    @Param('slug') slug: string,
+    @Param('pageSlug') pageSlug: string,
+  ) {
+    return this.publicService.getPage(slug, pageSlug);
   }
 
   @SkipThrottle({ default: false }) // Re-enable throttle for lead creation

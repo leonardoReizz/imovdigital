@@ -8,41 +8,49 @@
 - **apps/api** → apps/api/prisma, apps/api/modules, apps/api/common
 - **apps/api/common** → apps/api/prisma
 - **apps/api/modules** → apps/api/prisma, apps/api/common
-- **apps/dashboard** → apps/dashboard/layouts, apps/dashboard/pages, apps/dashboard/contexts
-- **apps/dashboard/components** → apps/dashboard, apps/dashboard/store, apps/dashboard/hooks
+- **apps/dashboard** → apps/dashboard/layouts, apps/dashboard/pages, apps/dashboard/editor, apps/dashboard/contexts
+- **apps/dashboard/components** → apps/dashboard
 - **apps/dashboard/contexts** → apps/dashboard
-- **apps/dashboard/hooks** → apps/dashboard/store, apps/dashboard
+- **apps/dashboard/editor** → apps/dashboard/hooks, apps/dashboard
+- **apps/dashboard/hooks** → apps/dashboard
 - **apps/dashboard/layouts** → apps/dashboard/contexts, apps/dashboard/components, apps/dashboard
-- **apps/dashboard/pages** → apps/dashboard, apps/dashboard/components, apps/dashboard/contexts, apps/dashboard/store, apps/dashboard/hooks
-- **apps/dashboard/store** → apps/dashboard
+- **apps/dashboard/pages** → apps/dashboard, apps/dashboard/components, apps/dashboard/contexts
+- **packages/site-blocks** → packages/site-blocks/elements, packages/site-blocks/utils
+- **packages/site-blocks/elements** → packages/site-blocks/utils, packages/site-blocks
 
 ## Module ← Used by
 
 - **apps/api/common** ← apps/api, apps/api/modules
 - **apps/api/modules** ← apps/api
 - **apps/api/prisma** ← apps/api, apps/api/common, apps/api/modules
-- **apps/dashboard** ← apps/dashboard/components, apps/dashboard/contexts, apps/dashboard/hooks, apps/dashboard/layouts, apps/dashboard/pages, apps/dashboard/store
+- **apps/dashboard** ← apps/dashboard/contexts, apps/dashboard/components, apps/dashboard/editor, apps/dashboard/hooks, apps/dashboard/layouts, apps/dashboard/pages
 - **apps/dashboard/components** ← apps/dashboard/layouts, apps/dashboard/pages
 - **apps/dashboard/contexts** ← apps/dashboard, apps/dashboard/layouts, apps/dashboard/pages
-- **apps/dashboard/hooks** ← apps/dashboard/components, apps/dashboard/pages
+- **apps/dashboard/editor** ← apps/dashboard
+- **apps/dashboard/hooks** ← apps/dashboard/editor
 - **apps/dashboard/layouts** ← apps/dashboard
 - **apps/dashboard/pages** ← apps/dashboard
-- **apps/dashboard/store** ← apps/dashboard/components, apps/dashboard/hooks, apps/dashboard/pages
+- **packages/site-blocks** ← packages/site-blocks/elements
+- **packages/site-blocks/elements** ← packages/site-blocks
+- **packages/site-blocks/utils** ← packages/site-blocks, packages/site-blocks/elements
 
 ## Impact analysis
 
 Modules ordered by number of dependents (highest impact first):
 
-🔴 **apps/dashboard** — 6 dependents (apps/dashboard/components, apps/dashboard/contexts, apps/dashboard/hooks, apps/dashboard/layouts, apps/dashboard/pages, apps/dashboard/store)
+🔴 **apps/dashboard** — 6 dependents (apps/dashboard/contexts, apps/dashboard/components, apps/dashboard/editor, apps/dashboard/hooks, apps/dashboard/layouts, apps/dashboard/pages)
 🔴 **apps/dashboard/contexts** — 3 dependents (apps/dashboard, apps/dashboard/layouts, apps/dashboard/pages)
 🔴 **apps/api/prisma** — 3 dependents (apps/api, apps/api/common, apps/api/modules)
-🔴 **apps/dashboard/store** — 3 dependents (apps/dashboard/components, apps/dashboard/hooks, apps/dashboard/pages)
 🟡 **apps/api/common** — 2 dependents (apps/api, apps/api/modules)
-🟡 **apps/dashboard/hooks** — 2 dependents (apps/dashboard/components, apps/dashboard/pages)
+🟡 **packages/site-blocks/utils** — 2 dependents (packages/site-blocks, packages/site-blocks/elements)
 🟡 **apps/dashboard/components** — 2 dependents (apps/dashboard/layouts, apps/dashboard/pages)
 🟢 **apps/dashboard/layouts** — 1 dependent (apps/dashboard)
 🟢 **apps/dashboard/pages** — 1 dependent (apps/dashboard)
+🟢 **apps/dashboard/editor** — 1 dependent (apps/dashboard)
 🟢 **apps/api/modules** — 1 dependent (apps/api)
+🟢 **packages/site-blocks/elements** — 1 dependent (packages/site-blocks)
+🟢 **apps/dashboard/hooks** — 1 dependent (apps/dashboard/editor)
+🟢 **packages/site-blocks** — 1 dependent (packages/site-blocks/elements)
 
 ## Isolated modules
 

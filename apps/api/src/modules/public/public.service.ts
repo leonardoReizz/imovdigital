@@ -39,9 +39,11 @@ export class PublicService {
       slug: tenant.slug,
       logoUrl: tenant.logoUrl,
       bannerUrl: tenant.bannerUrl,
+      faviconUrl: tenant.faviconUrl,
       primaryColor: tenant.primaryColor,
       secondaryColor: tenant.secondaryColor,
       fontFamily: tenant.fontFamily,
+      borderRadius: tenant.borderRadius,
       layoutStyle: tenant.layoutStyle,
       contact: tenant.contactConfig,
     };
@@ -177,17 +179,36 @@ export class PublicService {
     return { slug: tenant.slug };
   }
 
-  async getSiteConfig(slug: string) {
+  async getPage(slug: string, pageSlug: string) {
     const tenant = await this.prisma.tenant.findUnique({
       where: { slug },
       include: { contactConfig: true },
     });
     if (!tenant) throw new NotFoundException('Imobiliária não encontrada');
 
-    const config = await this.prisma.siteConfig.findUnique({ where: { tenantId: tenant.id } });
-    if (!config) return null;
+    const page = await this.prisma.page.findUnique({
+      where: { tenantId_slug: { tenantId: tenant.id, slug: pageSlug } },
+    });
+    if (!page || page.status !== 'published') return null;
 
-    return config.data;
+    const data = (page.data as Record<string, unknown>) ?? {};
+    return {
+      id: page.id,
+      slug: page.slug,
+      title: page.title,
+      status: page.status,
+      publishedAt: page.publishedAt ? page.publishedAt.toISOString() : null,
+      ...data,
+    };
+  }
+
+  async listPages(slug: string) {
+    const tenant = await this.prisma.tenant.findUnique({ where: { slug } });
+    if (!tenant) throw new NotFoundException('Imobiliária não encontrada');
+    return this.prisma.page.findMany({
+      where: { tenantId: tenant.id, status: 'published' },
+      select: { slug: true, title: true, updatedAt: true },
+    });
   }
 
   async createLead(slug: string, data: any) {
@@ -493,8 +514,6 @@ export class PublicService {
     if (!tenant) throw new NotFoundException('Imobiliária não encontrada');
 
     const baseUrl = this.getBaseUrl(slug, tenant.customDomain);
-    const siteConfig = await this.prisma.siteConfig.findUnique({ where: { tenantId: tenant.id } });
-    const configData = siteConfig?.data as any;
 
     // Build location-aware SEO
     const city = tenant.contactConfig?.city;

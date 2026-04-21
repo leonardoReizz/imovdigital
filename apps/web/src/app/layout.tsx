@@ -6,12 +6,15 @@ import './globals.css';
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const slug = await resolveTenantSlug();
-    const [seo, siteConfig] = await Promise.all([
+    const [seo, tenant, siteConfig] = await Promise.all([
       apiFetch(`/public/${slug}/seo/home`),
+      apiFetch(`/public/${slug}`).catch(() => null),
       apiFetch(`/public/${slug}/site-config`).catch(() => null),
     ]);
 
-    const faviconUrl = resolveFileUrl((siteConfig as any)?.faviconUrl);
+    const faviconUrl = resolveFileUrl(
+      (siteConfig as any)?.faviconUrl ?? (tenant as any)?.faviconUrl,
+    );
 
     return {
       title: seo.title,

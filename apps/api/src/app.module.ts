@@ -13,7 +13,7 @@ import { LeadModule } from './modules/lead/lead.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { PublicModule } from './modules/public/public.module';
-import { SiteConfigModule } from './modules/site-config/site-config.module';
+import { PageModule } from './modules/page/page.module';
 
 @Module({
   imports: [
@@ -33,7 +33,7 @@ import { SiteConfigModule } from './modules/site-config/site-config.module';
     UploadModule,
     SubscriptionModule,
     PublicModule,
-    SiteConfigModule,
+    PageModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

@@ -1,17 +1,14 @@
 # Apps/dashboard/hooks Module
 
-## Files (2)
-- apps/dashboard/src/hooks/useAutoSave.ts
+## Files (1)
 - apps/dashboard/src/hooks/useR2Upload.ts
 
 ## Exports
 
 ### Functions
-- `useAutoSave(): void`
 - `useR2Upload(): { upload: (file: File, options?: UploadOptions) => Promise<string>; uploading: boolean; progress:...`
 
 ## Internal dependencies
-- → apps/dashboard/store
 - → apps/dashboard
 
 ## External dependencies

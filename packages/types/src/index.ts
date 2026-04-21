@@ -8,4 +8,5 @@ export * from './auth';
 export * from './enums';
 export * from './theme';
 export * from './theme-presets';
-export * from './site-config';
+export * from './page';
+export * from './templates';

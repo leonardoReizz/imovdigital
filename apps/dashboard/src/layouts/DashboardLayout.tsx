@@ -50,7 +50,7 @@ const navItems: NavItem[] = [
     { to: '/dashboard/leads', label: 'Todos os leads' },
     { to: '/dashboard/leads/settings', label: 'Configurações' },
   ] },
-  { to: '/dashboard/editor', label: 'Editor do Site', icon: PenTool },
+  { to: '/dashboard/pages', label: 'Editor do Site', icon: PenTool },
   { to: '/dashboard/domain', label: 'Domínio', icon: Globe },
   { to: '/dashboard/contact', label: 'Contato', icon: Phone },
   { to: '/dashboard/team', label: 'Equipe', icon: Users, lockedKey: 'team' },

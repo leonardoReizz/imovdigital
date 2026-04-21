@@ -7,18 +7,24 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { PropertyCard } from '@/components/PropertyCard';
 import { ImageGallery } from '@/components/ImageGallery';
 import { formatPrice } from '@imovdigital/utils';
-import type { Property, PropertyDetailConfig } from '@imovdigital/types';
-import { DEFAULT_PROPERTY_DETAIL_CONFIG } from '@imovdigital/types';
+import type { Property, Section, ThemeTokens } from '@imovdigital/types';
+import { DEFAULT_THEME } from '@imovdigital/types';
+import type { PropertyDetailConfig } from '@/lib/legacy-config';
+import { DEFAULT_PROPERTY_DETAIL_CONFIG } from '@/lib/legacy-config';
 import {
-  ArrowLeft, MapPin, BedDouble, Bath, Car, Maximize,
-  Heart, MessageCircle, Phone, Check, Calendar,
-  ChevronLeft, ChevronRight,
+  MapPin, BedDouble, Bath, Car, Maximize,
+  MessageCircle, Phone, Check, Calendar,
 } from 'lucide-react';
 import { ShareButton } from '@/components/ShareButton';
 import { LeadForm } from '@/components/LeadForm';
 import { FloatingContactButton } from '@/components/FloatingContactButton';
-import { Footer } from '@/components/sections/Footer';
 import { formatListingDate } from '@/lib/dates';
+import { PageChrome } from '@/components/PageChrome';
+
+interface PublicPage {
+  sections?: Section[];
+  theme?: ThemeTokens;
+}
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -60,22 +66,40 @@ export default async function PropertyPage({ params }: Props) {
   let tenant: any;
   let property: Property;
   let seoData: any;
-  let siteConfig: any;
 
+  let propertyPage: PublicPage | null = null;
   try {
-    [tenant, property, seoData, siteConfig] = await Promise.all([
+    [tenant, property, seoData, propertyPage] = await Promise.all([
       apiFetch(`/public/${tenantSlug}`),
       apiFetch<Property>(`/public/${tenantSlug}/properties/${propertySlug}`),
       apiFetch(`/public/${tenantSlug}/seo/property/${propertySlug}`).catch(() => null),
-      apiFetch(`/public/${tenantSlug}/site-config`).catch(() => null),
+      apiFetch<PublicPage | null>(`/public/${tenantSlug}/pages/property`).catch(() => null),
     ]);
   } catch {
     notFound();
   }
 
-  const pd: PropertyDetailConfig = siteConfig?.propertyDetail || DEFAULT_PROPERTY_DETAIL_CONFIG;
-  const primaryColor = siteConfig?.primaryColor || tenant.primaryColor || '#2563eb';
-  const logoUrl = siteConfig?.logoUrl ?? tenant.logoUrl;
+  const rawChromeSections = propertyPage?.sections ?? [];
+  const chromeTheme: ThemeTokens = {
+    ...DEFAULT_THEME,
+    ...(propertyPage?.theme ?? {}),
+    ...(tenant?.primaryColor ? { primaryColor: tenant.primaryColor } : {}),
+    ...(tenant?.secondaryColor ? { secondaryColor: tenant.secondaryColor } : {}),
+    ...(tenant?.fontFamily ? { fontFamily: tenant.fontFamily } : {}),
+    ...(tenant?.borderRadius !== undefined ? { borderRadius: tenant.borderRadius } : {}),
+  };
+  // SiteHeader covers the chrome on this route, so skip the template's
+  // navbar section here (still rendered in the editor and on the home
+  // page which has no SiteHeader).
+  const chromeSections = rawChromeSections.filter(
+    (s) => (s as { type?: string }).type !== 'navbar',
+  );
+  const chromeHeader = chromeSections.slice(0, 1);
+  const chromeFooter = chromeSections.slice(1);
+
+  const pd: PropertyDetailConfig = DEFAULT_PROPERTY_DETAIL_CONFIG;
+  const primaryColor = tenant.primaryColor || '#2563eb';
+  const logoUrl = tenant.logoUrl;
   const isRent = property.listingType === 'RENT';
   const mainPrice = isRent ? (property.rentPrice || property.price) : property.price;
   const images = property.images || [];
@@ -104,7 +128,17 @@ export default async function PropertyPage({ params }: Props) {
 
   return (
     <>
-      <SiteHeader logoUrl={logoUrl} logoSize={(siteConfig as any)?.logoSize} siteName={tenant.name} primaryColor={primaryColor} />
+      <SiteHeader logoUrl={logoUrl} siteName={tenant.name} primaryColor={primaryColor} />
+
+      <PageChrome
+        sections={chromeHeader}
+        theme={chromeTheme}
+        tenantSlug={tenantSlug}
+        properties={[property]}
+        cities={[]}
+        neighborhoods={[]}
+        property={property}
+      />
 
       {/* JSON-LD */}
       {seoData?.jsonLd && (
@@ -293,11 +327,15 @@ export default async function PropertyPage({ params }: Props) {
         />
       )}
 
-      {/* Footer */}
-      {siteConfig?.sections && (() => {
-        const footerSection = (siteConfig as any).sections.find((s: any) => s.type === 'footer' && s.visible);
-        return footerSection ? <Footer settings={footerSection.settings} contactData={{ ...(tenant as any).contact }} /> : null;
-      })()}
+
+      <PageChrome
+        sections={chromeFooter}
+        theme={chromeTheme}
+        tenantSlug={tenantSlug}
+        properties={similar}
+        cities={[]}
+        neighborhoods={[]}
+      />
     </>
   );
 }
