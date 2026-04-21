@@ -13,7 +13,7 @@
 
 ### Functions
 - `ElementRenderer({ element }: { element: Element; }): React.JSX.Element`
-- `PropertyCard({ property, template }: Props): React.JSX.Element`
+- `PropertyCard({ property, template, orientation = 'vertical' }: Props): React.JSX.Element`
 - `SectionBody({ layout, gridConfig, elements, sectionId, style }: Props): React.JSX.Element`
 - `SectionRenderer({ sections }: Props): React.JSX.Element`
 - `BlocksProvider({
@@ -22,10 +22,11 @@
 }: BlocksContextValue & { children: React.ReactNode; }): React.JSX.Element`
 - `useBlocks(): BlocksContextValue`
 - `useIsEditMode(): boolean`
+- `useResponsiveBreakpoint(): Breakpoint`
 - `buildMockProperties(count: number): Property[]`
 
 ### Interfaces
-- `interface WrapElementContext { sectionId: string; layout: SectionLayout; parentCols: number | undefined; parentGap: number | undefined }`
+- `interface WrapElementContext { sectionId: string; layout: SectionLayout; parentCols: number | undefined; parentGap: number | undefined; parentDirection: "row" | "column" | undefined }`
 - `interface BlocksContextValue { breakpoint: Breakpoint; theme: ThemeTokens; tenantSlug: string; properties: Property[] | undefined; cities: string[] | undefined; neighborhoods: string[] | undefined }`
 
 ### Types

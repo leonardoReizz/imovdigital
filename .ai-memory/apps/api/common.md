@@ -1,20 +1,20 @@
 # Apps/api/common Module
 
 ## Files (6)
-- apps/api/src/common/filters/http-exception.filter.ts
 - apps/api/src/common/decorators/current-user.decorator.ts
 - apps/api/src/common/decorators/skip-subscription-check.decorator.ts
-- apps/api/src/common/middleware/tenant-context.middleware.ts
+- apps/api/src/common/filters/http-exception.filter.ts
 - apps/api/src/common/guards/jwt-auth.guard.ts
 - apps/api/src/common/guards/subscription.guard.ts
+- apps/api/src/common/middleware/tenant-context.middleware.ts
 
 ## Exports
 
 ### Classes
 - `class HttpExceptionFilter { catch(exception: unknown, host: ArgumentsHost) }`
-- `class TenantContextMiddleware { use(req: Request<ParamsDictionary, any, any, qs.ParsedQs, Record<string, any>>, _res: Response<any, Record<string, any>>, next: NextFunction) }`
 - `class JwtAuthGuard`
 - `class SubscriptionGuard { canActivate(context: ExecutionContext) }`
+- `class TenantContextMiddleware { use(req: Request<ParamsDictionary, any, any, qs.ParsedQs, Record<string, any>>, _res: Response<any, Record<string, any>>, next: NextFunction) }`
 
 ### Variables
 - `CurrentUser: (...dataOrPipes: (string | PipeTransform<any, any> | Type<PipeTransform<any, any>> | undefined)[]...`

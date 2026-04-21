@@ -21,27 +21,34 @@ export function PropertyPricesBlock({ element }: { element: PropertyPricesElemen
         {element.title}
       </h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {rows.map((row, i) => (
-          <div
-            key={i}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              paddingBottom: row.emphasis ? 0 : 8,
-              paddingTop: row.emphasis ? 8 : 0,
-              borderBottom: row.emphasis ? undefined : '1px solid #e2e8f0',
-              borderTop: row.emphasis ? '2px solid #e2e8f0' : undefined,
-              fontSize: 14,
-              fontWeight: row.emphasis ? 600 : 400,
-              color: row.emphasis ? '#0f172a' : '#64748b',
-            }}
-          >
-            <span>{row.label}</span>
-            <span style={{ color: row.emphasis ? theme.primaryColor : undefined }}>
-              {row.value}
-            </span>
-          </div>
-        ))}
+        {rows.map((row, i) => {
+          const nextIsEmphasis = rows[i + 1]?.emphasis === true;
+          // Skip the bottom rule when the next row is the emphasis total —
+          // that row already has its own thicker top rule, otherwise the
+          // two stack and look like a double divider.
+          const showBottomRule = !row.emphasis && !nextIsEmphasis;
+          return (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                paddingBottom: row.emphasis ? 0 : 8,
+                paddingTop: row.emphasis ? 8 : 0,
+                borderBottom: showBottomRule ? '1px solid #e2e8f0' : undefined,
+                borderTop: row.emphasis ? '2px solid #e2e8f0' : undefined,
+                fontSize: 14,
+                fontWeight: row.emphasis ? 600 : 400,
+                color: row.emphasis ? '#0f172a' : '#64748b',
+              }}
+            >
+              <span>{row.label}</span>
+              <span style={{ color: row.emphasis ? theme.primaryColor : undefined }}>
+                {row.value}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

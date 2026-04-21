@@ -120,6 +120,21 @@ export function ElementLibrary() {
         ? findSectionIdForElement(page, selection.id)
         : page?.sections[page.sections.length - 1]?.id;
 
+  // When the selection is a container (or an element inside one), drop new
+  // elements *into* that container instead of at the bottom of the section.
+  // - selected element is a container → use it as the parent
+  // - selected element lives inside a container → use that container
+  // - otherwise → null (append to section's children)
+  const targetContainerId =
+    selection?.kind === 'element'
+      ? findTargetContainerId(page, selection.id)
+      : null;
+
+  const insert = (type: ElementType) => {
+    if (!targetSectionId) return;
+    insertElement(targetSectionId, type, targetContainerId);
+  };
+
   return (
     <aside className="w-60 border-r border-slate-200 bg-white flex-shrink-0 overflow-y-auto">
       <div className="flex items-center justify-between p-3 pb-1">
@@ -170,7 +185,7 @@ export function ElementLibrary() {
               <NewElementDraggable key={type} elementType={type}>
                 <button
                   disabled={!targetSectionId}
-                  onClick={() => targetSectionId && insertElement(targetSectionId, type)}
+                  onClick={() => insert(type)}
                   className="w-full flex flex-col items-center gap-1 p-2 border border-slate-200 hover:border-blue-400 hover:bg-blue-50 rounded-md text-xs disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:bg-transparent"
                   title="Clique ou arraste pro canvas"
                 >
@@ -201,7 +216,7 @@ export function ElementLibrary() {
               <NewElementDraggable key={type} elementType={type}>
                 <button
                   disabled={!targetSectionId}
-                  onClick={() => targetSectionId && insertElement(targetSectionId, type)}
+                  onClick={() => insert(type)}
                   className="w-full flex flex-col items-center gap-1 p-2 border border-slate-200 hover:border-blue-400 hover:bg-blue-50 rounded-md text-xs disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:bg-transparent"
                   title="Clique ou arraste pro canvas"
                 >
@@ -233,4 +248,39 @@ function containsElement(elements: BlockElement[], id: string): boolean {
     if (el.type === 'container' && containsElement(el.children, id)) return true;
   }
   return false;
+}
+
+/**
+ * Decide which container (if any) a newly inserted element should land in,
+ * given the current selection. Returns:
+ *   - the selected element's id if it's a container
+ *   - the immediate parent container's id if the selection lives inside one
+ *   - null otherwise (insert at section level)
+ */
+function findTargetContainerId(page: Page | null, selectedId: string): string | null {
+  if (!page) return null;
+  for (const section of page.sections) {
+    const hit = walkForContainer(section.children, selectedId, null);
+    if (hit !== undefined) return hit;
+  }
+  return null;
+}
+
+function walkForContainer(
+  elements: BlockElement[],
+  selectedId: string,
+  currentContainerId: string | null,
+): string | null | undefined {
+  for (const el of elements) {
+    if (el.id === selectedId) {
+      // Selected element itself: if it's a container we drop INTO it,
+      // otherwise we drop into its parent container (or section).
+      return el.type === 'container' ? el.id : currentContainerId;
+    }
+    if (el.type === 'container') {
+      const found = walkForContainer(el.children, selectedId, el.id);
+      if (found !== undefined) return found;
+    }
+  }
+  return undefined;
 }

@@ -16,6 +16,43 @@ import type { Element as PageElement, ElementType, SectionType } from '@imovdigi
 import { ELEMENT_LABELS, SECTION_LABELS } from '@imovdigital/types';
 import { useEditorStore } from '../store';
 import type { DragPayload, DropPayload } from './types';
+
+/** Walk page tree to find an element + the section that owns it + its
+ *  parent container + index inside that parent. The section id is
+ *  important because nested containers re-use SectionBody and pass their
+ *  OWN id as the sectionId to it, so the over.sectionId reported by dnd
+ *  isn't always a real section id. */
+function locateElement(
+  page: ReturnType<typeof useEditorStore.getState>['page'],
+  elementId: string,
+): {
+  element: PageElement;
+  sectionId: string;
+  parentContainerId: string | null;
+  index: number;
+} | null {
+  if (!page) return null;
+  for (const section of page.sections) {
+    const hit = walk(section.children, null);
+    if (hit) return { ...hit, sectionId: section.id };
+  }
+  return null;
+
+  function walk(
+    nodes: PageElement[],
+    parentContainerId: string | null,
+  ): { element: PageElement; parentContainerId: string | null; index: number } | null {
+    for (let i = 0; i < nodes.length; i++) {
+      const n = nodes[i];
+      if (n.id === elementId) return { element: n, parentContainerId, index: i };
+      if (n.type === 'container') {
+        const found = walk(n.children, n.id);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+}
 import { snapModifier } from './snapModifier';
 import { resetSnapSticky } from './snap';
 import { zoomModifier } from './zoomModifier';
@@ -29,6 +66,7 @@ export function EditorDndProvider({ children }: Props) {
   const moveSection = useEditorStore((s) => s.moveSection);
   const insertElement = useEditorStore((s) => s.insertElement);
   const moveElementToSection = useEditorStore((s) => s.moveElementToSection);
+  const moveElementToParent = useEditorStore((s) => s.moveElementToParent);
   const setElementPosition = useEditorStore((s) => s.setElementPosition);
   const setDragging = useEditorStore((s) => s.setDragging);
   const select = useEditorStore((s) => s.select);
@@ -90,42 +128,64 @@ export function EditorDndProvider({ children }: Props) {
 
     if (!active || !over) return;
 
-    // Reorder inside a stack/grid section. Each EditableElement in flow
-    // mode exposes a `element-slot` droppable. Compute the before/after
-    // side SYNCHRONOUSLY from the target's current rect + the pointer
-    // position at drop — reading from the store-backed slotHint is racy
-    // when the cursor moves fast across items.
+    // Drop on an existing element's slot. Two cases:
+    //  - target is a CONTAINER → drop goes INSIDE the container (append).
+    //    Lets the user drop elements into a container even when it already
+    //    has children.
+    //  - target is anything else → drop beside it, INSIDE whichever parent
+    //    the target lives in (section.children or a container's children).
     if (
       (active.kind === 'element' || active.kind === 'new-element')
       && over.kind === 'element-slot'
     ) {
       const page = useEditorStore.getState().page;
-      const section = page?.sections.find((s) => s.id === over.sectionId);
-      const targetIndex = section?.children.findIndex((c) => c.id === over.elementId) ?? -1;
-      if (!section || targetIndex < 0) return;
+      const located = locateElement(page, over.elementId);
+      if (!located) return;
 
-      // Pointer position at drop: activator event + accumulated delta.
-      const activator = event.activatorEvent as PointerEvent | MouseEvent;
-      const cursorX = activator.clientX + event.delta.x;
-      const cursorY = activator.clientY + event.delta.y;
+      const targetIsContainer = located.element.type === 'container';
+      const parentContainerId = targetIsContainer
+        ? located.element.id
+        : located.parentContainerId;
 
-      const targetEl = document.querySelector(
-        `[data-element-id="${over.elementId}"]`,
-      ) as HTMLElement | null;
-      const rect = targetEl?.getBoundingClientRect();
-
-      let side: 'before' | 'after' = 'before';
-      if (rect) {
-        side = section.layout === 'grid'
-          ? (cursorX < rect.left + rect.width / 2 ? 'before' : 'after')
-          : (cursorY < rect.top + rect.height / 2 ? 'before' : 'after');
+      let insertIndex: number;
+      if (targetIsContainer) {
+        // Append at the end of the container's children.
+        insertIndex = located.element.type === 'container'
+          ? located.element.children.length
+          : 0;
+      } else {
+        // Pick before/after based on pointer position at drop.
+        const activator = event.activatorEvent as PointerEvent | MouseEvent;
+        const cursorX = activator.clientX + event.delta.x;
+        const cursorY = activator.clientY + event.delta.y;
+        const targetEl = document.querySelector(
+          `[data-element-id="${over.elementId}"]`,
+        ) as HTMLElement | null;
+        const rect = targetEl?.getBoundingClientRect();
+        let side: 'before' | 'after' = 'before';
+        if (rect) {
+          // Row-flowing siblings (grid or stack-row) split on X; stacked on Y.
+          const section = page?.sections.find((s) => s.id === over.sectionId);
+          const rowFlowing =
+            section?.layout === 'grid' ||
+            (section?.layout === 'stack' && section?.gridConfig?.direction === 'row');
+          side = rowFlowing
+            ? (cursorX < rect.left + rect.width / 2 ? 'before' : 'after')
+            : (cursorY < rect.top + rect.height / 2 ? 'before' : 'after');
+        }
+        insertIndex = side === 'after' ? located.index + 1 : located.index;
       }
-      const insertIndex = side === 'after' ? targetIndex + 1 : targetIndex;
+
+      // Use the REAL section id from the located element, not over.sectionId
+      // — when the target lives inside a container the latter is the
+      // container's id (ContainerBlock reuses SectionBody passing its own
+      // id as sectionId).
+      const realSectionId = located.sectionId;
 
       if (active.kind === 'new-element') {
-        insertElement(over.sectionId, active.elementType, null, insertIndex);
+        insertElement(realSectionId, active.elementType, parentContainerId, insertIndex);
       } else if (active.kind === 'element' && active.elementId !== over.elementId) {
-        moveElementToSection(active.elementId, over.sectionId, insertIndex);
+        moveElementToParent(active.elementId, realSectionId, parentContainerId, insertIndex);
       }
       return;
     }
@@ -162,12 +222,10 @@ export function EditorDndProvider({ children }: Props) {
     }
 
     // ── Insert new element ───────────────────────────────────────
+    // element-slot drops are already handled above; this fallback covers
+    // dropping onto an empty section body or free-canvas.
     if (active.kind === 'new-element') {
       if (over.kind === 'section-body' || over.kind === 'free-canvas') {
-        insertElement(over.sectionId, active.elementType);
-      } else if (over.kind === 'element-slot') {
-        // drop beside an existing element — insert at its index+1
-        // we don't have index info here, append to end for now
         insertElement(over.sectionId, active.elementType);
       }
       return;
@@ -182,12 +240,10 @@ export function EditorDndProvider({ children }: Props) {
     }
 
     // ── Move element between sections (stack/grid) ───────────────
-    if (active.kind === 'element' && !active.isFree) {
-      if (over.kind === 'section-body') {
-        moveElementToSection(active.elementId, over.sectionId);
-      } else if (over.kind === 'element-slot') {
-        moveElementToSection(active.elementId, over.sectionId);
-      }
+    // element-slot drops are already handled above; this fallback covers
+    // dropping onto an empty section body.
+    if (active.kind === 'element' && !active.isFree && over.kind === 'section-body') {
+      moveElementToSection(active.elementId, over.sectionId);
       return;
     }
   }

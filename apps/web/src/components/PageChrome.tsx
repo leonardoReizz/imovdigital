@@ -2,6 +2,7 @@
 
 import { BlocksProvider, SectionRenderer } from '@imovdigital/site-blocks';
 import type { Property, Section, ThemeTokens } from '@imovdigital/types';
+import { resolveFileUrl } from '@/lib/api';
 
 interface Props {
   sections: Section[];
@@ -39,6 +40,7 @@ export function PageChrome({
       cities={cities}
       neighborhoods={neighborhoods}
       property={property}
+      resolveImageUrl={resolveFileUrl}
     >
       <SectionRenderer sections={sections} />
     </BlocksProvider>

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Breakpoint, Element, Property, SectionLayout, ThemeTokens } from '@imovdigital/types';
 
 export interface WrapElementContext {
@@ -37,6 +37,12 @@ export interface BlocksContextValue {
    * URL prefix for listing search submissions. Defaults to "/imoveis".
    */
   searchBasePath?: string;
+  /**
+   * Host-provided helper to turn stored image URLs (often API-relative
+   * paths like `/api/files/gallery/xxx.png`) into absolute URLs the
+   * browser can load. If omitted, URLs are used as-is.
+   */
+  resolveImageUrl?: (url: string) => string;
   // Dashboard provides an editable wrapper; apps/web passes nothing.
   wrapElement?: (element: Element, rendered: ReactNode, ctx: WrapElementContext) => ReactNode;
 }
@@ -65,4 +71,53 @@ export function useBlocks(): BlocksContextValue {
 export function useIsEditMode(): boolean {
   const ctx = useContext(Ctx);
   return !!ctx?.wrapElement;
+}
+
+/**
+ * Returns a function that resolves stored image URLs (API-relative paths
+ * like `/api/files/gallery/xxx.png`) into absolute URLs the browser can
+ * load. Falls back to identity when the host doesn't provide a resolver.
+ */
+export function useResolveImageUrl(): (url: string | null | undefined) => string {
+  const ctx = useContext(Ctx);
+  const resolver = ctx?.resolveImageUrl;
+  return (url) => {
+    if (!url) return '';
+    return resolver ? resolver(url) : url;
+  };
+}
+
+/**
+ * Effective breakpoint for responsive blocks.
+ * - In the editor (wrapElement present) the canvas owns the viewport and we
+ *   honor whatever the BlocksProvider was given (the viewport switcher sets
+ *   this), so mobile/tablet/desktop mirror the simulation.
+ * - In production the BlocksProvider is rendered SSR with "desktop" as a
+ *   safe default; after hydration we switch to the value matching the
+ *   actual window width and keep it in sync with resizes.
+ */
+export function useResponsiveBreakpoint(): Breakpoint {
+  const ctx = useContext(Ctx);
+  const provided: Breakpoint = ctx?.breakpoint ?? 'desktop';
+  const isEdit = !!ctx?.wrapElement;
+  const [detected, setDetected] = useState<Breakpoint | null>(null);
+
+  useEffect(() => {
+    if (isEdit) {
+      setDetected(null);
+      return;
+    }
+    const compute = (): Breakpoint => {
+      const w = window.innerWidth;
+      if (w < 640) return 'mobile';
+      if (w < 1024) return 'tablet';
+      return 'desktop';
+    };
+    setDetected(compute());
+    const onResize = () => setDetected(compute());
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [isEdit]);
+
+  return isEdit ? provided : (detected ?? provided);
 }

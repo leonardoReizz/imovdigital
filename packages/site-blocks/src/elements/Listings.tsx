@@ -1,10 +1,11 @@
 import type { ListingsElement, Property } from '@imovdigital/types';
 import { elementStyleToCss } from '../utils/style';
-import { useBlocks } from '../context';
+import { useBlocks, useResponsiveBreakpoint } from '../context';
 import { PropertyCard } from '../PropertyCard';
 
 export function ListingsBlock({ element }: { element: ListingsElement }) {
   const { theme, properties } = useBlocks();
+  const breakpoint = useResponsiveBreakpoint();
 
   // No properties loaded → show skeleton (editor placeholder state).
   if (!properties) {
@@ -31,6 +32,12 @@ export function ListingsBlock({ element }: { element: ListingsElement }) {
     );
   }
 
+  const effectiveCols = breakpoint === 'mobile'
+    ? 1
+    : breakpoint === 'tablet'
+      ? Math.min(2, element.columns)
+      : element.columns;
+
   const gridStyle: React.CSSProperties =
     element.display === 'list'
       ? { display: 'flex', flexDirection: 'column', gap: 16 }
@@ -44,7 +51,7 @@ export function ListingsBlock({ element }: { element: ListingsElement }) {
           }
         : {
             display: 'grid',
-            gridTemplateColumns: `repeat(${element.columns}, minmax(0, 1fr))`,
+            gridTemplateColumns: `repeat(${effectiveCols}, minmax(0, 1fr))`,
             gap: 24,
           };
 

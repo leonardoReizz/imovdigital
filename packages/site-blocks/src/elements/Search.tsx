@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from 'react';
 import type { SearchElement } from '@imovdigital/types';
 import { elementStyleToCss } from '../utils/style';
-import { useBlocks, useIsEditMode } from '../context';
+import { useBlocks, useIsEditMode, useResponsiveBreakpoint } from '../context';
 
 const FIELD_LABELS: Record<string, string> = {
   type: 'Tipo',
@@ -50,6 +50,8 @@ const CHIP_VALUES = ['1', '2', '3', '4', '5'];
 export function SearchBlock({ element }: { element: SearchElement }) {
   const { theme, cities, neighborhoods, searchBasePath = '/imoveis' } = useBlocks();
   const isEdit = useIsEditMode();
+  const breakpoint = useResponsiveBreakpoint();
+  const isMobile = breakpoint === 'mobile';
   const [values, setValues] = useState<Record<FieldKey, string>>(() =>
     element.fields.reduce((acc, f) => ({ ...acc, [f]: '' }), {} as Record<FieldKey, string>),
   );
@@ -148,12 +150,14 @@ export function SearchBlock({ element }: { element: SearchElement }) {
     );
   }
 
+  const stackLayout = isStacked || isMobile;
+
   return (
     <form
       onSubmit={handleSubmit}
       style={{
         display: 'flex',
-        flexDirection: isStacked ? 'column' : 'row',
+        flexDirection: stackLayout ? 'column' : 'row',
         flexWrap: 'wrap',
         gap: 12,
         background: '#fff',
@@ -161,12 +165,12 @@ export function SearchBlock({ element }: { element: SearchElement }) {
         borderRadius: theme.borderRadius,
         boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
         width: '100%',
-        alignItems: isStacked ? 'stretch' : 'flex-end',
+        alignItems: stackLayout ? 'stretch' : 'flex-end',
         ...elementStyleToCss(element.style),
       }}
     >
       {element.fields.map((field) => (
-        <div key={field} style={{ flex: '1 1 140px', minWidth: 120 }}>
+        <div key={field} style={{ flex: '1 1 140px', minWidth: 120, width: stackLayout ? '100%' : undefined }}>
           <label
             style={{
               display: 'block',
@@ -195,6 +199,7 @@ export function SearchBlock({ element }: { element: SearchElement }) {
           height: 40,
           paddingLeft: 20,
           paddingRight: 20,
+          width: stackLayout ? '100%' : undefined,
           background: theme.primaryColor,
           color: '#fff',
           border: 'none',

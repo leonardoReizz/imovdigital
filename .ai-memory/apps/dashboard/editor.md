@@ -1,6 +1,6 @@
 # Apps/dashboard/editor Module
 
-## Files (27)
+## Files (28)
 - apps/dashboard/src/editor/Canvas.tsx
 - apps/dashboard/src/editor/EditableElement.tsx
 - apps/dashboard/src/editor/PageList.tsx
@@ -17,6 +17,7 @@
 - apps/dashboard/src/editor/defaults.ts
 - apps/dashboard/src/editor/store.ts
 - apps/dashboard/src/editor/types.ts
+- apps/dashboard/src/editor/useGoogleFont.ts
 - apps/dashboard/src/editor/dnd/EditorDndProvider.tsx
 - apps/dashboard/src/editor/dnd/draggables.tsx
 - apps/dashboard/src/editor/dnd/droppables.tsx
@@ -60,6 +61,7 @@
 - `selectSelectedElement(state: EditorState): Element | null`
 - `selectCanUndo(state: EditorState): boolean`
 - `selectCanRedo(state: EditorState): boolean`
+- `useGoogleFont(fontFamily: string | null | undefined): void`
 - `EditorDndProvider({ children }: Props): React.JSX.Element`
 - `NewSectionDraggable({
   sectionType,
@@ -114,7 +116,7 @@
 
 ### Interfaces
 - `interface PageListItem { id: string; slug: string; title: string; status: "draft" | "published"; publishedAt: string | null; updatedAt: string }`
-- `interface TenantTheme { primaryColor: string; secondaryColor: string; fontFamily: string; faviconUrl: string | null }`
+- `interface TenantTheme { primaryColor: string; secondaryColor: string; fontFamily: string; borderRadius: number; faviconUrl: string | null }`
 - `interface SnapGuides { active: boolean; x: number[]; y: number[]; sectionId: string | null }`
 - `interface SlotHint { elementId: string; side: "before" | "after" }`
 - `interface DraggingState { payload: DragPayload }`

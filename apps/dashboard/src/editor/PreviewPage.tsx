@@ -9,6 +9,7 @@ import {
 } from '@imovdigital/site-blocks';
 import type { Page, Property } from '@imovdigital/types';
 import { getPage, getTenantTheme, loadTenantProperties, type TenantTheme } from './api';
+import { resolveFileUrl } from '../lib/api';
 import { useGoogleFont } from './useGoogleFont';
 
 /**
@@ -112,6 +113,7 @@ function PreviewInner({
         property={contextProperty}
         cities={effectiveCities}
         neighborhoods={effectiveNeighborhoods}
+        resolveImageUrl={resolveFileUrl}
       >
         <SectionRenderer sections={page.sections} />
       </BlocksProvider>

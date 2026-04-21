@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { resolveTenantSlug } from '@/lib/tenant';
 import { apiFetch } from '@/lib/api';
-import { SiteHeader } from '@/components/SiteHeader';
 import { PropertyCard } from '@/components/PropertyCard';
 import { PropertyFilters } from '@/components/PropertyFilters';
 import type { Property, Section, ThemeTokens } from '@imovdigital/types';
@@ -65,7 +64,6 @@ export default async function ImoveisPage({ searchParams }: Props) {
     ),
   ]);
 
-  const logoUrl = tenant.logoUrl;
   const primaryColor = tenant.primaryColor;
 
   const rawSections = searchPage?.sections ?? [];
@@ -77,28 +75,20 @@ export default async function ImoveisPage({ searchParams }: Props) {
     ...(tenant?.fontFamily ? { fontFamily: tenant.fontFamily } : {}),
     ...(tenant?.borderRadius !== undefined ? { borderRadius: tenant.borderRadius } : {}),
   };
-  // SiteHeader below is a hardcoded sticky chrome with logo/mobile drawer,
-  // so we skip the template's navbar section here to avoid duplication.
-  // (The navbar still shows in the editor for WYSIWYG consistency and is
-  //  rendered on the home page which doesn't have SiteHeader.)
-  const sections = rawSections.filter(
-    (s) => (s as { type?: string }).type !== 'navbar',
-  );
   // The public page renders its own results grid (with filters, pagination,
   // live data) so the template's `listings` section is skipped — it only
   // exists to give the editor a WYSIWYG preview of the sidebar + grid.
   // Anything authored before the listings becomes header chrome; anything
-  // after becomes footer chrome.
-  const listingsIdx = sections.findIndex(
+  // after becomes footer chrome. Navbar stays in so the user's customized
+  // header (with theme colors + auto hamburger on mobile) shows.
+  const listingsIdx = rawSections.findIndex(
     (s) => (s as { type?: string }).type === 'listings',
   );
-  const headerSections = listingsIdx === -1 ? [] : sections.slice(0, listingsIdx);
-  const footerSections = listingsIdx === -1 ? sections : sections.slice(listingsIdx + 1);
+  const headerSections = listingsIdx === -1 ? [] : rawSections.slice(0, listingsIdx);
+  const footerSections = listingsIdx === -1 ? rawSections : rawSections.slice(listingsIdx + 1);
 
   return (
     <>
-      <SiteHeader logoUrl={logoUrl} siteName={tenant.name} primaryColor={primaryColor} />
-
       <PageChrome
         sections={headerSections}
         theme={theme}

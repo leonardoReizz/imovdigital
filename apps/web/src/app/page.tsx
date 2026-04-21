@@ -1,5 +1,5 @@
 import { resolveTenantSlug } from '@/lib/tenant';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, resolveFileUrl } from '@/lib/api';
 import { BlocksProvider, SectionRenderer } from '@imovdigital/site-blocks';
 import type { Page, Property, Section, ThemeTokens } from '@imovdigital/types';
 import { DEFAULT_THEME, createDefaultPage } from '@imovdigital/types';
@@ -35,7 +35,6 @@ export default async function HomePage() {
     ).catch(() => ({ cities: [], neighborhoods: [] })),
   ]);
 
-  const sections = page?.sections ?? createDefaultPage('', '', '', 'home').sections;
   // Tenant theme (global) overrides the per-page theme so colors/fonts are
   // consistent across every page of the site.
   const theme: ThemeTokens = {
@@ -47,6 +46,15 @@ export default async function HomePage() {
     ...(tenant?.borderRadius !== undefined ? { borderRadius: tenant.borderRadius } : {}),
   };
 
+  // When the home page has never been published the API returns null.
+  // Show a friendly placeholder instead of a blank page so the visitor
+  // knows the site is still being prepared.
+  if (!page) {
+    return <NotPublishedPlaceholder tenantName={tenant?.name} primaryColor={theme.primaryColor} />;
+  }
+
+  const sections = page.sections ?? createDefaultPage('', '', '', 'home').sections;
+
   return (
     <BlocksProvider
       breakpoint="desktop"
@@ -55,9 +63,69 @@ export default async function HomePage() {
       properties={propertiesRes.data}
       cities={filters.cities}
       neighborhoods={filters.neighborhoods}
+      resolveImageUrl={resolveFileUrl}
     >
       <SectionRenderer sections={sections} />
     </BlocksProvider>
+  );
+}
+
+function NotPublishedPlaceholder({
+  tenantName,
+  primaryColor,
+}: {
+  tenantName?: string;
+  primaryColor: string;
+}) {
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 24px',
+        background: '#f8fafc',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 480,
+          width: '100%',
+          textAlign: 'center',
+          background: '#fff',
+          borderRadius: 16,
+          padding: '40px 32px',
+          boxShadow: '0 2px 24px rgba(15, 23, 42, 0.06)',
+        }}
+      >
+        <div
+          style={{
+            width: 56,
+            height: 56,
+            margin: '0 auto 20px',
+            borderRadius: '50%',
+            background: `${primaryColor}1A`,
+            color: primaryColor,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 24,
+          }}
+          aria-hidden
+        >
+          🚧
+        </div>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0f172a', margin: '0 0 8px' }}>
+          Site em preparação
+        </h1>
+        <p style={{ fontSize: 14, color: '#64748b', margin: 0, lineHeight: 1.55 }}>
+          {tenantName
+            ? `A equipe da ${tenantName} está finalizando o conteúdo e logo a página estará no ar.`
+            : 'A equipe está finalizando o conteúdo e logo a página estará no ar.'}
+        </p>
+      </div>
+    </div>
   );
 }
 

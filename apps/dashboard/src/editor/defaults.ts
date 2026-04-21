@@ -52,7 +52,10 @@ export function buildDefaultElement(
         children: [],
         style: { paddingTop: 16, paddingBottom: 16, paddingX: 16 },
         ...basePosition,
-        size: isFreeLayout ? { w: 400, h: 200 } : { w: 'full', h: 'auto' },
+        // Always auto height so the container grows as elements are
+        // dropped inside — fixed height clipped overflowing children and
+        // hid them from view.
+        size: isFreeLayout ? { w: 400, h: 'auto' } : { w: 'full', h: 'auto' },
       };
     case 'listings':
       return {
@@ -144,10 +147,10 @@ export function buildDefaultElement(
         type: 'property_gallery',
         layout: 'grid',
         columns: 2,
-        aspectRatio: '4:3',
+        aspectRatio: '16:9',
         style: {},
         ...basePosition,
-        size: isFreeLayout ? { w: 'full', h: 'auto' } : undefined,
+        size: { w: 'full', h: 480 },
       };
     case 'property_map':
       return {

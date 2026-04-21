@@ -57,7 +57,19 @@ function FlowElement({ element, rendered, sectionId, layout, parentCols, parentG
   const [editing, setEditing] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const { attributes, listeners, setNodeRef: setDragRef, transform, isDragging } = useDraggable({
+  // Containers use a dedicated drag handle so clicks on their body still
+  // reach the children inside. Other elements remain draggable from
+  // anywhere on the wrapper.
+  const useHandle = element.type === 'container';
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef: setDragRef,
+    setActivatorNodeRef,
+    transform,
+    isDragging,
+  } = useDraggable({
     id: `element:${element.id}`,
     data: { payload },
     disabled: editing,
@@ -119,6 +131,8 @@ function FlowElement({ element, rendered, sectionId, layout, parentCols, parentG
       setNodeRef={setRefs}
       listeners={listeners}
       attributes={attributes}
+      setActivatorNodeRef={setActivatorNodeRef}
+      useHandle={useHandle}
       isDragging={isDragging}
       dragTransform={dragTransform}
       isFree={false}
@@ -146,6 +160,12 @@ interface ShellProps {
   listeners: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   attributes: any;
+  /** When provided, the drag activator is bound to a separate handle node
+   *  instead of the body — clicks on children pass through. */
+  setActivatorNodeRef?: (node: HTMLElement | null) => void;
+  /** Render a visible drag handle (top-left corner) and skip body
+   *  listeners. Used for containers so child clicks aren't hijacked. */
+  useHandle?: boolean;
   isDragging: boolean;
   dragTransform: string | undefined;
   isFree: boolean;
@@ -163,6 +183,7 @@ interface ShellProps {
 
 function EditableShell({
   element, rendered, setNodeRef, listeners, attributes,
+  setActivatorNodeRef, useHandle,
   isDragging, dragTransform, isFree, parentLayout, parentCols, parentGap,
   editing, setEditing,
   showIndicator, indicatorSide, indicatorOrientation = 'horizontal',
@@ -243,8 +264,25 @@ function EditableShell({
   const size = element.size;
   const width = size?.w === 'full' ? '100%' : size?.w;
   const height = size?.h;
+  // Explicit pixel sizing means the user dragged a resize handle — their
+  // chosen value should win over min-content, otherwise the wrapper can't
+  // shrink past whatever the content demands and the handle feels broken.
+  const hasExplicitW = typeof width === 'number';
+  const hasExplicitH = typeof height === 'number';
   const intrinsicClamp: CSSProperties =
-    element.type === 'image' ? {} : { minWidth: 'min-content', minHeight: 'min-content' };
+    element.type === 'image'
+      ? {}
+      : {
+          ...(hasExplicitW ? {} : { minWidth: 'min-content' }),
+          ...(hasExplicitH ? {} : { minHeight: 'min-content' }),
+        };
+  // Containers with an explicit size should clip overflowing children so
+  // the user gets clean visual feedback — otherwise content spills past
+  // the resized box and looks broken.
+  const containerOverflow: CSSProperties =
+    element.type === 'container' && (hasExplicitW || hasExplicitH)
+      ? { overflow: 'hidden' }
+      : {};
 
   // In flow layouts (stack/grid) the parent container controls the
   // dimensions — respecting element.size here would force a fixed width
@@ -271,6 +309,7 @@ function EditableShell({
         width: width ?? 'auto',
         height: height ?? 'auto',
         ...intrinsicClamp,
+        ...containerOverflow,
       }
     : {
         position: 'relative',
@@ -280,7 +319,13 @@ function EditableShell({
         ...(typeof height === 'number' ? { height } : {}),
         gridColumn,
         ...intrinsicClamp,
+        ...containerOverflow,
       };
+
+  // When useHandle is true, the body skips drag listeners — only the
+  // dedicated grip handle below initiates the drag, so clicks on the
+  // container's children pass through normally.
+  const bodyListeners = useHandle ? {} : listeners;
 
   return (
     <div
@@ -291,13 +336,13 @@ function EditableShell({
       onDoubleClick={handleDoubleClick}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
-      {...(editing ? {} : listeners)}
+      {...(editing ? {} : bodyListeners)}
       {...(editing ? {} : attributes)}
       style={{
         ...positionStyle,
         outline: outlineWidth ? `${outlineWidth}px solid ${outlineColor}` : undefined,
         outlineOffset: 2,
-        cursor: editing ? 'text' : isDragging ? 'grabbing' : 'grab',
+        cursor: editing ? 'text' : useHandle ? 'default' : isDragging ? 'grabbing' : 'grab',
         transform: dragTransform,
         opacity: isDragging ? 0.3 : 1,
         touchAction: editing ? 'auto' : 'none',
@@ -350,6 +395,44 @@ function EditableShell({
         >
           {ELEMENT_LABELS[element.type]}
         </span>
+      )}
+
+      {useHandle && (isSelected || isHover) && !editing && (
+        <button
+          ref={(node) => setActivatorNodeRef?.(node)}
+          {...listeners}
+          {...attributes}
+          aria-label="Arrastar container"
+          title="Arrastar container"
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'absolute',
+            top: -22,
+            right: 0,
+            zIndex: 11,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 20,
+            height: 20,
+            background: isSelected ? '#2563eb' : '#60a5fa',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 3,
+            cursor: 'grab',
+            padding: 0,
+            touchAction: 'none',
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+            <circle cx="5" cy="3" r="1.2" />
+            <circle cx="11" cy="3" r="1.2" />
+            <circle cx="5" cy="8" r="1.2" />
+            <circle cx="11" cy="8" r="1.2" />
+            <circle cx="5" cy="13" r="1.2" />
+            <circle cx="11" cy="13" r="1.2" />
+          </svg>
+        </button>
       )}
     </div>
   );

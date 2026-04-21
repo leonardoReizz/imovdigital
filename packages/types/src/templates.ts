@@ -264,11 +264,11 @@ function buildPropertySections(theme: ThemeTokens): Section[] {
       {
         id: id(),
         type: 'property_gallery',
-        layout: 'grid',
+        layout: 'carousel',
         columns: 3,
-        aspectRatio: '4:3',
+        aspectRatio: '16:9',
         style: {},
-        size: { w: 'full', h: 'auto' },
+        size: { w: 'full', h: 480 },
       } as PropertyGalleryElement,
     ],
   };

@@ -221,8 +221,9 @@ export class PageService {
         slug: dto.slug ?? existing.slug,
         title: dto.title ?? existing.title,
         data: merged as unknown as object,
-        // Any edit moves status back to draft until publish is called.
-        status: 'draft',
+        // Saves preserve the current status: a page stays 'draft' until
+        // the user explicitly publishes it, and once published every
+        // subsequent save goes live immediately (no re-publish needed).
       },
     });
 
@@ -328,12 +329,24 @@ export class PageService {
     const existing = await this.prisma.page.findFirst({ where: { id, tenantId } });
     if (!existing) throw new NotFoundException('Página não encontrada');
 
+    const now = new Date();
+
+    // Reserved pages (home/search/property) make up the site's shared
+    // chrome — they go live together so the user doesn't have to click
+    // publish three times. Custom pages publish individually as before.
+    if (isReservedSlug(existing.slug)) {
+      await this.prisma.page.updateMany({
+        where: { tenantId, slug: { in: [...RESERVED_SLUGS] }, status: { not: 'published' } },
+        data: { status: 'published', publishedAt: now },
+      });
+      const updated = await this.prisma.page.findUnique({ where: { id } });
+      if (!updated) throw new NotFoundException('Página não encontrada');
+      return this.toPage(updated);
+    }
+
     const updated = await this.prisma.page.update({
       where: { id },
-      data: {
-        status: 'published',
-        publishedAt: new Date(),
-      },
+      data: { status: 'published', publishedAt: now },
     });
     return this.toPage(updated);
   }

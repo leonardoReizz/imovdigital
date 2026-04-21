@@ -45,7 +45,7 @@
 - `interface ButtonElement { label: string; url: string; variant: "primary" | "secondary" | "outline" | "ghost"; openInNewTab: boolean | undefined }`
 - `interface ContainerElement { layout: SectionLayout; gridConfig: GridConfig | undefined; children: Element[] }`
 - `interface ListingsElement { source: "featured" | "filter" | "manual"; filter: { type?: string | undefined; listingType?: "SALE" | "RENT" | "BOTH" | undefined; city?: string | ...; manualIds: string[] | undefined; count: number; display: "grid" | "carousel" | "list"; columns: 1 | 2 | 3 | 4 }`
-- `interface SearchElement { fields: ("bedrooms" | "neighborhood" | "city" | "type" | "operation" | "priceRange" | "parking" | "areaRa...; layout: "compact" | "row" | "stacked" | "sidebar"; submitMode: "redirect" | "inline"; submitLabel: string }`
+- `interface SearchElement { fields: ("bedrooms" | "bathrooms" | "neighborhood" | "city" | "type" | "operation" | "priceRange" | "park...; layout: "compact" | "row" | "stacked" | "sidebar"; submitMode: "redirect" | "inline"; submitLabel: string }`
 - `interface FormField { id: string; type: "text" | "email" | "phone" | "textarea" | "select"; label: string; placeholder: string | undefined; required: boolean; options: string[] | undefined }`
 - `interface FormElement { fields: FormField[]; submitLabel: string; destination: "email" | "whatsapp" | "both"; successMessage: string }`
 - `interface DividerElement { thickness: number; color: string; lineStyle: "solid" | "dashed" | "dotted" }`

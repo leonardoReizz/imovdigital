@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { Property } from '@imovdigital/types';
 import { formatPrice } from '@imovdigital/utils';
-import { useBlocks, useIsEditMode } from './context';
+import { useBlocks, useIsEditMode, useResolveImageUrl, useResponsiveBreakpoint } from './context';
 
 export type PropertyCardTemplate = 'compact' | 'standard' | 'highlight';
 
@@ -27,6 +27,13 @@ export function PropertyCard({ property, template, orientation = 'vertical' }: P
 
 function coverImage(property: Property): string | null {
   return property.images?.[0]?.url ?? null;
+}
+
+/** Hook shortcut — each card reads the resolver once and passes the
+ *  ready-to-load URL to its <img>. */
+function useCoverUrl(property: Property): string {
+  const resolve = useResolveImageUrl();
+  return resolve(coverImage(property));
 }
 
 function priceLabel(property: Property): string {
@@ -68,7 +75,7 @@ function CardShell({
 
 function CompactCard({ property }: { property: Property }) {
   const { theme } = useBlocks();
-  const cover = coverImage(property);
+  const cover = useCoverUrl(property);
 
   return (
     <CardShell
@@ -110,7 +117,7 @@ function CompactCard({ property }: { property: Property }) {
 
 function StandardCard({ property }: { property: Property }) {
   const { theme } = useBlocks();
-  const cover = coverImage(property);
+  const cover = useCoverUrl(property);
 
   return (
     <CardShell
@@ -179,7 +186,7 @@ function StandardCard({ property }: { property: Property }) {
 
 function HighlightCard({ property }: { property: Property }) {
   const { theme } = useBlocks();
-  const cover = coverImage(property);
+  const cover = useCoverUrl(property);
 
   return (
     <CardShell
@@ -241,29 +248,32 @@ function HighlightCard({ property }: { property: Property }) {
 
 function RowCard({ property }: { property: Property }) {
   const { theme } = useBlocks();
-  const cover = coverImage(property);
+  const breakpoint = useResponsiveBreakpoint();
+  const isMobile = breakpoint === 'mobile';
+  const cover = useCoverUrl(property);
 
   return (
     <CardShell
       property={property}
       style={{
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: isMobile ? 'column' : 'row',
         background: '#fff',
         borderRadius: theme.borderRadius,
         overflow: 'hidden',
         textDecoration: 'none',
         color: 'inherit',
         border: '1px solid #e2e8f0',
-        minHeight: 180,
+        minHeight: isMobile ? undefined : 180,
       }}
     >
       <div
         style={{
-          width: 260,
+          width: isMobile ? '100%' : 260,
           flexShrink: 0,
           background: '#f1f5f9',
           position: 'relative',
+          aspectRatio: isMobile ? '16 / 10' : undefined,
         }}
       >
         {cover && (

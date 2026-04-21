@@ -1,5 +1,5 @@
 {
-  "totalFiles": 176,
+  "totalFiles": 178,
   "files": [
     {
       "path": "apps/dashboard/vite.config.ts",
@@ -282,6 +282,11 @@
       "module": "apps/dashboard/editor"
     },
     {
+      "path": "apps/dashboard/src/editor/useGoogleFont.ts",
+      "name": "useGoogleFont.ts",
+      "module": "apps/dashboard/editor"
+    },
+    {
       "path": "apps/dashboard/src/hooks/useR2Upload.ts",
       "name": "useR2Upload.ts",
       "module": "apps/dashboard/hooks"
@@ -407,6 +412,31 @@
       "module": "apps/web/app"
     },
     {
+      "path": "apps/web/src/lib/api.ts",
+      "name": "api.ts",
+      "module": "apps/web"
+    },
+    {
+      "path": "apps/web/src/lib/client-api.ts",
+      "name": "client-api.ts",
+      "module": "apps/web"
+    },
+    {
+      "path": "apps/web/src/lib/dates.ts",
+      "name": "dates.ts",
+      "module": "apps/web"
+    },
+    {
+      "path": "apps/web/src/lib/legacy-config.ts",
+      "name": "legacy-config.ts",
+      "module": "apps/web"
+    },
+    {
+      "path": "apps/web/src/lib/tenant.ts",
+      "name": "tenant.ts",
+      "module": "apps/web"
+    },
+    {
       "path": "apps/web/src/components/CustomSelect.tsx",
       "name": "CustomSelect.tsx",
       "module": "apps/web/components"
@@ -475,31 +505,6 @@
       "path": "apps/web/src/components/SortSelect.tsx",
       "name": "SortSelect.tsx",
       "module": "apps/web/components"
-    },
-    {
-      "path": "apps/web/src/lib/api.ts",
-      "name": "api.ts",
-      "module": "apps/web"
-    },
-    {
-      "path": "apps/web/src/lib/client-api.ts",
-      "name": "client-api.ts",
-      "module": "apps/web"
-    },
-    {
-      "path": "apps/web/src/lib/dates.ts",
-      "name": "dates.ts",
-      "module": "apps/web"
-    },
-    {
-      "path": "apps/web/src/lib/legacy-config.ts",
-      "name": "legacy-config.ts",
-      "module": "apps/web"
-    },
-    {
-      "path": "apps/web/src/lib/tenant.ts",
-      "name": "tenant.ts",
-      "module": "apps/web"
     },
     {
       "path": "packages/site-blocks/src/elements/Button.tsx",
@@ -592,11 +597,6 @@
       "module": "packages/site-blocks/utils"
     },
     {
-      "path": "apps/api/src/common/filters/http-exception.filter.ts",
-      "name": "http-exception.filter.ts",
-      "module": "apps/api/common"
-    },
-    {
       "path": "apps/api/src/common/decorators/current-user.decorator.ts",
       "name": "current-user.decorator.ts",
       "module": "apps/api/common"
@@ -607,8 +607,8 @@
       "module": "apps/api/common"
     },
     {
-      "path": "apps/api/src/common/middleware/tenant-context.middleware.ts",
-      "name": "tenant-context.middleware.ts",
+      "path": "apps/api/src/common/filters/http-exception.filter.ts",
+      "name": "http-exception.filter.ts",
       "module": "apps/api/common"
     },
     {
@@ -619,6 +619,11 @@
     {
       "path": "apps/api/src/common/guards/subscription.guard.ts",
       "name": "subscription.guard.ts",
+      "module": "apps/api/common"
+    },
+    {
+      "path": "apps/api/src/common/middleware/tenant-context.middleware.ts",
+      "name": "tenant-context.middleware.ts",
       "module": "apps/api/common"
     },
     {
@@ -672,6 +677,21 @@
       "module": "apps/api/modules"
     },
     {
+      "path": "apps/api/src/modules/lead/lead.controller.ts",
+      "name": "lead.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/lead/lead.module.ts",
+      "name": "lead.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/lead/lead.service.ts",
+      "name": "lead.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
       "path": "apps/api/src/modules/page/page.controller.ts",
       "name": "page.controller.ts",
       "module": "apps/api/modules"
@@ -722,21 +742,6 @@
       "module": "apps/api/modules"
     },
     {
-      "path": "apps/api/src/modules/lead/lead.controller.ts",
-      "name": "lead.controller.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/lead/lead.module.ts",
-      "name": "lead.module.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/lead/lead.service.ts",
-      "name": "lead.service.ts",
-      "module": "apps/api/modules"
-    },
-    {
       "path": "apps/api/src/modules/public/public.controller.ts",
       "name": "public.controller.ts",
       "module": "apps/api/modules"
@@ -749,36 +754,6 @@
     {
       "path": "apps/api/src/modules/public/public.service.ts",
       "name": "public.service.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/tenant/tenant.controller.ts",
-      "name": "tenant.controller.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/tenant/tenant.module.ts",
-      "name": "tenant.module.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/tenant/tenant.service.ts",
-      "name": "tenant.service.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/upload/upload.controller.ts",
-      "name": "upload.controller.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/upload/upload.module.ts",
-      "name": "upload.module.ts",
-      "module": "apps/api/modules"
-    },
-    {
-      "path": "apps/api/src/modules/upload/upload.service.ts",
-      "name": "upload.service.ts",
       "module": "apps/api/modules"
     },
     {
@@ -799,6 +774,41 @@
     {
       "path": "apps/api/src/modules/subscription/tiktok-events.service.ts",
       "name": "tiktok-events.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/tenant/tenant.controller.ts",
+      "name": "tenant.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/tenant/tenant.module.ts",
+      "name": "tenant.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/tenant/tenant.service.ts",
+      "name": "tenant.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/upload/upload-gc.service.ts",
+      "name": "upload-gc.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/upload/upload.controller.ts",
+      "name": "upload.controller.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/upload/upload.module.ts",
+      "name": "upload.module.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/upload/upload.service.ts",
+      "name": "upload.service.ts",
       "module": "apps/api/modules"
     },
     {
@@ -857,11 +867,6 @@
       "module": "apps/dashboard/editor"
     },
     {
-      "path": "apps/web/src/app/imoveis/page.tsx",
-      "name": "page.tsx",
-      "module": "apps/web/app"
-    },
-    {
       "path": "apps/dashboard/src/editor/sidebar/ElementLibrary.tsx",
       "name": "ElementLibrary.tsx",
       "module": "apps/dashboard/editor"
@@ -875,6 +880,11 @@
       "path": "apps/dashboard/src/editor/sidebar/controls.tsx",
       "name": "controls.tsx",
       "module": "apps/dashboard/editor"
+    },
+    {
+      "path": "apps/web/src/app/imoveis/page.tsx",
+      "name": "page.tsx",
+      "module": "apps/web/app"
     },
     {
       "path": "apps/web/src/app/imoveis/[slug]/page.tsx",

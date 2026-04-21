@@ -10,6 +10,7 @@ import {
 } from '@imovdigital/site-blocks';
 import type { Element, Section } from '@imovdigital/types';
 import { SECTION_LABELS } from '@imovdigital/types';
+import { resolveFileUrl } from '../lib/api';
 import { useEditorStore } from './store';
 import { EditableElement } from './EditableElement';
 import { SectionDragHandle } from './dnd/draggables';
@@ -380,6 +381,7 @@ export function Canvas() {
             property={contextProperty}
             cities={effectiveCities}
             neighborhoods={effectiveNeighborhoods}
+            resolveImageUrl={resolveFileUrl}
             wrapElement={wrapElement}
           >
             <SectionGapDropZone index={0} active={gapActive} />

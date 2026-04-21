@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import type { Element, GridConfig, SectionLayout } from '@imovdigital/types';
 import { ElementRenderer } from './ElementRenderer';
-import { useBlocks } from './context';
+import { useBlocks, useResponsiveBreakpoint } from './context';
 import { isElementHidden, resolveElement } from './utils/style';
 
 interface Props {
@@ -15,6 +15,16 @@ interface Props {
 
 export function SectionBody({ layout, gridConfig, elements, sectionId, style }: Props) {
   const { breakpoint, wrapElement } = useBlocks();
+  const responsiveBp = useResponsiveBreakpoint();
+
+  // Collapse grid columns on narrow viewports — otherwise a "3 columns"
+  // layout squeezes every child into a thin ribbon on mobile.
+  const configuredCols = gridConfig?.cols ?? 3;
+  const effectiveCols = responsiveBp === 'mobile'
+    ? 1
+    : responsiveBp === 'tablet'
+      ? Math.min(2, configuredCols)
+      : configuredCols;
 
   const JUSTIFY_MAP: Record<string, CSSProperties['justifyContent']> = {
     start: 'flex-start',
@@ -36,14 +46,16 @@ export function SectionBody({ layout, gridConfig, elements, sectionId, style }: 
       : layout === 'grid'
         ? {
             display: 'grid',
-            gridTemplateColumns: `repeat(${gridConfig?.cols ?? 3}, minmax(0, 1fr))`,
+            gridTemplateColumns: `repeat(${effectiveCols}, minmax(0, 1fr))`,
             gap: gridConfig?.gap ?? 24,
             width: '100%',
             ...style,
           }
         : {
             display: 'flex',
-            flexDirection: gridConfig?.direction === 'row' ? 'row' : 'column',
+            // Stack-row wraps to column on mobile so inline items (buttons,
+            // nav links, etc.) don't overflow a 375px screen.
+            flexDirection: gridConfig?.direction === 'row' && responsiveBp !== 'mobile' ? 'row' : 'column',
             gap: gridConfig?.gap ?? 16,
             justifyContent: gridConfig?.justifyContent
               ? JUSTIFY_MAP[gridConfig.justifyContent]
@@ -69,7 +81,7 @@ export function SectionBody({ layout, gridConfig, elements, sectionId, style }: 
           return wrapElement(element, inner, {
             sectionId,
             layout,
-            parentCols: layout === 'grid' ? (gridConfig?.cols ?? 3) : undefined,
+            parentCols: layout === 'grid' ? effectiveCols : undefined,
             parentGap: gridConfig?.gap,
             parentDirection: layout === 'stack' ? (gridConfig?.direction ?? 'column') : undefined,
           });

@@ -138,6 +138,12 @@ interface EditorState {
   updateElement: (id: string, mutator: (element: Element) => void) => void;
   updateElementStyle: (id: string, style: Partial<ElementStyle>) => void;
   moveElementToSection: (id: string, targetSectionId: string, index?: number) => void;
+  moveElementToParent: (
+    id: string,
+    targetSectionId: string,
+    parentContainerId: string | null,
+    index?: number,
+  ) => void;
   setElementPosition: (id: string, x: number, y: number) => void;
   setElementSize: (id: string, w: number | 'auto' | 'full', h: number | 'auto') => void;
   setElementBox: (id: string, box: { x: number; y: number; w: number; h: number }) => void;
@@ -561,14 +567,19 @@ export const useEditorStore = create<EditorState>((set, get) => {
     },
 
     moveElementToSection(id, targetSectionId, index) {
+      get().moveElementToParent(id, targetSectionId, null, index);
+    },
+
+    moveElementToParent(id, targetSectionId, parentContainerId, index) {
       commit((draft) => {
+        // Extract the active element from wherever it lives (any depth).
         let extracted: Element | null = null;
-        let sourceSectionId: string | null = null;
+        let sourceParent: Element[] | null = null;
         let sourceIndex = -1;
         for (const section of draft.sections) {
           let done = false;
           walkElements(section.children, id, (_el, parent, idx) => {
-            sourceSectionId = section.id;
+            sourceParent = parent;
             sourceIndex = idx;
             [extracted] = parent.splice(idx, 1);
             done = true;
@@ -577,19 +588,34 @@ export const useEditorStore = create<EditorState>((set, get) => {
         }
         if (!extracted) return;
 
+        const sourceParentArr = sourceParent as Element[] | null;
+
+        // Refuse to drop a container into one of its own descendants —
+        // would create an infinite tree on next render.
+        if (parentContainerId && elementContains(extracted, parentContainerId)) {
+          // Put it back where it was and bail.
+          if (sourceParentArr && sourceIndex >= 0) {
+            sourceParentArr.splice(sourceIndex, 0, extracted);
+          }
+          return;
+        }
+
         const target = draft.sections.find((s) => s.id === targetSectionId);
         if (!target) return;
 
-        // Adjust index: if the item was moved forward within the same
-        // section, the splice shifted every subsequent index by -1, so we
-        // need to compensate or the item lands one slot past the target.
-        let at = index ?? target.children.length;
-        if (sourceSectionId === targetSectionId && sourceIndex < at) {
+        const targetChildren: Element[] = parentContainerId
+          ? findChildrenOfContainer(target.children, parentContainerId) ?? target.children
+          : target.children;
+
+        // Adjust the index when the source and destination are the same
+        // collection — splice shifted everything after sourceIndex by -1.
+        let at = index ?? targetChildren.length;
+        if (sourceParentArr === targetChildren && sourceIndex < at) {
           at -= 1;
         }
-        at = Math.max(0, Math.min(at, target.children.length));
+        at = Math.max(0, Math.min(at, targetChildren.length));
 
-        target.children.splice(at, 0, extracted);
+        targetChildren.splice(at, 0, extracted);
       });
     },
 
@@ -864,6 +890,16 @@ function writePanelPref(side: 'left' | 'right', value: boolean): void {
   } catch {
     /* ignore */
   }
+}
+
+/** Recursive `id in element subtree?` — used to block self-parenting drops. */
+function elementContains(root: Element, id: string): boolean {
+  if (root.id === id) return true;
+  if (root.type !== 'container') return false;
+  for (const child of root.children) {
+    if (elementContains(child, id)) return true;
+  }
+  return false;
 }
 
 function findChildrenOfContainer(elements: Element[], containerId: string): Element[] | null {
