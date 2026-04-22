@@ -23,6 +23,8 @@ function useSectionUpdater(sectionId: string) {
 
 function HeroSettingsPanel({ section }: { section: Section<'hero'> }) {
   const update = useSectionUpdater(section.id);
+  const template = useEditorStore((s) => s.config?.template || 'classic');
+  const isEditorial = template === 'editorial';
   const s = section.settings;
 
   return (
@@ -70,29 +72,48 @@ function HeroSettingsPanel({ section }: { section: Section<'hero'> }) {
           />
         </>
       )}
-      <ColorPicker label="Cor do overlay" value={s.overlayColor} onChange={(v) => update('overlayColor', v)} />
-      <RangeSlider label="Opacidade do overlay" value={s.overlayOpacity} onChange={(v) => update('overlayOpacity', v)} suffix="%" />
-      <ToggleGroup
-        label="Altura"
-        value={s.height}
-        onChange={(v) => update('height', v)}
-        options={[
-          { value: 'small', label: 'Pequena' },
-          { value: 'medium', label: 'Média' },
-          { value: 'large', label: 'Grande' },
-          { value: 'full', label: 'Tela cheia' },
-        ]}
-      />
-      <ToggleGroup
-        label="Alinhamento"
-        value={s.textAlign}
-        onChange={(v) => update('textAlign', v)}
-        options={[
-          { value: 'left', label: 'Esquerda' },
-          { value: 'center', label: 'Centro' },
-          { value: 'right', label: 'Direita' },
-        ]}
-      />
+      {!isEditorial && (
+        <>
+          <ColorPicker label="Cor do overlay" value={s.overlayColor} onChange={(v) => update('overlayColor', v)} />
+          <RangeSlider label="Opacidade do overlay" value={s.overlayOpacity} onChange={(v) => update('overlayOpacity', v)} suffix="%" />
+        </>
+      )}
+      {isEditorial && s.backgroundType === 'image' && (
+        <>
+          <ColorPicker label="Cor do overlay" value={s.overlayColor} onChange={(v) => update('overlayColor', v)} />
+          <RangeSlider label="Opacidade do overlay" value={s.overlayOpacity} onChange={(v) => update('overlayOpacity', v)} suffix="%" />
+        </>
+      )}
+      {!isEditorial && (
+        <ToggleGroup
+          label="Altura"
+          value={s.height}
+          onChange={(v) => update('height', v)}
+          options={[
+            { value: 'small', label: 'Pequena' },
+            { value: 'medium', label: 'Média' },
+            { value: 'large', label: 'Grande' },
+            { value: 'full', label: 'Tela cheia' },
+          ]}
+        />
+      )}
+      {!isEditorial && (
+        <ToggleGroup
+          label="Alinhamento"
+          value={s.textAlign}
+          onChange={(v) => update('textAlign', v)}
+          options={[
+            { value: 'left', label: 'Esquerda' },
+            { value: 'center', label: 'Centro' },
+            { value: 'right', label: 'Direita' },
+          ]}
+        />
+      )}
+      {isEditorial && (
+        <p className="text-[11px] text-gray-400 bg-gray-50 rounded-lg p-2.5 leading-relaxed">
+          O template <strong>Editorial</strong> usa um layout assimétrico fixo (texto à esquerda, bloco visual à direita). Altura e alinhamento são definidos pelo design e não são editáveis.
+        </p>
+      )}
     </div>
   );
 }
@@ -101,22 +122,40 @@ function HeroSettingsPanel({ section }: { section: Section<'hero'> }) {
 
 function SearchBarSettingsPanel({ section }: { section: Section<'search_bar'> }) {
   const update = useSectionUpdater(section.id);
+  const template = useEditorStore((s) => s.config?.template || 'classic');
+  const isEditorial = template === 'editorial';
   const s = section.settings;
+
+  const positionOptions = isEditorial
+    ? [
+        { value: 'below_hero', label: 'Abaixo do banner' },
+        { value: 'standalone', label: 'Separada' },
+      ]
+    : [
+        { value: 'above_hero', label: 'Acima do banner' },
+        { value: 'center_hero', label: 'Centro do banner' },
+        { value: 'below_hero', label: 'Abaixo do banner' },
+        { value: 'standalone', label: 'Separada' },
+      ];
+
+  const positionValue = isEditorial && (s.position === 'above_hero' || s.position === 'center_hero')
+    ? 'below_hero'
+    : s.position;
 
   return (
     <div className="space-y-4">
       <TextInput label="Placeholder" value={s.placeholder} onChange={(v) => update('placeholder', v)} />
       <SelectField
         label="Posição"
-        value={s.position}
+        value={positionValue}
         onChange={(v) => update('position', v)}
-        options={[
-          { value: 'above_hero', label: 'Acima do banner' },
-          { value: 'center_hero', label: 'Centro do banner' },
-          { value: 'below_hero', label: 'Abaixo do banner' },
-          { value: 'standalone', label: 'Separada' },
-        ]}
+        options={positionOptions}
       />
+      {isEditorial && (
+        <p className="text-[11px] text-gray-400 bg-gray-50 rounded-lg p-2.5 leading-relaxed -mt-2">
+          No template <strong>Editorial</strong>, a barra de busca aparece flutuando abaixo do banner ou em uma seção própria. Posições "Acima" e "Centro" não se aplicam ao layout assimétrico.
+        </p>
+      )}
       <ColorPicker label="Cor de fundo" value={s.backgroundColor} onChange={(v) => update('backgroundColor', v)} />
       <ToggleGroup
         label="Borda arredondada"
@@ -154,16 +193,18 @@ function FeaturedListingsSettingsPanel({ section }: { section: Section<'featured
           { value: 'list', label: 'Lista' },
         ]}
       />
-      <ToggleGroup
-        label="Colunas"
-        value={String(s.columns)}
-        onChange={(v) => update('columns', Number(v))}
-        options={[
-          { value: '2', label: '2' },
-          { value: '3', label: '3' },
-          { value: '4', label: '4' },
-        ]}
-      />
+      {s.layout === 'grid' && (
+        <ToggleGroup
+          label="Colunas"
+          value={String(s.columns)}
+          onChange={(v) => update('columns', Number(v))}
+          options={[
+            { value: '2', label: '2' },
+            { value: '3', label: '3' },
+            { value: '4', label: '4' },
+          ]}
+        />
+      )}
       <RangeSlider label="Máximo de itens" value={s.maxItems} onChange={(v) => update('maxItems', v)} min={2} max={12} />
       <BadgeToggle label="Mostrar preço" value={s.showPrice} onChange={(v) => update('showPrice', v)} />
       <BadgeToggle label="Mostrar badge" value={s.showBadge} onChange={(v) => update('showBadge', v)} />

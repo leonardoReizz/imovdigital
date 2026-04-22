@@ -1,7 +1,7 @@
 import type { FeaturedListingsSettings, Property } from '@imovdigital/types';
 import { useEditorStore } from '../../../../store/editorStore';
 import { PropertyPrice } from '../PropertyPrice';
-import { Home, ArrowRight, BedDouble, Bath, Car } from 'lucide-react';
+import { Home, ArrowRight, BedDouble, Bath, Car, MapPin } from 'lucide-react';
 import { Img } from '../../../Img';
 
 function EditorialCard({ property, showPrice, showBadge, primaryColor, onClick }: {
@@ -35,6 +35,43 @@ function EditorialCard({ property, showPrice, showBadge, primaryColor, onClick }
         </div>
         {showPrice && (
           <div className="pt-2" style={{ fontFamily: 'Georgia, serif' }}>
+            <PropertyPrice price={property.price} rentPrice={property.rentPrice} listingType={property.listingType} primaryColor="#111827" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function HorizontalEditorialCard({ property, showPrice, showBadge, primaryColor, onClick }: {
+  property: Property; showPrice: boolean; showBadge: boolean; primaryColor: string; onClick: () => void;
+}) {
+  const hasImage = property.images && property.images.length > 0;
+  const isRent = property.listingType === 'RENT';
+  return (
+    <div className="flex border-b border-stone-200 cursor-pointer hover:bg-stone-50/50 transition-colors" onClick={onClick}>
+      <div className="relative w-56 sm:w-72 shrink-0 bg-stone-100 overflow-hidden" style={{ aspectRatio: '4/3' }}>
+        {hasImage ? (
+          <Img src={property.images[0].url} alt={property.images[0].alt} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center"><Home className="w-12 h-12 text-stone-300" /></div>
+        )}
+        {showBadge && property.featured && (
+          <span className="absolute top-3 left-3 uppercase font-semibold px-2 py-1 bg-white/90" style={{ color: primaryColor, fontSize: 10, letterSpacing: '0.2em' }}>Destaque</span>
+        )}
+      </div>
+      <div className="p-5 sm:p-7 flex-1 flex flex-col justify-center gap-1.5">
+        <p className="uppercase text-gray-400" style={{ fontSize: 10, letterSpacing: '0.2em' }}>{isRent ? 'Aluguel' : 'Venda'}</p>
+        <p className="text-gray-900 leading-tight" style={{ fontSize: 19, fontFamily: 'Georgia, serif' }}>{property.title}</p>
+        <p className="text-xs text-gray-500 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{property.neighborhood}, {property.city}</p>
+        <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
+          {property.bedrooms > 0 && <span className="flex items-center gap-1"><BedDouble className="w-3.5 h-3.5" /> {property.bedrooms}</span>}
+          {property.bathrooms > 0 && <span className="flex items-center gap-1"><Bath className="w-3.5 h-3.5" /> {property.bathrooms}</span>}
+          {property.parkingSpots > 0 && <span className="flex items-center gap-1"><Car className="w-3.5 h-3.5" /> {property.parkingSpots}</span>}
+          <span>{property.area}m²</span>
+        </div>
+        {showPrice && (
+          <div className="mt-2" style={{ fontFamily: 'Georgia, serif' }}>
             <PropertyPrice price={property.price} rentPrice={property.rentPrice} listingType={property.listingType} primaryColor="#111827" />
           </div>
         )}
@@ -96,20 +133,44 @@ export function FeaturedListingsPreview({ settings }: { settings: FeaturedListin
           )}
         </div>
 
-        <div
-          className="grid"
-          style={{
-            gridTemplateColumns: `repeat(${effectiveColumns}, 1fr)`,
-            columnGap: isMobile ? 16 : 32,
-            rowGap: isMobile ? 32 : 56,
-          }}
-        >
-          {hasProperties
-            ? limited.map((p) => (
-                <EditorialCard key={p.id} property={p} showPrice={settings.showPrice} showBadge={settings.showBadge} primaryColor={primaryColor} onClick={() => navigatePreview({ type: 'property', propertyId: p.id })} />
-              ))
-            : Array.from({ length: gridCount }).map((_, i) => <PlaceholderCard key={i} />)}
-        </div>
+        {settings.layout === 'list' ? (
+          <div className="flex flex-col">
+            {hasProperties
+              ? limited.map((p) => (
+                  <HorizontalEditorialCard key={p.id} property={p} showPrice={settings.showPrice} showBadge={settings.showBadge} primaryColor={primaryColor} onClick={() => navigatePreview({ type: 'property', propertyId: p.id })} />
+                ))
+              : Array.from({ length: Math.min(settings.maxItems, 3) }).map((_, i) => <PlaceholderCard key={i} />)}
+          </div>
+        ) : settings.layout === 'carousel' ? (
+          <div className="flex gap-8 overflow-x-auto snap-x snap-mandatory pb-6 -mx-4 px-4" style={{ scrollbarWidth: 'thin' }}>
+            {hasProperties
+              ? limited.map((p) => (
+                  <div key={p.id} className="shrink-0 snap-start" style={{ width: isMobile ? 260 : 320 }}>
+                    <EditorialCard property={p} showPrice={settings.showPrice} showBadge={settings.showBadge} primaryColor={primaryColor} onClick={() => navigatePreview({ type: 'property', propertyId: p.id })} />
+                  </div>
+                ))
+              : Array.from({ length: Math.min(settings.maxItems, 4) }).map((_, i) => (
+                  <div key={i} className="shrink-0 snap-start" style={{ width: isMobile ? 260 : 320 }}>
+                    <PlaceholderCard />
+                  </div>
+                ))}
+          </div>
+        ) : (
+          <div
+            className="grid"
+            style={{
+              gridTemplateColumns: `repeat(${effectiveColumns}, 1fr)`,
+              columnGap: isMobile ? 16 : 32,
+              rowGap: isMobile ? 32 : 56,
+            }}
+          >
+            {hasProperties
+              ? limited.map((p) => (
+                  <EditorialCard key={p.id} property={p} showPrice={settings.showPrice} showBadge={settings.showBadge} primaryColor={primaryColor} onClick={() => navigatePreview({ type: 'property', propertyId: p.id })} />
+                ))
+              : Array.from({ length: gridCount }).map((_, i) => <PlaceholderCard key={i} />)}
+          </div>
+        )}
       </div>
     </div>
   );

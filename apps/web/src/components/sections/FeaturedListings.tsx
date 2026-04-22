@@ -21,6 +21,14 @@ export function FeaturedListings({ settings, properties, primaryColor }: { setti
               <PropertyCard key={p.id} property={p} primaryColor={primaryColor} layout="horizontal" showPrice={settings.showPrice} showBadge={settings.showBadge} />
             ))}
           </div>
+        ) : settings.layout === 'carousel' ? (
+          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 scrollbar-thin">
+            {display.map((p) => (
+              <div key={p.id} className="shrink-0 w-[280px] sm:w-[320px] snap-start">
+                <PropertyCard property={p} primaryColor={primaryColor} showPrice={settings.showPrice} showBadge={settings.showBadge} />
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="grid gap-6" style={{ gridTemplateColumns: `repeat(${Math.min(settings.columns, 2)}, 1fr)` }}>
             {display.map((p) => (

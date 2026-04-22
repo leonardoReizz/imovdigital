@@ -57,3 +57,41 @@ Treat this as a 4-step checklist. Skipping any step leaves the new template visu
 - Don't introduce new `SectionSettings` fields just to support a template — templates should reinterpret the same settings, not require their own schema. New fields belong in the section settings only when they are useful in *all* templates (the recent `gradientFrom/gradientTo/gradientDirection` additions are an example).
 - Preserve all existing config switches (`pd.galleryStyle`, `sp.filterPosition`, `sp.layout`, `contactPosition`, etc.) — a template chooses *how* a setting renders, not *whether* it exists.
 - Keep the public site components and the editor preview components visually aligned per template, otherwise users will publish a site that doesn't match what they were editing.
+
+## Template-aware editor controls
+
+Settings that a template can't honor (because the layout makes them meaningless) **must not appear in the editor** for that template. Don't show a control that does nothing — users will think the editor is broken.
+
+Make the panels in `apps/dashboard/src/components/editor/SectionSettings.tsx` template-aware:
+
+```tsx
+const template = useEditorStore((s) => s.config?.template || 'classic');
+const isEditorial = template === 'editorial';
+
+// Hide a control entirely when the template ignores it:
+{!isEditorial && <ToggleGroup label="Altura" ... />}
+
+// Or restrict the option list:
+const positionOptions = isEditorial
+  ? [{ value: 'below_hero', ... }, { value: 'standalone', ... }]
+  : [/* all 4 positions */];
+
+// And include a one-line note explaining why a control is missing:
+{isEditorial && (
+  <p className="text-[11px] text-gray-400 bg-gray-50 rounded-lg p-2.5">
+    O template <strong>Editorial</strong> usa layout assimétrico fixo. Altura e alinhamento são definidos pelo design.
+  </p>
+)}
+```
+
+When restricting an option list, also normalize the displayed value so the `<SelectField>` doesn't render blank when the stored value is no longer a valid option (e.g. data created in `classic` then opened in `editorial`):
+
+```tsx
+const positionValue = isEditorial && (s.position === 'above_hero' || s.position === 'center_hero')
+  ? 'below_hero'
+  : s.position;
+```
+
+The renderer side should similarly tolerate legacy values rather than crashing — the editorial `Hero` accepts any of `above_hero/center_hero/below_hero` as "embed below" so old data published in classic keeps working when the tenant switches templates.
+
+**Audit checklist when adding a new template:** for each section, walk every control in the corresponding `*SettingsPanel` and ask "does my template visibly react to this?". If no, gate it behind `!isNewTemplate` and add a note. Examples of controls that commonly don't translate: hero `height`/`textAlign`, search bar `position`, layout toggles like `grid`/`carousel` when only one is implemented.
