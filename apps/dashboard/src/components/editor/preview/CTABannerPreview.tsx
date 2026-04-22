@@ -4,7 +4,10 @@ export function CTABannerPreview({ settings }: { settings: CTABannerSettings }) 
   const bgStyle: React.CSSProperties = {};
 
   if (settings.backgroundType === 'gradient') {
-    bgStyle.background = `linear-gradient(135deg, ${settings.backgroundValue}, ${settings.backgroundValue}dd)`;
+    const from = settings.gradientFrom || settings.backgroundValue;
+    const to = settings.gradientTo || `${settings.backgroundValue}dd`;
+    const direction = settings.gradientDirection || '135deg';
+    bgStyle.background = `linear-gradient(${direction}, ${from}, ${to})`;
   } else if (settings.backgroundType === 'image') {
     bgStyle.backgroundImage = `url(${settings.backgroundValue})`;
     bgStyle.backgroundSize = 'cover';

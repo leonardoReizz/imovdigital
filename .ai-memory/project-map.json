@@ -1,5 +1,5 @@
 {
-  "totalFiles": 160,
+  "totalFiles": 165,
   "files": [
     {
       "path": "apps/dashboard/vite.config.ts",
@@ -142,6 +142,11 @@
       "module": "apps/dashboard/components"
     },
     {
+      "path": "apps/dashboard/src/components/PlanChangeConfirmModal.tsx",
+      "name": "PlanChangeConfirmModal.tsx",
+      "module": "apps/dashboard/components"
+    },
+    {
       "path": "apps/dashboard/src/components/SupportWidget.tsx",
       "name": "SupportWidget.tsx",
       "module": "apps/dashboard/components"
@@ -174,6 +179,11 @@
     {
       "path": "apps/dashboard/src/lib/api.ts",
       "name": "api.ts",
+      "module": "apps/dashboard"
+    },
+    {
+      "path": "apps/dashboard/src/lib/tiktok.ts",
+      "name": "tiktok.ts",
       "module": "apps/dashboard"
     },
     {
@@ -382,6 +392,11 @@
       "module": "apps/api/common"
     },
     {
+      "path": "apps/api/src/common/decorators/skip-subscription-check.decorator.ts",
+      "name": "skip-subscription-check.decorator.ts",
+      "module": "apps/api/common"
+    },
+    {
       "path": "apps/api/src/common/filters/http-exception.filter.ts",
       "name": "http-exception.filter.ts",
       "module": "apps/api/common"
@@ -389,6 +404,11 @@
     {
       "path": "apps/api/src/common/guards/jwt-auth.guard.ts",
       "name": "jwt-auth.guard.ts",
+      "module": "apps/api/common"
+    },
+    {
+      "path": "apps/api/src/common/guards/subscription.guard.ts",
+      "name": "subscription.guard.ts",
       "module": "apps/api/common"
     },
     {
@@ -539,6 +559,11 @@
     {
       "path": "apps/api/src/modules/subscription/subscription.service.ts",
       "name": "subscription.service.ts",
+      "module": "apps/api/modules"
+    },
+    {
+      "path": "apps/api/src/modules/subscription/tiktok-events.service.ts",
+      "name": "tiktok-events.service.ts",
       "module": "apps/api/modules"
     },
     {

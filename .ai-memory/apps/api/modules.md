@@ -1,6 +1,6 @@
 # Apps/api/modules Module
 
-## Files (38)
+## Files (39)
 - apps/api/src/modules/admin/admin.controller.ts
 - apps/api/src/modules/admin/admin.module.ts
 - apps/api/src/modules/admin/admin.service.ts
@@ -30,6 +30,7 @@
 - apps/api/src/modules/subscription/subscription.controller.ts
 - apps/api/src/modules/subscription/subscription.module.ts
 - apps/api/src/modules/subscription/subscription.service.ts
+- apps/api/src/modules/subscription/tiktok-events.service.ts
 - apps/api/src/modules/tenant/tenant.controller.ts
 - apps/api/src/modules/tenant/tenant.module.ts
 - apps/api/src/modules/tenant/tenant.service.ts
@@ -72,7 +73,8 @@
 - `class SiteConfigService { buildDefaultConfig(tenantId: string); findByTenant(tenantId: string); update(tenantId: string, dto: UpdateSiteConfigDto); publish(tenantId: string) }`
 - `class SubscriptionController { getInfo(tenantId: string); createCheckout(tenantId: string, body: { planId: string; billing?: "monthly" | "yearly" | undefined; }); billingPortal(tenantId: string); cancellationSummary(tenantId: string); cancel(tenantId: string, userId: string, body: { reason: string; comment?: string | undefined; }); webhook(req: RawBodyRequest<Request<ParamsDictionary, any, any, qs.ParsedQs, Record<string, any>>>, signature: string) }`
 - `class SubscriptionModule`
-- `class SubscriptionService { getStripe(); getSubscriptionInfo(tenantId: string); createCheckoutSession(tenantId: string, planId: string, billing: "monthly" | "yearly"); createPortalSession(tenantId: string); cancelSubscription(tenantId: string, userId: string, reason: string, comment: string | undefined); getCancellationSummary(tenantId: string); handleWebhook(payload: Buffer<ArrayBufferLike>, signature: string) }`
+- `class SubscriptionService { getStripe(); getSubscriptionInfo(tenantId: string); getPlanChangeStatus(tenant: { stripeSubscriptionId: string | null; subscriptionStatus: string; planChangedAt: Date | null; }); createCheckoutSession(tenantId: string, planId: string, billing: "monthly" | "yearly"); createPortalSession(tenantId: string); cancelSubscription(tenantId: string, userId: string, reason: string, comment: string | undefined); getCancellationSummary(tenantId: string); handleWebhook(payload: Buffer<ArrayBufferLike>, signature: string) }`
+- `class TikTokEventsService { sha256(value: string); sendEvent(eventName: string, user: UserData, properties: EventProperties, eventId: string | undefined) }`
 - `class TenantController { get(tenantId: string); dashboard(tenantId: string); update(tenantId: string, body: any); checkSlug(tenantId: string, slug: string); updateSlug(tenantId: string, body: { slug: string; }); updateDomain(tenantId: string, body: { domain: string | null; }); verifyDomain(tenantId: string) }`
 - `class TenantModule`
 - `class TenantService { findById(id: string); getDashboardStats(tenantId: string); findBySlug(slug: string); update(id: string, data: any); checkSlugAvailability(slug: string, currentTenantId: string); updateSlug(tenantId: string, slug: string); updateCustomDomain(tenantId: string, domain: string | null); verifyDomain(tenantId: string) }`

@@ -18,6 +18,9 @@ export type SectionType =
 export interface HeroSettings {
   backgroundType: 'image' | 'video' | 'gradient' | 'color';
   backgroundUrl: string | null;
+  gradientFrom?: string;
+  gradientTo?: string;
+  gradientDirection?: 'to right' | 'to left' | 'to bottom' | 'to top' | '135deg' | '45deg';
   overlayOpacity: number;
   overlayColor: string;
   headline: string;
@@ -84,6 +87,9 @@ export interface CTABannerSettings {
   ctaUrl: string;
   backgroundType: 'color' | 'gradient' | 'image';
   backgroundValue: string;
+  gradientFrom?: string;
+  gradientTo?: string;
+  gradientDirection?: 'to right' | 'to left' | 'to bottom' | 'to top' | '135deg' | '45deg';
   textColor: string;
 }
 
@@ -276,6 +282,9 @@ export const DEFAULT_SECTION_SETTINGS: SectionSettingsMap = {
   hero: {
     backgroundType: 'color',
     backgroundUrl: null,
+    gradientFrom: '#2563eb',
+    gradientTo: '#1e40af',
+    gradientDirection: '135deg',
     overlayOpacity: 40,
     overlayColor: '#000000',
     headline: 'Encontre o imóvel dos seus sonhos',
@@ -331,6 +340,9 @@ export const DEFAULT_SECTION_SETTINGS: SectionSettingsMap = {
     ctaUrl: '/contato',
     backgroundType: 'color',
     backgroundValue: '#2563eb',
+    gradientFrom: '#2563eb',
+    gradientTo: '#1e40af',
+    gradientDirection: '135deg',
     textColor: '#ffffff',
   },
   contact: {

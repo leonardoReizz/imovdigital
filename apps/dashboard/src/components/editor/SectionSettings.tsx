@@ -51,6 +51,25 @@ function HeroSettingsPanel({ section }: { section: Section<'hero'> }) {
           aspectRatio="16/9"
         />
       )}
+      {s.backgroundType === 'gradient' && (
+        <>
+          <ColorPicker label="Cor inicial do gradiente" value={s.gradientFrom || '#2563eb'} onChange={(v) => update('gradientFrom', v)} />
+          <ColorPicker label="Cor final do gradiente" value={s.gradientTo || '#1e40af'} onChange={(v) => update('gradientTo', v)} />
+          <SelectField
+            label="Direção do gradiente"
+            value={s.gradientDirection || '135deg'}
+            onChange={(v) => update('gradientDirection', v)}
+            options={[
+              { value: 'to right', label: 'Horizontal →' },
+              { value: 'to left', label: 'Horizontal ←' },
+              { value: 'to bottom', label: 'Vertical ↓' },
+              { value: 'to top', label: 'Vertical ↑' },
+              { value: '135deg', label: 'Diagonal ↘' },
+              { value: '45deg', label: 'Diagonal ↗' },
+            ]}
+          />
+        </>
+      )}
       <ColorPicker label="Cor do overlay" value={s.overlayColor} onChange={(v) => update('overlayColor', v)} />
       <RangeSlider label="Opacidade do overlay" value={s.overlayOpacity} onChange={(v) => update('overlayOpacity', v)} suffix="%" />
       <ToggleGroup
@@ -496,7 +515,27 @@ function CTABannerSettingsPanel({ section }: { section: Section<'cta_banner'> })
           { value: 'image', label: 'Imagem' },
         ]}
       />
-      <ColorPicker label="Cor/Valor do fundo" value={s.backgroundValue} onChange={(v) => update('backgroundValue', v)} />
+      {s.backgroundType === 'gradient' ? (
+        <>
+          <ColorPicker label="Cor inicial do gradiente" value={s.gradientFrom || s.backgroundValue || '#2563eb'} onChange={(v) => update('gradientFrom', v)} />
+          <ColorPicker label="Cor final do gradiente" value={s.gradientTo || '#1e40af'} onChange={(v) => update('gradientTo', v)} />
+          <SelectField
+            label="Direção do gradiente"
+            value={s.gradientDirection || '135deg'}
+            onChange={(v) => update('gradientDirection', v)}
+            options={[
+              { value: 'to right', label: 'Horizontal →' },
+              { value: 'to left', label: 'Horizontal ←' },
+              { value: 'to bottom', label: 'Vertical ↓' },
+              { value: 'to top', label: 'Vertical ↑' },
+              { value: '135deg', label: 'Diagonal ↘' },
+              { value: '45deg', label: 'Diagonal ↗' },
+            ]}
+          />
+        </>
+      ) : (
+        <ColorPicker label="Cor/Valor do fundo" value={s.backgroundValue} onChange={(v) => update('backgroundValue', v)} />
+      )}
       <ColorPicker label="Cor do texto" value={s.textColor} onChange={(v) => update('textColor', v)} />
     </div>
   );

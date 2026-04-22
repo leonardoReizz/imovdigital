@@ -3,7 +3,7 @@ import { resolveFileUrl } from '@/lib/api';
 
 export function CTABanner({ settings }: { settings: CTABannerSettings }) {
   const bgStyle: React.CSSProperties = settings.backgroundType === 'gradient'
-    ? { background: `linear-gradient(135deg, ${settings.backgroundValue}, ${settings.backgroundValue}dd)` }
+    ? { background: `linear-gradient(${settings.gradientDirection || '135deg'}, ${settings.gradientFrom || settings.backgroundValue}, ${settings.gradientTo || `${settings.backgroundValue}dd`})` }
     : settings.backgroundType === 'image'
       ? { backgroundImage: `url(${resolveFileUrl(settings.backgroundValue)})`, backgroundSize: 'cover', backgroundPosition: 'center' }
       : { backgroundColor: settings.backgroundValue };

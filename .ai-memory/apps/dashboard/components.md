@@ -1,11 +1,12 @@
 # Apps/dashboard/components Module
 
-## Files (38)
+## Files (39)
 - apps/dashboard/src/components/CancellationModal.tsx
 - apps/dashboard/src/components/GoogleAddressInput.tsx
 - apps/dashboard/src/components/ImageUploader.tsx
 - apps/dashboard/src/components/Img.tsx
 - apps/dashboard/src/components/PhoneInput.tsx
+- apps/dashboard/src/components/PlanChangeConfirmModal.tsx
 - apps/dashboard/src/components/SupportWidget.tsx
 - apps/dashboard/src/components/UpgradeWall.tsx
 - apps/dashboard/src/components/editor/GlobalSettings.tsx
@@ -53,6 +54,7 @@
 }: ImageUploaderProps): React.JSX.Element`
 - `Img(props: React.ImgHTMLAttributes<HTMLImageElement>): React.JSX.Element`
 - `formatPhone(value: string): string`
+- `PlanChangeConfirmModal({ currentPlan, targetPlan, billing, submitting, onConfirm, onClose }: Props): React.JSX.Element`
 - `SupportWidget(): React.JSX.Element`
 - `UpgradeWall({ feature, description }: UpgradeWallProps): React.JSX.Element`
 - `GlobalSettings(): React.JSX.Element | null`

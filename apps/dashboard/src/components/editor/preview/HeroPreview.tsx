@@ -26,7 +26,10 @@ export function HeroPreview({ settings }: { settings: HeroSettings }) {
     bgStyle.backgroundSize = 'cover';
     bgStyle.backgroundPosition = 'center';
   } else if (settings.backgroundType === 'gradient') {
-    bgStyle.background = `linear-gradient(135deg, ${primaryColor}, #1e40af)`;
+    const from = settings.gradientFrom || primaryColor;
+    const to = settings.gradientTo || '#1e40af';
+    const direction = settings.gradientDirection || '135deg';
+    bgStyle.background = `linear-gradient(${direction}, ${from}, ${to})`;
   } else {
     bgStyle.backgroundColor = primaryColor;
   }

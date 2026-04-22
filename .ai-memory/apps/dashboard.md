@@ -1,16 +1,18 @@
 # Apps/dashboard Module
 
-## Files (4)
+## Files (5)
 - apps/dashboard/vite.config.ts
 - apps/dashboard/src/App.tsx
 - apps/dashboard/src/main.tsx
 - apps/dashboard/src/lib/api.ts
+- apps/dashboard/src/lib/tiktok.ts
 
 ## Exports
 
 ### Functions
 - `App(): React.JSX.Element`
 - `resolveFileUrl(url: string | null | undefined): string`
+- `tiktokTrack(event: string, props: TtqProps | undefined): void`
 
 ## Internal dependencies
 - → apps/dashboard/layouts
