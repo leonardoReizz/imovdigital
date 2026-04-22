@@ -31,6 +31,10 @@ class SectionDto {
 
 export class UpdateSiteConfigDto {
   @IsOptional()
+  @IsIn(['classic', 'editorial'])
+  template?: 'classic' | 'editorial';
+
+  @IsOptional()
   @IsString()
   primaryColor?: string;
 

@@ -98,6 +98,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       ]);
       const config = {
         ...data,
+        template: data.template || 'classic',
         propertyDetail: data.propertyDetail || DEFAULT_PROPERTY_DETAIL_CONFIG,
         searchPage: data.searchPage || DEFAULT_SEARCH_PAGE_CONFIG,
       } as SiteConfig;

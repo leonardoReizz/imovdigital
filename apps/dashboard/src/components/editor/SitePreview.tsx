@@ -4,7 +4,7 @@ import type { Section, SectionType } from '@imovdigital/types';
 import { SECTION_LABELS } from '@imovdigital/types';
 import { Pencil, Eye, EyeOff, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
 
-// Preview components
+// Classic preview components
 import { HeroPreview } from './preview/HeroPreview';
 import { SearchBarPreview } from './preview/SearchBarPreview';
 import { FeaturedListingsPreview } from './preview/FeaturedListingsPreview';
@@ -15,21 +15,46 @@ import { CTABannerPreview } from './preview/CTABannerPreview';
 import { ContactPreview } from './preview/ContactPreview';
 import { FooterPreview } from './preview/FooterPreview';
 
+// Editorial preview components
+import { HeroPreview as EditorialHeroPreview } from './preview/editorial/HeroPreview';
+import { FeaturedListingsPreview as EditorialFeaturedPreview } from './preview/editorial/FeaturedListingsPreview';
+import { AboutPreview as EditorialAboutPreview } from './preview/editorial/AboutPreview';
+import { AgentsPreview as EditorialAgentsPreview } from './preview/editorial/AgentsPreview';
+import { TestimonialsPreview as EditorialTestimonialsPreview } from './preview/editorial/TestimonialsPreview';
+import { CTABannerPreview as EditorialCTAPreview } from './preview/editorial/CTABannerPreview';
+import { FooterPreview as EditorialFooterPreview } from './preview/editorial/FooterPreview';
+
 // Page previews
 import { PreviewHeader } from './preview/PreviewHeader';
+import { PreviewHeader as EditorialPreviewHeader } from './preview/editorial/PreviewHeader';
 import { PropertyDetailPreview } from './preview/PropertyDetailPreview';
+import { PropertyDetailPreview as EditorialPropertyDetailPreview } from './preview/editorial/PropertyDetailPreview';
 import { SearchResultsPreview } from './preview/SearchResultsPreview';
+import { SearchResultsPreview as EditorialSearchResultsPreview } from './preview/editorial/SearchResultsPreview';
 
-const PREVIEW_COMPONENTS: Record<SectionType, React.ComponentType<{ settings: any }>> = {
-  hero: HeroPreview,
-  search_bar: SearchBarPreview,
-  featured_listings: FeaturedListingsPreview,
-  about: AboutPreview,
-  agents: AgentsPreview,
-  testimonials: TestimonialsPreview,
-  cta_banner: CTABannerPreview,
-  contact: ContactPreview,
-  footer: FooterPreview,
+const PREVIEW_COMPONENTS_BY_TEMPLATE: Record<string, Record<SectionType, React.ComponentType<{ settings: any }>>> = {
+  classic: {
+    hero: HeroPreview,
+    search_bar: SearchBarPreview,
+    featured_listings: FeaturedListingsPreview,
+    about: AboutPreview,
+    agents: AgentsPreview,
+    testimonials: TestimonialsPreview,
+    cta_banner: CTABannerPreview,
+    contact: ContactPreview,
+    footer: FooterPreview,
+  },
+  editorial: {
+    hero: EditorialHeroPreview,
+    search_bar: SearchBarPreview,
+    featured_listings: EditorialFeaturedPreview,
+    about: EditorialAboutPreview,
+    agents: EditorialAgentsPreview,
+    testimonials: EditorialTestimonialsPreview,
+    cta_banner: EditorialCTAPreview,
+    contact: ContactPreview,
+    footer: EditorialFooterPreview,
+  },
 };
 
 const BREAKPOINT_WIDTHS = {
@@ -49,7 +74,8 @@ function SectionWrapper({ section, index, total }: { section: Section; index: nu
   const config = useEditorStore((s) => s.config);
 
   const isSelected = selectedSectionId === section.id;
-  const Preview = PREVIEW_COMPONENTS[section.type];
+  const template = (config?.template || 'classic') as string;
+  const Preview = (PREVIEW_COMPONENTS_BY_TEMPLATE[template] || PREVIEW_COMPONENTS_BY_TEMPLATE.classic)[section.type];
 
   const handleMove = (direction: 'up' | 'down') => {
     if (!config) return;
@@ -160,7 +186,7 @@ function HomePagePreview() {
 
 // ─── Property Detail Page ────────────────────────────────────
 
-function PropertyPagePreview({ propertyId }: { propertyId: string }) {
+function PropertyPagePreview({ propertyId, PropertyDetail }: { propertyId: string; PropertyDetail: React.ComponentType<{ property: any }> }) {
   const properties = useEditorStore((s) => s.properties);
   const navigatePreview = useEditorStore((s) => s.navigatePreview);
 
@@ -180,7 +206,7 @@ function PropertyPagePreview({ propertyId }: { propertyId: string }) {
     );
   }
 
-  return <PropertyDetailPreview property={property} />;
+  return <PropertyDetail property={property} />;
 }
 
 // ─── Footer for internal pages ───────────────────────────────
@@ -192,7 +218,9 @@ function PageFooter() {
   const footerSection = config.sections.find((s) => s.type === 'footer' && s.visible);
   if (!footerSection) return null;
 
-  return <FooterPreview settings={footerSection.settings as any} />;
+  const template = (config.template || 'classic') as string;
+  const FooterComp = (PREVIEW_COMPONENTS_BY_TEMPLATE[template] || PREVIEW_COMPONENTS_BY_TEMPLATE.classic).footer;
+  return <FooterComp settings={footerSection.settings as any} />;
 }
 
 // ─── Main Preview ────────────────────────────────────────────
@@ -234,6 +262,10 @@ export function SitePreview() {
 
   const previewId = 'site-preview-container';
   const isInternalPage = previewPage.type !== 'home';
+  const template = (config.template || 'classic') as string;
+  const Header = template === 'editorial' ? EditorialPreviewHeader : PreviewHeader;
+  const SearchResults = template === 'editorial' ? EditorialSearchResultsPreview : SearchResultsPreview;
+  const PropertyDetail = template === 'editorial' ? EditorialPropertyDetailPreview : PropertyDetailPreview;
 
   return (
     <div className="flex-1 bg-gray-100 overflow-y-auto min-h-0">
@@ -251,13 +283,13 @@ export function SitePreview() {
           }}
         >
           {/* Header for internal pages */}
-          {isInternalPage && <PreviewHeader />}
+          {isInternalPage && <Header />}
 
           {/* Page content */}
           {previewPage.type === 'home' && <HomePagePreview />}
-          {previewPage.type === 'search' && <SearchResultsPreview />}
+          {previewPage.type === 'search' && <SearchResults />}
           {previewPage.type === 'property' && (
-            <PropertyPagePreview propertyId={previewPage.propertyId} />
+            <PropertyPagePreview propertyId={previewPage.propertyId} PropertyDetail={PropertyDetail} />
           )}
 
           {/* Footer on internal pages */}

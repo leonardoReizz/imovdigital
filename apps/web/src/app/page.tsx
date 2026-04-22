@@ -32,6 +32,7 @@ export default async function HomePage() {
       cities={filters.cities}
       tenantSlug={slug}
       contactData={tenant.contact}
+      template={siteConfig?.template}
     />
   );
 }

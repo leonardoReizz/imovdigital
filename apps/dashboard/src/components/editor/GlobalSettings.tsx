@@ -1,12 +1,15 @@
 import { useEditorStore } from '../../store/editorStore';
 import { ColorPicker, FontSelector, EditorImageUploader, RangeSlider } from './controls';
 import { RotateCcw } from 'lucide-react';
+import { SITE_TEMPLATES, type SiteTemplate } from '@imovdigital/types';
 
 export function GlobalSettings() {
   const config = useEditorStore((s) => s.config);
   const updateGlobal = useEditorStore((s) => s.updateGlobal);
 
   if (!config) return null;
+
+  const currentTemplate = (config.template || 'classic') as SiteTemplate;
 
   const handleReset = () => {
     updateGlobal({
@@ -19,6 +22,30 @@ export function GlobalSettings() {
 
   return (
     <div className="space-y-5">
+      <div className="space-y-2">
+        <label className="text-xs font-medium text-gray-600">Template do site</label>
+        <div className="grid grid-cols-2 gap-2">
+          {SITE_TEMPLATES.map((tpl) => {
+            const active = currentTemplate === tpl.value;
+            return (
+              <button
+                key={tpl.value}
+                type="button"
+                onClick={() => updateGlobal({ template: tpl.value } as any)}
+                className={`text-left rounded-lg border p-2.5 transition-colors ${
+                  active
+                    ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
+                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                }`}
+              >
+                <p className={`text-xs font-semibold ${active ? 'text-primary' : 'text-gray-700'}`}>{tpl.label}</p>
+                <p className="text-[10px] text-gray-400 mt-0.5 leading-tight">{tpl.description}</p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <div>
         <EditorImageUploader
           label="Logo"

@@ -23,6 +23,7 @@ export class SiteConfigService {
     return {
       id: randomUUID(),
       tenantId,
+      template: 'classic' as const,
       primaryColor: '#2563eb',
       secondaryColor: '#1e40af',
       fontFamily: 'Inter',

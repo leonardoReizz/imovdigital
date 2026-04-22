@@ -232,11 +232,23 @@ export interface Section<T extends SectionType = SectionType> {
   settings: SectionSettingsMap[T];
 }
 
+// ─── Templates ───────────────────────────────────────────────
+
+export type SiteTemplate = 'classic' | 'editorial';
+
+export const SITE_TEMPLATES: { value: SiteTemplate; label: string; description: string }[] = [
+  { value: 'classic', label: 'Clássico', description: 'Layout tradicional, claro e direto.' },
+  { value: 'editorial', label: 'Editorial', description: 'Tipografia grande, layouts assimétricos e cards minimalistas.' },
+];
+
 // ─── SiteConfig ──────────────────────────────────────────────
 
 export interface SiteConfig {
   id: string;
   tenantId: string;
+
+  // Template
+  template: SiteTemplate;
 
   // Global
   primaryColor: string;
