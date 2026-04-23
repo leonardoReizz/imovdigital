@@ -3,6 +3,7 @@ import { useEditorStore } from '../../store/editorStore';
 import { useAutoSave } from '../../hooks/useAutoSave';
 import { api } from '../../lib/api';
 import logoImg from '../../assets/logo.png';
+import { MOCK_PROPERTIES } from '../../lib/mockProperties';
 import { SectionsList } from '../../components/editor/SectionsList';
 import { SectionSettings } from '../../components/editor/SectionSettings';
 import { GlobalSettings } from '../../components/editor/GlobalSettings';
@@ -161,11 +162,9 @@ export function SiteEditor() {
         </button>
         <button
           onClick={() => {
-            const firstProp = properties[0];
-            if (firstProp) {
-              navigatePreview({ type: 'property', propertyId: firstProp.id });
-              setActiveTab('property');
-            }
+            const firstProp = properties[0] || MOCK_PROPERTIES[0];
+            navigatePreview({ type: 'property', propertyId: firstProp.id });
+            setActiveTab('property');
           }}
           className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
             previewPage.type === 'property' ? 'bg-primary/10 text-primary' : 'text-gray-500 hover:bg-gray-50'
@@ -389,7 +388,7 @@ export function SiteEditor() {
             <div className="flex items-center gap-2 flex-1 bg-gray-50 rounded-lg px-3 py-1.5 border border-gray-200 min-w-0">
               <Globe className="w-3.5 h-3.5 text-gray-400 shrink-0" />
               <span className="text-xs text-gray-500 font-mono truncate">
-                {tenantDomain || 'carregando...'}{getPreviewLabel(previewPage, properties)}
+                {tenantDomain || 'carregando...'}{getPreviewLabel(previewPage, properties.length > 0 ? properties : MOCK_PROPERTIES)}
               </span>
             </div>
           </div>

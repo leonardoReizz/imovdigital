@@ -8,8 +8,9 @@ import { MapCircle } from '../MapCircle';
 import { Img } from '../../../Img';
 import {
   MapPin, BedDouble, Bath, Car, Maximize,
-  MessageCircle, Phone as PhoneIcon, Check, ChevronLeft, ChevronRight,
+  MessageCircle, Phone as PhoneIcon, Check, ChevronLeft, ChevronRight, Expand,
 } from 'lucide-react';
+import { MOCK_PROPERTIES } from '../../../../lib/mockProperties';
 
 function SectionHeading({ kicker, children }: { kicker: string; children: React.ReactNode }) {
   return (
@@ -20,35 +21,131 @@ function SectionHeading({ kicker, children }: { kicker: string; children: React.
   );
 }
 
-function GalleryEditorial({ images, onImageClick, isMobile }: { images: Property['images']; onImageClick: (i: number) => void; isMobile: boolean }) {
-  const [current, setCurrent] = useState(0);
-  if (isMobile) {
-    return (
-      <div className="relative" style={{ aspectRatio: '4/3' }}>
-        <Img src={images[current].url} alt={images[current].alt} className="w-full h-full object-cover cursor-pointer" onClick={() => onImageClick(current)} />
-        {images.length > 1 && (
-          <>
-            <button onClick={() => setCurrent((c) => (c === 0 ? images.length - 1 : c - 1))} className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/95 flex items-center justify-center"><ChevronLeft className="w-4 h-4" /></button>
-            <button onClick={() => setCurrent((c) => (c === images.length - 1 ? 0 : c + 1))} className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/95 flex items-center justify-center"><ChevronRight className="w-4 h-4" /></button>
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs px-2 py-0.5 font-mono">{current + 1} / {images.length}</div>
-          </>
-        )}
-      </div>
-    );
-  }
+function GalleryGridEditorial({ images, onImageClick }: { images: Property['images']; onImageClick: (i: number) => void }) {
   return (
-    <div className="grid gap-2" style={{ gridTemplateColumns: '2fr 1fr', height: 480 }}>
+    <div className="grid gap-2" style={{ gridTemplateColumns: '2fr 1fr 1fr', height: 480 }}>
       <div className="overflow-hidden cursor-pointer relative group" onClick={() => onImageClick(0)}>
         <Img src={images[0].url} alt={images[0].alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
       </div>
-      <div className="grid gap-2">
+      <div className="grid grid-rows-2 gap-2">
         {[1, 2].map((i) => (
           <div key={i} className="overflow-hidden cursor-pointer bg-stone-100" onClick={() => onImageClick(Math.min(i, images.length - 1))}>
-            {images[i] ? (
-              <Img src={images[i].url} alt={images[i].alt} className="w-full h-full object-cover" />
-            ) : null}
+            {images[i] ? <Img src={images[i].url} alt={images[i].alt} className="w-full h-full object-cover" /> : null}
           </div>
         ))}
+      </div>
+      <div className="grid grid-rows-2 gap-2">
+        {[3, 4].map((i) => (
+          <div key={i} className="overflow-hidden cursor-pointer bg-stone-100 relative" onClick={() => onImageClick(Math.min(i, images.length - 1))}>
+            {images[i] ? <Img src={images[i].url} alt={images[i].alt} className="w-full h-full object-cover" /> : null}
+            {i === 4 && images.length > 5 && (
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                <span className="text-white" style={{ fontSize: 18, fontFamily: 'Georgia, serif' }}>+{images.length - 5} fotos</span>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function GalleryCarouselEditorial({ images, onImageClick }: { images: Property['images']; onImageClick: (i: number) => void }) {
+  const [current, setCurrent] = useState(0);
+  return (
+    <div className="relative bg-stone-100 overflow-hidden" style={{ height: 540 }}>
+      <Img src={images[current].url} alt={images[current].alt} className="w-full h-full object-cover cursor-pointer" onClick={() => onImageClick(current)} />
+      {images.length > 1 && (
+        <>
+          <button onClick={() => setCurrent((c) => (c === 0 ? images.length - 1 : c - 1))} className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 bg-white flex items-center justify-center hover:bg-stone-50 transition-colors">
+            <ChevronLeft className="w-5 h-5 text-gray-900" />
+          </button>
+          <button onClick={() => setCurrent((c) => (c === images.length - 1 ? 0 : c + 1))} className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 bg-white flex items-center justify-center hover:bg-stone-50 transition-colors">
+            <ChevronRight className="w-5 h-5 text-gray-900" />
+          </button>
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white px-4 py-1.5 text-xs font-mono text-gray-700">
+            {String(current + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function GallerySingleEditorial({ images, onImageClick }: { images: Property['images']; onImageClick: (i: number) => void }) {
+  return (
+    <div className="relative cursor-pointer group overflow-hidden" style={{ height: 540 }} onClick={() => onImageClick(0)}>
+      <Img src={images[0].url} alt={images[0].alt} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700" />
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <Expand className="w-8 h-8 text-white opacity-0 group-hover:opacity-80 transition-opacity" />
+      </div>
+      {images.length > 1 && (
+        <div className="absolute bottom-4 right-4 bg-white px-4 py-1.5 text-xs uppercase font-semibold text-gray-700" style={{ letterSpacing: '0.15em' }}>
+          +{images.length - 1} fotos
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GalleryMobileEditorial({ images, onImageClick }: { images: Property['images']; onImageClick: (i: number) => void }) {
+  const [current, setCurrent] = useState(0);
+  return (
+    <div className="relative" style={{ aspectRatio: '4/3' }}>
+      <Img src={images[current].url} alt={images[current].alt} className="w-full h-full object-cover cursor-pointer" onClick={() => onImageClick(current)} />
+      {images.length > 1 && (
+        <>
+          <button onClick={() => setCurrent((c) => (c === 0 ? images.length - 1 : c - 1))} className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/95 flex items-center justify-center"><ChevronLeft className="w-4 h-4" /></button>
+          <button onClick={() => setCurrent((c) => (c === images.length - 1 ? 0 : c + 1))} className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/95 flex items-center justify-center"><ChevronRight className="w-4 h-4" /></button>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs px-2 py-0.5 font-mono">{current + 1} / {images.length}</div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function FloatingChatBubbleEditorial({ pd, primaryColor }: { pd: PropertyDetailConfig; primaryColor: string }) {
+  const [open, setOpen] = useState(false);
+  const tooltip = pd.chatTooltip || 'Precisa de ajuda?';
+
+  return (
+    <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-3">
+      {open && (
+        <div className="w-80 bg-white shadow-2xl border border-stone-200 overflow-hidden">
+          <div className="px-5 py-4 flex items-center justify-between border-b border-stone-200">
+            <div>
+              <p className="uppercase text-gray-400" style={{ fontSize: 10, letterSpacing: '0.2em' }}>— Atendimento</p>
+              <p className="text-gray-900 mt-0.5" style={{ fontSize: 18, fontFamily: 'Georgia, serif' }}>Fale conosco</p>
+            </div>
+            <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-700 text-2xl leading-none">&times;</button>
+          </div>
+          {pd.showContactForm && (
+            <div className="p-5 space-y-2">
+              <div className="px-3 py-2.5 bg-white border-b border-stone-300 text-sm text-gray-400">Seu nome *</div>
+              <div className="px-3 py-2.5 bg-white border-b border-stone-300 text-sm text-gray-400">Seu e-mail</div>
+              <div className="px-3 py-2.5 bg-white border-b border-stone-300 text-sm text-gray-400 h-14">Mensagem</div>
+              <button className="w-full py-3 mt-2 uppercase font-semibold text-white" style={{ backgroundColor: primaryColor, fontSize: 11, letterSpacing: '0.2em' }}>
+                Enviar
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="relative">
+        {!open && (
+          <div className="absolute bottom-full right-0 mb-2 bg-gray-900 text-white text-xs px-3 py-1.5 whitespace-nowrap shadow-lg">
+            {tooltip}
+            <div className="absolute top-full right-4 w-2 h-2 bg-gray-900 rotate-45 -mt-1" />
+          </div>
+        )}
+        <button
+          onClick={() => setOpen(!open)}
+          className="w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-white hover:scale-105 transition-transform"
+          style={{ backgroundColor: primaryColor }}
+        >
+          {open ? <span className="text-2xl leading-none">&times;</span> : <MessageCircle className="w-6 h-6" />}
+        </button>
       </div>
     </div>
   );
@@ -75,7 +172,8 @@ function ContactCardEditorial({ pd, primaryColor }: { pd: PropertyDetailConfig; 
 }
 
 function SimilarPropertiesEditorial({ currentProperty, isMobile }: { currentProperty: Property; isMobile: boolean }) {
-  const properties = useEditorStore((s) => s.properties);
+  const realProperties = useEditorStore((s) => s.properties);
+  const properties = realProperties.length > 0 ? realProperties : MOCK_PROPERTIES;
   const navigatePreview = useEditorStore((s) => s.navigatePreview);
 
   const scored = properties
@@ -154,7 +252,15 @@ export function PropertyDetailPreview({ property }: { property: Property }) {
       {/* Gallery */}
       <div className="max-w-7xl mx-auto" style={{ padding: isMobile ? '0 16px' : '0 32px' }}>
         {hasImages ? (
-          <GalleryEditorial images={property.images} onImageClick={setLightboxIndex} isMobile={isMobile} />
+          isMobile ? (
+            <GalleryMobileEditorial images={property.images} onImageClick={setLightboxIndex} />
+          ) : pd.galleryStyle === 'carousel' ? (
+            <GalleryCarouselEditorial images={property.images} onImageClick={setLightboxIndex} />
+          ) : pd.galleryStyle === 'single' ? (
+            <GallerySingleEditorial images={property.images} onImageClick={setLightboxIndex} />
+          ) : (
+            <GalleryGridEditorial images={property.images} onImageClick={setLightboxIndex} />
+          )
         ) : (
           <div style={{ height: isCompact ? 250 : 480 }} className="bg-stone-100 flex items-center justify-center">
             <p className="text-stone-300 text-sm">Sem imagens</p>
@@ -285,6 +391,11 @@ export function PropertyDetailPreview({ property }: { property: Property }) {
           </div>
         </div>
       </div>
+
+      {/* Floating chat bubble */}
+      {pd.contactPosition === 'floating' && (
+        <FloatingChatBubbleEditorial pd={pd} primaryColor={primaryColor} />
+      )}
     </div>
   );
 }

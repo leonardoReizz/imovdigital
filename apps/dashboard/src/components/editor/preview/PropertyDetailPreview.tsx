@@ -24,6 +24,7 @@ import {
   Check,
   Expand,
 } from 'lucide-react';
+import { MOCK_PROPERTIES } from '../../../lib/mockProperties';
 
 // ─── Gallery Components ──────────────────────────────────────
 
@@ -225,7 +226,8 @@ function QuickActionButtons({ pd, isMobile }: { pd: PropertyDetailConfig; isMobi
 // ─── Similar Properties ──────────────────────────────────────
 
 function SimilarProperties({ currentProperty, isMobile }: { currentProperty: Property; isMobile: boolean }) {
-  const properties = useEditorStore((s) => s.properties);
+  const realProperties = useEditorStore((s) => s.properties);
+  const properties = realProperties.length > 0 ? realProperties : MOCK_PROPERTIES;
   const navigatePreview = useEditorStore((s) => s.navigatePreview);
   const primaryColor = useEditorStore((s) => s.config?.primaryColor || '#2563eb');
 

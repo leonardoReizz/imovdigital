@@ -3,6 +3,7 @@ import { useEditorStore } from '../../../store/editorStore';
 import { PropertyPrice } from './PropertyPrice';
 import { Home, MapPin, BedDouble, Bath, Car } from 'lucide-react';
 import { Img } from '../../Img';
+import { MOCK_PROPERTIES } from '../../../lib/mockProperties';
 
 function RealPropertyCard({ property, showPrice, showBadge, primaryColor, onClick }: {
   property: Property; showPrice: boolean; showBadge: boolean; primaryColor: string; onClick: () => void;
@@ -96,7 +97,8 @@ function PlaceholderCard({ showPrice }: { showPrice: boolean }) {
 }
 
 export function FeaturedListingsPreview({ settings }: { settings: FeaturedListingsSettings }) {
-  const properties = useEditorStore((s) => s.properties);
+  const realProperties = useEditorStore((s) => s.properties);
+  const properties = realProperties.length > 0 ? realProperties : MOCK_PROPERTIES;
   const navigatePreview = useEditorStore((s) => s.navigatePreview);
   const primaryColor = useEditorStore((s) => s.config?.primaryColor || '#2563eb');
   const breakpoint = useEditorStore((s) => s.previewBreakpoint);

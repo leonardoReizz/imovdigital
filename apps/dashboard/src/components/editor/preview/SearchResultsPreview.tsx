@@ -1,6 +1,7 @@
 import type { Property, SearchPageConfig } from '@imovdigital/types';
 import { DEFAULT_SEARCH_PAGE_CONFIG } from '@imovdigital/types';
 import { useEditorStore } from '../../../store/editorStore';
+import { MOCK_PROPERTIES } from '../../../lib/mockProperties';
 import { PropertyPrice } from './PropertyPrice';
 import {
   MapPin,
@@ -157,7 +158,8 @@ function FilterSidebar({ sp, primaryColor }: { sp: SearchPageConfig; primaryColo
 // ─── Main ────────────────────────────────────────────────────
 
 export function SearchResultsPreview() {
-  const properties = useEditorStore((s) => s.properties);
+  const realProperties = useEditorStore((s) => s.properties);
+  const properties = realProperties.length > 0 ? realProperties : MOCK_PROPERTIES;
   const navigatePreview = useEditorStore((s) => s.navigatePreview);
   const primaryColor = useEditorStore((s) => s.config?.primaryColor || '#2563eb');
   const breakpoint = useEditorStore((s) => s.previewBreakpoint);

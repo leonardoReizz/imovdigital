@@ -3,6 +3,7 @@ import { useEditorStore } from '../../store/editorStore';
 import type { Section, SectionType } from '@imovdigital/types';
 import { SECTION_LABELS } from '@imovdigital/types';
 import { Pencil, Eye, EyeOff, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
+import { MOCK_PROPERTIES } from '../../lib/mockProperties';
 
 // Classic preview components
 import { HeroPreview } from './preview/HeroPreview';
@@ -187,7 +188,8 @@ function HomePagePreview() {
 // ─── Property Detail Page ────────────────────────────────────
 
 function PropertyPagePreview({ propertyId, PropertyDetail }: { propertyId: string; PropertyDetail: React.ComponentType<{ property: any }> }) {
-  const properties = useEditorStore((s) => s.properties);
+  const realProperties = useEditorStore((s) => s.properties);
+  const properties = realProperties.length > 0 ? realProperties : MOCK_PROPERTIES;
   const navigatePreview = useEditorStore((s) => s.navigatePreview);
 
   const property = properties.find((p) => p.id === propertyId);
